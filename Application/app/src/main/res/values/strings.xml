@@ -3,4 +3,5 @@
     <string name="hint_email">E-mail Address</string>
     <string name="hint_password">Password</string>
     <string name="login_button_text">Log In</string>
+    <string name="register_button_text">Create account</string>
 </resources>
