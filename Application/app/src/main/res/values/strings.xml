@@ -9,4 +9,8 @@
     <string name="text_register_navigation_link">Sign up now!</string>
     <string name="hint_repeat_password">Repeat Password</string>
     <string name="hint_register_button">Create account</string>
+    <string name="placeholder_log_facebook">Login with Facebook</string>
+    <string name="placeholder_log_google">Login with Google</string>
+    <string name="placeholder_log_twitter">Login with Twitter</string>
+    <string name="hint_username">Display Name</string>
 </resources>

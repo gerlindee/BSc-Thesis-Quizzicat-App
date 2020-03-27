@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".LoginActivity">
 
     <ImageView
         android:id="@+id/app_header"
@@ -13,7 +13,7 @@
         android:contentDescription="@string/placeholder_application_header"
         android:src="@drawable/yellow_header"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.426"
+        app:layout_constraintHorizontal_bias="0.604"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -126,7 +126,8 @@
         app:layout_constraintStart_toEndOf="@+id/register_google_button"
         app:layout_constraintTop_toBottomOf="@+id/layout_redirect_register_text"
         app:layout_constraintVertical_bias="0.272"
-        app:srcCompat="@drawable/facebook" />
+        app:srcCompat="@drawable/facebook"
+        android:contentDescription="@string/placeholder_log_facebook" />
 
     <ImageView
         android:id="@+id/register_google_button"
@@ -138,7 +139,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_redirect_register_text"
         app:layout_constraintVertical_bias="0.272"
-        app:srcCompat="@drawable/google" />
+        app:srcCompat="@drawable/google"
+        android:contentDescription="@string/placeholder_log_google" />
 
     <ImageView
         android:id="@+id/register_twitter_button"
@@ -150,7 +152,8 @@
         app:layout_constraintStart_toEndOf="@+id/register_facebook_button"
         app:layout_constraintTop_toBottomOf="@+id/layout_redirect_register_text"
         app:layout_constraintVertical_bias="0.272"
-        app:srcCompat="@drawable/twitter" />
+        app:srcCompat="@drawable/twitter"
+        android:contentDescription="@string/placeholder_log_twitter" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
