@@ -4,4 +4,9 @@
     <string name="hint_password">Password</string>
     <string name="login_button_text">Log In</string>
     <string name="register_button_text">Create account</string>
+    <string name="placeholder_application_header">Application Header</string>
+    <string name="text_register_account_question">Don\'t have an account?</string>
+    <string name="text_register_navigation_link">Sign up now!</string>
+    <string name="hint_repeat_password">Repeat Password</string>
+    <string name="hint_register_button">Create account</string>
 </resources>
