@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+// Google Gradle Plugin
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 29
@@ -28,6 +30,9 @@ android {
 dependencies {
     // material design dependency
     implementation 'com.google.android.material:material:1.2.0-alpha02'
+
+    // firebase SDK for google analytics
+    implementation 'com.google.firebase:firebase-analytics:17.2.2'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

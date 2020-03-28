@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "343397760478",
+    "firebase_url": "https://quizzicat-af605.firebaseio.com",
+    "project_id": "quizzicat-af605",
+    "storage_bucket": "quizzicat-af605.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:343397760478:android:6f0235ac9fd84782c4f14f",
+        "android_client_info": {
+          "package_name": "com.example.quizzicat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "343397760478-oc4tphr8951r1lktae3k0oiburqdkd7e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtjpwxk9IPoNR-usFGxZaQ0Z2F_Rcfueg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "343397760478-oc4tphr8951r1lktae3k0oiburqdkd7e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
