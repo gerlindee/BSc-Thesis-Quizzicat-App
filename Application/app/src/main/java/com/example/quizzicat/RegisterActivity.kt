@@ -37,33 +37,38 @@ class RegisterActivity : AppCompatActivity() {
             val password = register_password.text.toString()
             val repeatedPassword = register_r_password.text.toString()
             val email = register_email.text.toString()
+            val displayname = register_username.text.toString()
 
-            if (password != repeatedPassword) {
-                DesignUtils.showSnackbar(window.decorView.rootView, "Passwords must match!", this)
+            if (password.isEmpty() || repeatedPassword.isEmpty() || email.isEmpty() || displayname.isEmpty()) {
+                DesignUtils.showSnackbar(window.decorView.rootView, "Please fill in all the fields!", this)
             } else {
-                register_progress_bar.visibility = View.VISIBLE
+                if (password != repeatedPassword) {
+                    DesignUtils.showSnackbar(window.decorView.rootView, "Passwords must match!", this)
+                } else {
+                    register_progress_bar.visibility = View.VISIBLE
 
-                mFirebaseAuth!!.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this) {
-                        if (it.isSuccessful) {
-                            mFirebaseAuth!!.currentUser?.sendEmailVerification()
-                                ?.addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-                                        register_progress_bar.visibility = View.GONE
-                                        AlertDialog.Builder(this)
-                                            .setTitle("Success")
-                                            .setMessage("Account created successfully! To complete the registration process, please verify your e-mail address. Otherwise, you will not be able to access your Quizzicat account! If you do not receive a verification e-mail, please contact the support team.")
-                                            .setPositiveButton("Confirm", null)
-                                            .show()
-                                    } else {
-                                        DesignUtils.showSnackbar(window.decorView.rootView, it.exception?.message.toString(), this)
+                    mFirebaseAuth!!.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(this) {
+                            if (it.isSuccessful) {
+                                mFirebaseAuth!!.currentUser?.sendEmailVerification()
+                                    ?.addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            register_progress_bar.visibility = View.GONE
+                                            AlertDialog.Builder(this)
+                                                .setTitle("Success")
+                                                .setMessage("Account created successfully! To complete the registration process, please verify your e-mail address. Otherwise, you will not be able to access your Quizzicat account! If you do not receive a verification e-mail, please contact the support team.")
+                                                .setPositiveButton("Confirm", null)
+                                                .show()
+                                        } else {
+                                            DesignUtils.showSnackbar(window.decorView.rootView, it.exception?.message.toString(), this)
+                                        }
                                     }
-                                }
-                        } else {
-                            register_progress_bar.visibility = View.GONE
-                            DesignUtils.showSnackbar(window.decorView.rootView, it.exception?.message.toString(), this)
+                            } else {
+                                register_progress_bar.visibility = View.GONE
+                                DesignUtils.showSnackbar(window.decorView.rootView, it.exception?.message.toString(), this)
+                            }
                         }
-                    }
+                }
             }
         }
     }
