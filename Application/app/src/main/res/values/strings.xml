@@ -13,4 +13,5 @@
     <string name="placeholder_log_google">Login with Google</string>
     <string name="placeholder_log_twitter">Login with Twitter</string>
     <string name="hint_username">Display Name</string>
+    <string name="placeholder_terms_of_service">I have read and agree with the Terms of Service.</string>
 </resources>
