@@ -6,6 +6,9 @@ import android.webkit.WebView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
+import com.example.quizzicat.Exceptions.AbstractException
+import com.example.quizzicat.Exceptions.EmptyFieldsException
+import com.example.quizzicat.Exceptions.UnmatchedPasswordsException
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_register.*
 
@@ -13,6 +16,11 @@ class RegisterActivity : AppCompatActivity() {
 
     private var mWebView: WebView? = null
     private var mFirebaseAuth: FirebaseAuth? = null
+
+    private var password: String? = null
+    private var repeatedPassword: String? = null
+    private var email: String? = null
+    private var displayName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,47 +37,66 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         text_terms_service.setOnClickListener {
-            setContentView(mWebView)
-            mWebView?.loadUrl("https://www.websitepolicies.com/policies/view/FVj4pExJ")
+            loadTermsAndConditions()
         }
 
         register_button.setOnClickListener {
-            val password = register_password.text.toString()
-            val repeatedPassword = register_r_password.text.toString()
-            val email = register_email.text.toString()
-            val displayname = register_username.text.toString()
+            try {
+                bindData()
+                checkFieldsEmpty()
+                checkPasswordsSame()
+                registerUserWithEmailPassword()
+            } catch (ex: AbstractException) {
+                ex.displayMessageWithSnackbar(window.decorView.rootView, this)
+            }
+        }
+    }
 
-            if (password.isEmpty() || repeatedPassword.isEmpty() || email.isEmpty() || displayname.isEmpty()) {
-                DesignUtils.showSnackbar(window.decorView.rootView, "Please fill in all the fields!", this)
-            } else {
-                if (password != repeatedPassword) {
-                    DesignUtils.showSnackbar(window.decorView.rootView, "Passwords must match!", this)
-                } else {
-                    register_progress_bar.visibility = View.VISIBLE
+    private fun bindData() {
+        password = register_password.text.toString()
+        repeatedPassword = register_r_password.text.toString()
+        email = register_email.text.toString()
+        displayName = register_username.text.toString()
+    }
 
-                    mFirebaseAuth!!.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(this) {
-                            if (it.isSuccessful) {
-                                mFirebaseAuth!!.currentUser?.sendEmailVerification()
-                                    ?.addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
-                                            register_progress_bar.visibility = View.GONE
-                                            AlertDialog.Builder(this)
-                                                .setTitle("Success")
-                                                .setMessage("Account created successfully! To complete the registration process, please verify your e-mail address. Otherwise, you will not be able to access your Quizzicat account! If you do not receive a verification e-mail, please contact the support team.")
-                                                .setPositiveButton("Confirm", null)
-                                                .show()
-                                        } else {
-                                            DesignUtils.showSnackbar(window.decorView.rootView, it.exception?.message.toString(), this)
-                                        }
-                                    }
-                            } else {
+    private fun loadTermsAndConditions() {
+        setContentView(mWebView)
+        mWebView?.loadUrl("https://www.websitepolicies.com/policies/view/FVj4pExJ")
+    }
+
+    private fun checkFieldsEmpty() {
+        if (password!!.isEmpty() || repeatedPassword!!.isEmpty() || email!!.isEmpty() || displayName!!.isEmpty())
+            throw EmptyFieldsException()
+    }
+
+    private fun checkPasswordsSame() {
+        if (password != repeatedPassword)
+            throw UnmatchedPasswordsException()
+    }
+
+    private fun registerUserWithEmailPassword() {
+        register_progress_bar.visibility = View.VISIBLE
+
+        mFirebaseAuth!!.createUserWithEmailAndPassword(email!!, password!!)
+            .addOnCompleteListener(this) {
+                if (it.isSuccessful) {
+                    mFirebaseAuth!!.currentUser?.sendEmailVerification()
+                        ?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
                                 register_progress_bar.visibility = View.GONE
+                                AlertDialog.Builder(this)
+                                    .setTitle("Success")
+                                    .setMessage("Account created successfully! To complete the registration process, please verify your e-mail address. Otherwise, you will not be able to access your Quizzicat account! If you do not receive a verification e-mail, please contact the support team.")
+                                    .setPositiveButton("Confirm", null)
+                                    .show()
+                            } else {
                                 DesignUtils.showSnackbar(window.decorView.rootView, it.exception?.message.toString(), this)
                             }
                         }
+                } else {
+                    register_progress_bar.visibility = View.GONE
+                    DesignUtils.showSnackbar(window.decorView.rootView, it.exception?.message.toString(), this)
                 }
             }
-        }
     }
 }
