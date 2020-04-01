@@ -58,34 +58,22 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-//        register_select_photo_button.setOnClickListener {
-//            val intent = Intent(Intent.ACTION_PICK)
-//            intent.type = "image/*"
-//            startActivityForResult(intent, 0)
-//        }
+        register_avatar.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            startActivityForResult(intent, 0)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == 0 && requestCode == Activity.RESULT_OK && data != null) {
-            val selectedPhotoUri = data.data
-            try {
-                selectedPhotoUri?.let {
-                    if(Build.VERSION.SDK_INT < 28) {
-                        val selectedPhotoBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedPhotoUri)
-                        val bitmapDrawable = BitmapDrawable()
-//                        register_select_photo_button.icon = bitmapDrawable
-                    } else {
-                        val source = ImageDecoder.createSource(this.contentResolver, selectedPhotoUri)
-                        val bitmap = ImageDecoder.decodeBitmap(source)
-                        val bitmapDrawable = BitmapDrawable(resources, bitmap)
-//                        register_select_photo_button.setBackgroundDrawable(bitmapDrawable)
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+        if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
+            val selectedPhotoURI = data.data
+            val source = ImageDecoder.createSource(this.contentResolver, selectedPhotoURI!!)
+            val bitmap = ImageDecoder.decodeBitmap(source)
+            val drawable = BitmapDrawable(resources, bitmap)
+            register_avatar.setImageDrawable(drawable)
         }
     }
 
