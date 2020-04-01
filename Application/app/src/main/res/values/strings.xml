@@ -14,4 +14,6 @@
     <string name="placeholder_log_twitter">Login with Twitter</string>
     <string name="hint_username">Display Name</string>
     <string name="placeholder_terms_of_service">I have read and agree with the Terms of Service.</string>
+    <string name="placeholder_select_photo">Select photo</string>
+    <string name="placeholder_avatar">User Avatar</string>
 </resources>

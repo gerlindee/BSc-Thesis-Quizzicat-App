@@ -1,6 +1,13 @@
 package com.example.quizzicat
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.ImageDecoder
+import android.graphics.drawable.BitmapDrawable
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
+import android.view.ActionMode
 import android.view.View
 import android.webkit.WebView
 import androidx.appcompat.app.AlertDialog
@@ -48,6 +55,36 @@ class RegisterActivity : AppCompatActivity() {
                 registerUserWithEmailPassword()
             } catch (ex: AbstractException) {
                 ex.displayMessageWithSnackbar(window.decorView.rootView, this)
+            }
+        }
+
+//        register_select_photo_button.setOnClickListener {
+//            val intent = Intent(Intent.ACTION_PICK)
+//            intent.type = "image/*"
+//            startActivityForResult(intent, 0)
+//        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 0 && requestCode == Activity.RESULT_OK && data != null) {
+            val selectedPhotoUri = data.data
+            try {
+                selectedPhotoUri?.let {
+                    if(Build.VERSION.SDK_INT < 28) {
+                        val selectedPhotoBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedPhotoUri)
+                        val bitmapDrawable = BitmapDrawable()
+//                        register_select_photo_button.icon = bitmapDrawable
+                    } else {
+                        val source = ImageDecoder.createSource(this.contentResolver, selectedPhotoUri)
+                        val bitmap = ImageDecoder.decodeBitmap(source)
+                        val bitmapDrawable = BitmapDrawable(resources, bitmap)
+//                        register_select_photo_button.setBackgroundDrawable(bitmapDrawable)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
