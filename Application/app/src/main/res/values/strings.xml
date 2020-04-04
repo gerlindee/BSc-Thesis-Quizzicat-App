@@ -16,4 +16,5 @@
     <string name="placeholder_terms_of_service">I have read and agree with the Terms of Service.</string>
     <string name="placeholder_select_photo">Select photo</string>
     <string name="placeholder_avatar">User Avatar</string>
+    <string name="placeholder_forgot_password">Forgot your password?</string>
 </resources>
