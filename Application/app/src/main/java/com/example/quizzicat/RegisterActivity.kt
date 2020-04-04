@@ -3,13 +3,14 @@ package com.example.quizzicat
 import android.app.Activity
 import android.content.Intent
 import android.graphics.ImageDecoder
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.HtmlCompat
 import com.example.quizzicat.Exceptions.AbstractException
 import com.example.quizzicat.Exceptions.EmptyFieldsException
@@ -68,10 +69,17 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        register_avatar.setOnClickListener {
+        register_avatar_civ.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
             startActivityForResult(intent, 0)
+        }
+
+        register_avatar_remove.setOnClickListener {
+            register_avatar_remove.visibility = View.GONE
+            Log.d("RegisterActivity", "Remove button has been pressed")
+            selectedPhotoUri = null
+            register_avatar_civ.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.default_icon, null))
         }
     }
 
@@ -79,6 +87,7 @@ class RegisterActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
+            register_avatar_remove.visibility = View.VISIBLE
             setSelectedAvatar(data)
         }
     }
@@ -137,7 +146,6 @@ class RegisterActivity : AppCompatActivity() {
         val source = ImageDecoder.createSource(this.contentResolver, selectedPhotoUri!!)
         val bitmap = ImageDecoder.decodeBitmap(source)
         register_avatar_civ.setImageBitmap(bitmap)
-        register_avatar.alpha =  0f
     }
 
     private fun uploadAvatarToFirebaseStorage() {
@@ -156,7 +164,6 @@ class RegisterActivity : AppCompatActivity() {
             }
             .addOnFailureListener {
                 DesignUtils.showSnackbar(window.decorView.rootView, it.message!!, this)
-//                DesignUtils.showSnackbar(window.decorView.rootView, "Profile picture could not be uploaded due to internal error!", this)
             }
     }
 
