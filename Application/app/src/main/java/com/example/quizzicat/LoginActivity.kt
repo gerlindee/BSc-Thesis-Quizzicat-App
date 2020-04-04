@@ -21,11 +21,8 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         mFirebaseAuth = FirebaseAuth.getInstance()
-        val currentUser = mFirebaseAuth!!.currentUser
-        if (currentUser != null && currentUser.isEmailVerified) {
-            val mainMenuIntent = Intent(this, MainMenuActivity::class.java)
-            startActivity(mainMenuIntent)
-        }
+
+        checkUserSession()
 
         redirect_register_link.setOnClickListener {
             val registerIntent = Intent(this, RegisterActivity::class.java)
@@ -41,6 +38,14 @@ class LoginActivity : AppCompatActivity() {
             } catch (ex : AbstractException) {
                 ex.displayMessageWithSnackbar(window.decorView.rootView, this)
             }
+        }
+    }
+
+    private fun checkUserSession() {
+        val currentUser = mFirebaseAuth!!.currentUser
+        if (currentUser != null && currentUser.isEmailVerified) {
+            val mainMenuIntent = Intent(this, MainMenuActivity::class.java)
+            startActivity(mainMenuIntent)
         }
     }
 
