@@ -37,6 +37,15 @@ dependencies {
     // firebase sdk for authentication
     implementation 'com.google.firebase:firebase-auth:19.3.0'
 
+    // firebase sdk for cloud storage
+    implementation 'com.google.firebase:firebase-storage-ktx:19.1.1'
+
+    // firebase sdk for database
+    implementation 'com.google.firebase:firebase-database-ktx:19.2.1'
+
+    // CircleImageView library
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'

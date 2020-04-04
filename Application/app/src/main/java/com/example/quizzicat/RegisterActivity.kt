@@ -4,10 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.ImageDecoder
 import android.graphics.drawable.BitmapDrawable
-import android.os.Build
+import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.view.ActionMode
 import android.view.View
 import android.webkit.WebView
 import androidx.appcompat.app.AlertDialog
@@ -16,24 +14,36 @@ import androidx.core.text.HtmlCompat
 import com.example.quizzicat.Exceptions.AbstractException
 import com.example.quizzicat.Exceptions.EmptyFieldsException
 import com.example.quizzicat.Exceptions.UnmatchedPasswordsException
+import com.example.quizzicat.Model.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_register.*
+import java.util.*
 
 class RegisterActivity : AppCompatActivity() {
 
     private var mWebView: WebView? = null
+
     private var mFirebaseAuth: FirebaseAuth? = null
+    private var mFirebaseStorage: FirebaseStorage? = null
+    private var mFirebaseDatabase: FirebaseDatabase? = null
 
     private var password: String? = null
     private var repeatedPassword: String? = null
     private var email: String? = null
     private var displayName: String? = null
 
+    private var selectedPhotoUri: Uri? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
         mFirebaseAuth = FirebaseAuth.getInstance()
+        mFirebaseStorage = FirebaseStorage.getInstance()
+        mFirebaseDatabase = FirebaseDatabase.getInstance()
+
         mWebView = WebView(this)
 
         val termsOfServiceMessage = "I have read and therefore agree with the " + "<u>" + "Terms of Service" + "</u>" + "."
@@ -69,11 +79,7 @@ class RegisterActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
-            val selectedPhotoURI = data.data
-            val source = ImageDecoder.createSource(this.contentResolver, selectedPhotoURI!!)
-            val bitmap = ImageDecoder.decodeBitmap(source)
-            val drawable = BitmapDrawable(resources, bitmap)
-            register_avatar.setImageDrawable(drawable)
+            setSelectedAvatar(data)
         }
     }
 
@@ -108,6 +114,7 @@ class RegisterActivity : AppCompatActivity() {
                     mFirebaseAuth!!.currentUser?.sendEmailVerification()
                         ?.addOnCompleteListener { task ->
                             if (task.isSuccessful) {
+                                uploadAvatarToFirebaseStorage()
                                 register_progress_bar.visibility = View.GONE
                                 AlertDialog.Builder(this)
                                     .setTitle("Success")
@@ -123,5 +130,40 @@ class RegisterActivity : AppCompatActivity() {
                     DesignUtils.showSnackbar(window.decorView.rootView, it.exception?.message.toString(), this)
                 }
             }
+    }
+
+    private fun setSelectedAvatar(data: Intent) {
+        selectedPhotoUri = data.data
+        val source = ImageDecoder.createSource(this.contentResolver, selectedPhotoUri!!)
+        val bitmap = ImageDecoder.decodeBitmap(source)
+        register_avatar_civ.setImageBitmap(bitmap)
+        register_avatar.alpha =  0f
+    }
+
+    private fun uploadAvatarToFirebaseStorage() {
+        if (selectedPhotoUri == null) {
+            // if no profile picture has been uploaded just set the default picture for the user
+            saveUserToFirebaseDatabase("https://firebasestorage.googleapis.com/v0/b/quizzicat-af605.appspot.com/o/Avatars%2Fdefault_icon.png?alt=media&token=9c0aaa26-f86e-4f76-a7fc-f2b2c80011c5")
+            return
+        }
+        val filename = UUID.randomUUID().toString()
+        val ref = mFirebaseStorage!!.getReference("/Avatars/$filename")
+        ref.putFile(selectedPhotoUri!!)
+            .addOnSuccessListener {
+                ref.downloadUrl.addOnSuccessListener {
+                    saveUserToFirebaseDatabase(it.toString())
+                }
+            }
+            .addOnFailureListener {
+                DesignUtils.showSnackbar(window.decorView.rootView, it.message!!, this)
+//                DesignUtils.showSnackbar(window.decorView.rootView, "Profile picture could not be uploaded due to internal error!", this)
+            }
+    }
+
+    private fun saveUserToFirebaseDatabase(profileImageURL: String) {
+        val uid = mFirebaseAuth!!.uid ?: ""
+        val ref = mFirebaseDatabase!!.getReference("/Users/$uid")
+        val user = User(uid, displayName!!, profileImageURL)
+        ref.setValue(user)
     }
 }
