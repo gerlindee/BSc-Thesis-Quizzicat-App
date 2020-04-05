@@ -1,13 +1,20 @@
 package com.example.quizzicat
 
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.quizzicat.Exceptions.AbstractException
 import com.example.quizzicat.Exceptions.EmptyFieldsException
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.transaction_password_reset.*
+import kotlinx.android.synthetic.main.transaction_password_reset.view.*
 
 class LoginActivity : AppCompatActivity() {
 
@@ -38,6 +45,38 @@ class LoginActivity : AppCompatActivity() {
             } catch (ex : AbstractException) {
                 ex.displayMessageWithSnackbar(window.decorView.rootView, this)
             }
+        }
+
+        login_forgot_password.setOnClickListener {
+            val inflater = LayoutInflater.from(this)
+            val dialogView = inflater.inflate(R.layout.transaction_password_reset, null)
+
+            AlertDialog.Builder(this)
+                .setTitle("Reset password")
+                .setView(dialogView)
+                .setPositiveButton("Confirm", DialogInterface.OnClickListener{
+                        _, _ ->
+                    run {
+                        val resetEmail = dialogView.reset_email.text.toString()
+                        if (resetEmail.isEmpty()) {
+                            DesignUtils.showSnackbar(window.decorView.rootView, "Please provide the e-mail address associated with your account", this)
+                        } else {
+                            login_progress_bar.visibility = View.VISIBLE
+                            mFirebaseAuth!!.sendPasswordResetEmail(resetEmail)
+                                .addOnCompleteListener {
+                                    login_progress_bar.visibility = View.GONE
+                                    if (it.isSuccessful) {
+                                        DesignUtils.showSnackbar(window.decorView.rootView, "Password reset e-mail was sent", this)
+                                    } else {
+                                        DesignUtils.showSnackbar(window.decorView.rootView, it.exception!!.message.toString(), this)
+                                    }
+                                }
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", DialogInterface.OnClickListener{ _, _ -> })
+                .create()
+                .show()
         }
     }
 
