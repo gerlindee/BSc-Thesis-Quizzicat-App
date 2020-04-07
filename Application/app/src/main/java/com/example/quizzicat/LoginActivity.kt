@@ -6,14 +6,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.GridLayoutManager
 import com.example.quizzicat.Exceptions.AbstractException
 import com.example.quizzicat.Exceptions.EmptyFieldsException
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.transaction_password_reset.*
 import kotlinx.android.synthetic.main.transaction_password_reset.view.*
 
 class LoginActivity : AppCompatActivity() {

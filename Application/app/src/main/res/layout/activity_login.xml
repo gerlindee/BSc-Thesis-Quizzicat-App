@@ -116,51 +116,51 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageView
-        android:id="@+id/register_facebook_button"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/register_twitter_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/register_google_button"
-        app:layout_constraintTop_toBottomOf="@+id/layout_redirect_register_text"
-        app:layout_constraintVertical_bias="0.272"
-        app:srcCompat="@drawable/facebook"
-        android:contentDescription="@string/placeholder_log_facebook" />
-
-    <ImageView
-        android:id="@+id/register_google_button"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/register_facebook_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_redirect_register_text"
-        app:layout_constraintVertical_bias="0.272"
-        app:srcCompat="@drawable/google"
-        android:contentDescription="@string/placeholder_log_google" />
-
-    <ImageView
-        android:id="@+id/register_twitter_button"
+    <FrameLayout
+        android:id="@+id/frame_layout_facebook_button"
         android:layout_width="50dp"
         android:layout_height="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/register_facebook_button"
+        app:layout_constraintStart_toEndOf="@+id/register_google_button"
+        app:layout_constraintTop_toBottomOf="@+id/layout_redirect_register_text"
+        app:layout_constraintVertical_bias="0.26999998">
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/register_facebook_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/register_facebook_icon"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/placeholder_log_facebook"
+            android:src="@drawable/facebook" />
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/register_google_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:contentDescription="@string/placeholder_log_google"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/frame_layout_facebook_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_redirect_register_text"
         app:layout_constraintVertical_bias="0.272"
-        app:srcCompat="@drawable/twitter"
-        android:contentDescription="@string/placeholder_log_twitter" />
+        app:srcCompat="@drawable/google" />
+
 
     <TextView
         android:id="@+id/login_forgot_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorPrimaryDark"
         android:text="@string/placeholder_forgot_password"
+        android:textColor="@color/colorPrimaryDark"
         app:layout_constraintBottom_toTopOf="@+id/layout_redirect_register_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
