@@ -117,24 +117,24 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
-        android:id="@+id/frame_layout_facebook_button"
+        android:id="@+id/frame_layout_facebook"
         android:layout_width="50dp"
         android:layout_height="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/register_google_button"
+        app:layout_constraintStart_toEndOf="@+id/login_google_button"
         app:layout_constraintTop_toBottomOf="@+id/layout_redirect_register_text"
         app:layout_constraintVertical_bias="0.26999998">
 
         <com.facebook.login.widget.LoginButton
-            android:id="@+id/register_facebook_button"
+            android:id="@+id/login_facebook_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
         <ImageView
-            android:id="@+id/register_facebook_icon"
+            android:id="@+id/login_facebook_icon"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:contentDescription="@string/placeholder_log_facebook"
@@ -142,12 +142,12 @@
     </FrameLayout>
 
     <ImageView
-        android:id="@+id/register_google_button"
+        android:id="@+id/login_google_button"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:contentDescription="@string/placeholder_log_google"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/frame_layout_facebook_button"
+        app:layout_constraintEnd_toStartOf="@+id/frame_layout_facebook"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_redirect_register_text"
