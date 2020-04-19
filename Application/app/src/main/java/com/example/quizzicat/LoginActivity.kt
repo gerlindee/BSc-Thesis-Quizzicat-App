@@ -106,6 +106,7 @@ class LoginActivity : AppCompatActivity() {
         login_facebook_button.registerCallback(mCallbackManager, object :
             FacebookCallback<LoginResult> {
             override fun onSuccess(loginResult: LoginResult) {
+                login_progress_bar.visibility = View.VISIBLE
                 handleFacebookAccessToken(loginResult.accessToken)
             }
 
@@ -127,11 +128,11 @@ class LoginActivity : AppCompatActivity() {
                     // Sign in success, update UI with the signed-in user's information
                     val user = mFirebaseAuth!!.currentUser
                     checkUserSession()
+                    login_progress_bar.visibility = View.GONE
                 } else {
                     // If sign in fails, display a message to the user.
                     DesignUtils.showSnackbar(window.decorView.rootView, task.exception!!.message.toString(), this)
                 }
-
             }
     }
 
