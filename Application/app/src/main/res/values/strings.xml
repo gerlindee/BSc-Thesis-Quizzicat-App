@@ -18,7 +18,7 @@
     <string name="placeholder_avatar">User Avatar</string>
     <string name="placeholder_forgot_password">Forgot your password?</string>
 
-<!--    facebook app information-->
+    <!--    facebook app information-->
     <string name="facebook_app_id">243414633450192</string>
     <string name="fb_login_protocol_scheme">fb243414633450192</string>
 </resources>

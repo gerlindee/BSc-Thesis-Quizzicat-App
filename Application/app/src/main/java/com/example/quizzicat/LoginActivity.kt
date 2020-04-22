@@ -231,11 +231,13 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
+    // retrieves the values from the input fields
     private fun bindData() {
         password = login_password.text.toString()
         email = login_email.text.toString()
     }
 
+    // checks if the user has filled all the input fields on the screen
     private fun checkFieldsEmpty() {
         if (password!!.isEmpty() || email!!.isEmpty())
             throw EmptyFieldsException()
