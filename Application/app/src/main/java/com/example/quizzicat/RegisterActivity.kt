@@ -16,6 +16,7 @@ import com.example.quizzicat.Exceptions.AbstractException
 import com.example.quizzicat.Exceptions.EmptyFieldsException
 import com.example.quizzicat.Exceptions.UnmatchedPasswordsException
 import com.example.quizzicat.Model.User
+import com.example.quizzicat.Utils.DesignUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage

@@ -9,6 +9,8 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.example.quizzicat.Exceptions.AbstractException
 import com.example.quizzicat.Exceptions.EmptyFieldsException
+import com.example.quizzicat.Utils.DesignUtils
+import com.example.quizzicat.Utils.NetworkUtils
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -48,6 +50,8 @@ class LoginActivity : AppCompatActivity() {
         mFirebaseAuth = FirebaseAuth.getInstance()
         mFirebaseStorage = FirebaseStorage.getInstance()
         mFirebaseDatabase = FirebaseDatabase.getInstance()
+
+        isOnline()
 
         checkUserSession()
 
@@ -241,5 +245,13 @@ class LoginActivity : AppCompatActivity() {
     private fun checkFieldsEmpty() {
         if (password!!.isEmpty() || email!!.isEmpty())
             throw EmptyFieldsException()
+    }
+
+    private fun isOnline() {
+        val connection = NetworkUtils.getConnectivityStatus(this)
+        if (connection == NetworkUtils.TYPE_NO_CONNECTION) {
+            val noInternetIntent = Intent(this, NoInternetConnectionActivity::class.java)
+            startActivity(noInternetIntent)
+        }
     }
 }
