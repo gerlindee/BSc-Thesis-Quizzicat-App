@@ -21,4 +21,8 @@
     <!--    facebook app information-->
     <string name="facebook_app_id">243414633450192</string>
     <string name="fb_login_protocol_scheme">fb243414633450192</string>
+    <string name="placeholder_no_internet_title">Ooops!</string>
+    <string name="placeholder_no_internet_line_1">Slow or no internet connection.</string>
+    <string name="placeholder_no_internet_line_2">Check your internet settings and try again.</string>
+    <string name="placehoder_no_internet_button">Try again</string>
 </resources>

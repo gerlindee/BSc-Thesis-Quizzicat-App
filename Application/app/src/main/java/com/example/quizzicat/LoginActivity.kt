@@ -117,6 +117,11 @@ class LoginActivity : AppCompatActivity() {
         initializeGoogleLogin()
     }
 
+    override fun onResume() {
+        super.onResume()
+        isOnline()
+    }
+
     // ------------------------------ Google Login Methods ----------------------------- //
 
     private fun signInWithGoogle() {
