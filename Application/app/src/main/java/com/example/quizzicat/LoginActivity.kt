@@ -119,7 +119,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        isOnline()
+        isOnline() // this method needs to be called so that we can't just navigate back to the login screen using the back button
     }
 
     // ------------------------------ Google Login Methods ----------------------------- //
