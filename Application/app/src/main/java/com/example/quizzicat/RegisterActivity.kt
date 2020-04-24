@@ -1,8 +1,11 @@
 package com.example.quizzicat
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.ImageDecoder
+import android.location.Criteria
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -12,15 +15,22 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.HtmlCompat
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.JsonRequest
+import com.android.volley.toolbox.Volley
 import com.example.quizzicat.Exceptions.AbstractException
 import com.example.quizzicat.Exceptions.EmptyFieldsException
 import com.example.quizzicat.Exceptions.UnmatchedPasswordsException
 import com.example.quizzicat.Model.User
 import com.example.quizzicat.Utils.DesignUtils
+import com.example.quizzicat.Utils.HttpRequestUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_register.*
+import java.net.URL
 import java.util.*
 
 class RegisterActivity : AppCompatActivity() {
@@ -35,6 +45,8 @@ class RegisterActivity : AppCompatActivity() {
     private var repeatedPassword: String? = null
     private var email: String? = null
     private var displayName: String? = null
+    private var countryName: String? = null
+    private var cityName: String? = null
 
     private var selectedPhotoUri: Uri? = null
 
@@ -50,6 +62,8 @@ class RegisterActivity : AppCompatActivity() {
 
         val termsOfServiceMessage = "I have read and therefore agree with the " + "<u>" + "Terms of Service" + "</u>" + "."
         text_terms_service.text = HtmlCompat.fromHtml(termsOfServiceMessage, HtmlCompat.FROM_HTML_MODE_LEGACY)
+
+        getUserCountryDetails()
 
         checkbox_terms_service.setOnCheckedChangeListener { _, isChecked ->
             register_button.isEnabled = isChecked
@@ -168,10 +182,27 @@ class RegisterActivity : AppCompatActivity() {
             }
     }
 
+    private fun getUserCountryDetails() {
+        val locationDetailsURL = "http://ip-api.com/json"
+
+        // request a json request from the provided url
+        val request = JsonObjectRequest(Request.Method.GET, locationDetailsURL, null,
+            Response.Listener {
+                countryName = it.getString("country")
+                cityName = it.getString("city")
+            },
+            Response.ErrorListener {
+                DesignUtils.showSnackbar(window.decorView, it.message.toString(), this)
+            }
+        )
+
+        HttpRequestUtils.getInstance(this).addToRequestQueue(request)
+    }
+
     private fun saveUserToFirebaseDatabase(profileImageURL: String) {
         val uid = mFirebaseAuth!!.uid ?: ""
         val ref = mFirebaseDatabase!!.getReference("/Users/$uid")
-        val user = User(uid, displayName!!, profileImageURL)
+        val user = User(uid, displayName!!, profileImageURL, countryName!!, cityName!!)
         ref.setValue(user)
     }
 }

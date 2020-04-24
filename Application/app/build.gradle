@@ -52,6 +52,9 @@ dependencies {
     // google authentication sdk
     implementation 'com.google.android.gms:play-services-auth:18.0.0'
 
+    // volley (http library) dependency
+    implementation 'com.android.volley:volley:1.1.1'
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
