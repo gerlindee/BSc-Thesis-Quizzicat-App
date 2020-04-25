@@ -17,6 +17,7 @@ buildscript {
 
         // Google Firebase services
         classpath 'com.google.gms:google-services:4.3.3'
+
     }
 }
 

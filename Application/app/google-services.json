@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "343397760478",
-    "firebase_url": "https://quizzicat-af605.firebaseio.com",
-    "project_id": "quizzicat-af605",
-    "storage_bucket": "quizzicat-af605.appspot.com"
+    "project_number": "703013005041",
+    "firebase_url": "https://quizzicat-ca219.firebaseio.com",
+    "project_id": "quizzicat-ca219",
+    "storage_bucket": "quizzicat-ca219.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:343397760478:android:6f0235ac9fd84782c4f14f",
+        "mobilesdk_app_id": "1:703013005041:android:fff6afe30857a9a7d7ab50",
         "android_client_info": {
           "package_name": "com.example.quizzicat"
         }
       },
       "oauth_client": [
         {
-          "client_id": "343397760478-oc4tphr8951r1lktae3k0oiburqdkd7e.apps.googleusercontent.com",
+          "client_id": "703013005041-n8996jj05s0o610q9o8tnj6miuucftrp.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAtjpwxk9IPoNR-usFGxZaQ0Z2F_Rcfueg"
+          "current_key": "AIzaSyDdaqtKSVWjGB7xwbg6lumzFbBDH2a3VmU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "343397760478-oc4tphr8951r1lktae3k0oiburqdkd7e.apps.googleusercontent.com",
+              "client_id": "703013005041-n8996jj05s0o610q9o8tnj6miuucftrp.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

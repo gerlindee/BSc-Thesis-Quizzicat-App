@@ -43,6 +43,9 @@ dependencies {
     // firebase sdk for database
     implementation 'com.google.firebase:firebase-database-ktx:19.2.1'
 
+    // firebase sdk for firestore database
+    implementation 'com.google.firebase:firebase-firestore-ktx:21.4.3'
+
     // CircleImageView library
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 

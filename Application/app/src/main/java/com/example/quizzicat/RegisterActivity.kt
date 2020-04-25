@@ -9,6 +9,7 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.Display
 import android.view.View
 import android.webkit.WebView
 import androidx.appcompat.app.AlertDialog
@@ -28,6 +29,9 @@ import com.example.quizzicat.Utils.DesignUtils
 import com.example.quizzicat.Utils.HttpRequestUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_register.*
 import java.net.URL
@@ -39,7 +43,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private var mFirebaseAuth: FirebaseAuth? = null
     private var mFirebaseStorage: FirebaseStorage? = null
-    private var mFirebaseDatabase: FirebaseDatabase? = null
+    private var mFirestoreDatabase: FirebaseFirestore? = null
 
     private var password: String? = null
     private var repeatedPassword: String? = null
@@ -56,7 +60,8 @@ class RegisterActivity : AppCompatActivity() {
 
         mFirebaseAuth = FirebaseAuth.getInstance()
         mFirebaseStorage = FirebaseStorage.getInstance()
-        mFirebaseDatabase = FirebaseDatabase.getInstance()
+        mFirestoreDatabase = Firebase.firestore
+        FirebaseFirestore.setLoggingEnabled(true);
 
         mWebView = WebView(this)
 
@@ -166,7 +171,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun uploadAvatarToFirebaseStorage() {
         if (selectedPhotoUri == null) {
             // if no profile picture has been uploaded just set the default picture for the user
-            saveUserToFirebaseDatabase("https://firebasestorage.googleapis.com/v0/b/quizzicat-af605.appspot.com/o/Avatars%2Fdefault_icon.png?alt=media&token=9c0aaa26-f86e-4f76-a7fc-f2b2c80011c5")
+            saveUserToFirebaseDatabase("https://firebasestorage.googleapis.com/v0/b/quizzicat-ca219.appspot.com/o/Avatars%2Fdefault_icon.png?alt=media&token=bfb09bfc-df91-4027-8242-5480e6c27e3f")
             return
         }
         val filename = UUID.randomUUID().toString()
@@ -201,8 +206,15 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun saveUserToFirebaseDatabase(profileImageURL: String) {
         val uid = mFirebaseAuth!!.uid ?: ""
-        val ref = mFirebaseDatabase!!.getReference("/Users/$uid")
         val user = User(uid, displayName!!, profileImageURL, countryName!!, cityName!!)
-        ref.setValue(user)
+        mFirestoreDatabase!!.collection("Users").document(uid)
+            .set(user)
+            .addOnSuccessListener {
+                Log.d("SaveUser", "User information successfully saved to the cloud")
+            }
+            .addOnFailureListener {
+                DesignUtils.showSnackbar(window.decorView.rootView, "An internal error occured when saving user information. Please try again!", this)
+                Log.d("SaveUser", "User info could not be saved due to error " + it.message.toString())
+            }
     }
 }
