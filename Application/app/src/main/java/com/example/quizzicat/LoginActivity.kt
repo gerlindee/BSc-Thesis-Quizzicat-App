@@ -4,12 +4,18 @@ import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
 import com.example.quizzicat.Exceptions.AbstractException
 import com.example.quizzicat.Exceptions.EmptyFieldsException
+import com.example.quizzicat.Model.User
 import com.example.quizzicat.Utils.DesignUtils
+import com.example.quizzicat.Utils.HttpRequestUtils
 import com.example.quizzicat.Utils.NetworkUtils
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
@@ -26,6 +32,9 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.transaction_password_reset.view.*
@@ -34,12 +43,14 @@ class LoginActivity : AppCompatActivity() {
 
     private var mFirebaseAuth: FirebaseAuth? = null
     private var mFirebaseStorage: FirebaseStorage? = null
-    private var mFirebaseDatabase: FirebaseDatabase? = null
+    private var mFirestoreDatabase: FirebaseFirestore? = null
 
     private var mGoogleSignInClient: GoogleSignInClient? = null
 
     private var password: String? = null
     private var email: String? = null
+    private var countryName: String? = null
+    private var cityName: String? = null
 
     private lateinit var mCallbackManager: CallbackManager
 
@@ -49,11 +60,13 @@ class LoginActivity : AppCompatActivity() {
 
         mFirebaseAuth = FirebaseAuth.getInstance()
         mFirebaseStorage = FirebaseStorage.getInstance()
-        mFirebaseDatabase = FirebaseDatabase.getInstance()
+        mFirestoreDatabase = Firebase.firestore
 
         isOnline()
 
         checkUserSession()
+
+        getUserCountryDetails()
 
         redirect_register_link.setOnClickListener {
             val registerIntent = Intent(this, RegisterActivity::class.java)
@@ -67,6 +80,7 @@ class LoginActivity : AppCompatActivity() {
                 checkFieldsEmpty()
                 firebaseAuthWithEmailAndPassword()
             } catch (ex : AbstractException) {
+                login_progress_bar.visibility = View.GONE
                 ex.displayMessageWithSnackbar(window.decorView.rootView, this)
             }
         }
@@ -151,6 +165,7 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) {
                 login_progress_bar.visibility = View.GONE
                 if (it.isSuccessful) {
+                    saveUserData()
                     checkUserSession()
                 } else {
                     DesignUtils.showSnackbar(window.decorView.rootView, it.exception!!.message.toString(), this)
@@ -186,10 +201,12 @@ class LoginActivity : AppCompatActivity() {
         val credential = FacebookAuthProvider.getCredential(token.token)
         mFirebaseAuth!!.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
+                login_progress_bar.visibility = View.GONE
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
+                    // save the user's information to the database
+                    saveUserData()
+                    // update UI with the signed-in user's information
                     checkUserSession()
-                    login_progress_bar.visibility = View.GONE
                 } else {
                     // If sign in fails, display a message to the user.
                     DesignUtils.showSnackbar(window.decorView.rootView, task.exception!!.message.toString(), this)
@@ -221,6 +238,47 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(mainMenuIntent)
             }
         }
+    }
+
+    private fun saveUserData() {
+        val currentUser = mFirebaseAuth!!.currentUser!!
+        var userProfilePictureURL = ""
+        val userUID = currentUser.uid
+        val userDisplayName = currentUser.displayName.toString()
+        // get a bigger size for the pictures from facebook and google, since by default they're less than 100 x 100 px
+        if (currentUser.providerData[1].providerId == "facebook.com") {
+            val facebookUserID = currentUser.providerData[1].uid
+            userProfilePictureURL = "https://graph.facebook.com/" + facebookUserID + "/picture?height=500";
+        } else if(currentUser.providerData[1].providerId == "google.com"){
+            userProfilePictureURL = currentUser.providerData[1].photoUrl.toString().replace("s96-c", "s400-c")
+        }
+        val user = User(userUID, userDisplayName, userProfilePictureURL, countryName!!, cityName!!)
+        mFirestoreDatabase!!.collection("Users").document(userUID)
+            .set(user)
+            .addOnSuccessListener {
+                Log.d("SaveUser", "User information successfully saved to the cloud")
+            }
+            .addOnFailureListener {
+                DesignUtils.showSnackbar(window.decorView.rootView, "An internal error occurred when saving user information. Please try again!", this)
+                Log.d("SaveUser", "User info could not be saved due to error " + it.message.toString())
+            }
+    }
+
+    private fun getUserCountryDetails() {
+        val locationDetailsURL = "http://ip-api.com/json"
+
+        // request a json request from the provided url
+        val request = JsonObjectRequest(Request.Method.GET, locationDetailsURL, null,
+            Response.Listener {
+                countryName = it.getString("country")
+                cityName = it.getString("city")
+            },
+            Response.ErrorListener {
+                DesignUtils.showSnackbar(window.decorView, it.message.toString(), this)
+            }
+        )
+
+        HttpRequestUtils.getInstance(this).addToRequestQueue(request)
     }
 
     private fun firebaseAuthWithEmailAndPassword() {

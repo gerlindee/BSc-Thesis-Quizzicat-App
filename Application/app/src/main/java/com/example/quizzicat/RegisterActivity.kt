@@ -61,7 +61,6 @@ class RegisterActivity : AppCompatActivity() {
         mFirebaseAuth = FirebaseAuth.getInstance()
         mFirebaseStorage = FirebaseStorage.getInstance()
         mFirestoreDatabase = Firebase.firestore
-        FirebaseFirestore.setLoggingEnabled(true);
 
         mWebView = WebView(this)
 
