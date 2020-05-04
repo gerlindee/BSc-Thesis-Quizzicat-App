@@ -10,7 +10,6 @@
         android:id="@+id/main_menu_appbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_constraintBottom_toTopOf="@+id/main_menu_viewpager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,7 +29,7 @@
             app:tabBackground="@color/colorPrimary"
             app:tabGravity="fill"
             app:tabMode="fixed"
-            app:tabTextColor="@android:color/white" />
+            style="@style/CustomTabStyle"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
