@@ -11,7 +11,6 @@ import com.example.quizzicat.R
 class QuestionsLeaderboardFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Inflate the questions leaderboard layout for this fragment
         return inflater.inflate(R.layout.fragment_questions_leaderboard, container, false)
     }
 

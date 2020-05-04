@@ -11,7 +11,6 @@ import com.example.quizzicat.R
 class SettingsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Inflate the settings layout for this fragment
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
 

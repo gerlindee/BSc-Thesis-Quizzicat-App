@@ -11,7 +11,6 @@ import com.example.quizzicat.R
 class UserProfileFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Inflate the user profile layout for this fragment
         return inflater.inflate(R.layout.fragment_user_profile, container, false)
     }
 
