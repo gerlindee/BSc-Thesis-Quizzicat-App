@@ -16,21 +16,11 @@ import kotlinx.android.synthetic.main.fragment_topic_categories.*
 
 class TopicCategoriesFragment : Fragment() {
 
-    private var mFirebaseAuth: FirebaseAuth? = null
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_topic_categories, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        mFirebaseAuth = FirebaseAuth.getInstance()
-
-        sign_out_button.setOnClickListener {
-            mFirebaseAuth!!.signOut()
-            LoginManager.getInstance().logOut();
-            val loginIntent = Intent(context, LoginActivity::class.java)
-            startActivity(loginIntent)
-        }
     }
 
 }
