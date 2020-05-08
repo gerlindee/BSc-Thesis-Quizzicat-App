@@ -1,5 +1,6 @@
 package com.example.quizzicat
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -160,6 +161,7 @@ class RegisterActivity : AppCompatActivity() {
             }
     }
 
+    @SuppressLint("NewApi")
     private fun setSelectedAvatar(data: Intent) {
         selectedPhotoUri = data.data
         val source = ImageDecoder.createSource(this.contentResolver, selectedPhotoUri!!)
