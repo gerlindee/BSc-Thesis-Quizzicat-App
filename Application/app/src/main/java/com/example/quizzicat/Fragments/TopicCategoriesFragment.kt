@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.GridView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.quizzicat.Adapters.TopicCategoriesAdapter
 import com.example.quizzicat.Model.AbstractTopic
@@ -40,7 +41,10 @@ class TopicCategoriesFragment : Fragment() {
 
         topicCategoriesGridView?.setOnItemClickListener { _, _, position, _ ->
             if (topicsLevel) {
-                Toast.makeText(context, "You are seeing the subcategories now", Toast.LENGTH_LONG).show()
+                AlertDialog.Builder(context!!)
+                    .setView(R.layout.view_customize_solo_quiz)
+                    .setPositiveButton("Let's play", null)
+                    .show()
             } else {
                 val selectedCategory = topicCategoriesList!![position]
                 getTopicsForCategory(object: CustomCallBack {
