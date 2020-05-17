@@ -21,8 +21,6 @@ class MainMenuActivity : AppCompatActivity() {
 
     private var menuViewPager: ViewPager2? = null
 
-    private var topicsLevel: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
@@ -57,8 +55,6 @@ class MainMenuActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (menuViewPager!!.currentItem == 0 && topicsLevel) {
-            Toast.makeText(this, "Now you should see categories", Toast.LENGTH_LONG)
-        }
+        // this is empty so that it does not by default go back to LoginActivity
     }
 }

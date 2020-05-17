@@ -17,6 +17,7 @@ import com.example.quizzicat.Utils.CustomCallBack
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.fragment_topic_categories.*
 
 class TopicCategoriesFragment : Fragment() {
 
@@ -24,9 +25,7 @@ class TopicCategoriesFragment : Fragment() {
     private var topicCategoriesAdapter: TopicCategoriesAdapter ? = null
     private var topicCategoriesList: ArrayList<TopicCategory> ? = null
     private var topicsList: ArrayList<Topic> ? = null
-
     private var mFirestoreDatabase: FirebaseFirestore? = null
-
     private var topicsLevel: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -37,13 +36,7 @@ class TopicCategoriesFragment : Fragment() {
         mFirestoreDatabase = Firebase.firestore
 
         topicCategoriesGridView = view.findViewById(R.id.categories_grid_view)
-        setDataList(object: CustomCallBack {
-            override fun onCallback(value: List<AbstractTopic>) {
-                topicCategoriesList = value as ArrayList<TopicCategory>
-                topicCategoriesAdapter = TopicCategoriesAdapter(context!!, topicCategoriesList as ArrayList<AbstractTopic>)
-                topicCategoriesGridView?.adapter = topicCategoriesAdapter
-            }
-        })
+        setCategoriesData()
 
         topicCategoriesGridView?.setOnItemClickListener { _, _, position, _ ->
             if (topicsLevel) {
@@ -57,11 +50,28 @@ class TopicCategoriesFragment : Fragment() {
                         topicCategoriesAdapter!!.notifyDataSetChanged()
                     }
                 }, selectedCategory.CID)
+                categories_go_back.visibility = View.VISIBLE
             }
+        }
+
+        categories_go_back.setOnClickListener {
+            setCategoriesData()
+            topicsLevel = false
+            categories_go_back.visibility = View.GONE
         }
     }
 
-    private fun setDataList(myCallback: CustomCallBack) {
+    private fun setCategoriesData() {
+        getCategories(object: CustomCallBack {
+            override fun onCallback(value: List<AbstractTopic>) {
+                topicCategoriesList = value as ArrayList<TopicCategory>
+                topicCategoriesAdapter = TopicCategoriesAdapter(context!!, topicCategoriesList as ArrayList<AbstractTopic>)
+                topicCategoriesGridView?.adapter = topicCategoriesAdapter
+            }
+        })
+    }
+
+    private fun getCategories(myCallback: CustomCallBack) {
         mFirestoreDatabase!!.collection("Topic_Categories")
             .get()
             .addOnCompleteListener { task ->
