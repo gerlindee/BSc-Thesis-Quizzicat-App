@@ -47,7 +47,7 @@ class TopicCategoriesFragment : Fragment() {
             }
         })
 
-        topicCategoriesGridView?.setOnItemClickListener { parent, view, position, id ->
+        topicCategoriesGridView?.setOnItemClickListener { _, _, position, id ->
             val selectedCategory = topicCategoriesList!![position]
             Toast.makeText(context, selectedCategory.name, Toast.LENGTH_LONG).show()
         }
