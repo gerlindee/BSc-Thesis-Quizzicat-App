@@ -7,10 +7,11 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.example.quizzicat.Facades.ImageLoadingFacade
+import com.example.quizzicat.Model.AbstractTopic
 import com.example.quizzicat.Model.TopicCategory
 import com.example.quizzicat.R
 
-class TopicCategoriesAdapter(var context: Context, var arrayList: ArrayList<TopicCategory>) : BaseAdapter() {
+class TopicCategoriesAdapter(var context: Context, var arrayList: ArrayList<AbstractTopic>) : BaseAdapter() {
 
     override fun getItem(position: Int): Any {
         return arrayList[position]
