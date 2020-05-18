@@ -27,7 +27,7 @@
     <string name="placehoder_no_internet_button">Try again</string>
     <string name="string_placeholder">Placeholder</string>
     <string name="string_all_categories">All categories</string>
-    <string name="string_custom_quiz_duration">Each round lasts 10 seconds, regardless of difficulty or number of questions. Good luck!</string>
+    <string name="string_custom_quiz_duration">Each round lasts 10 seconds, regardless of the difficulty or number of questions. Good luck!</string>
     <string name="string_play_button">Play</string>
     <string name="string_quiz_details_title">QUIZ DETAILS</string>
 

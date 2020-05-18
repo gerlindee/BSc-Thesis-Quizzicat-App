@@ -1,5 +1,7 @@
 package com.example.quizzicat.Fragments
 
+import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +16,7 @@ import com.example.quizzicat.Model.AbstractTopic
 import com.example.quizzicat.Model.Topic
 import com.example.quizzicat.Model.TopicCategory
 import com.example.quizzicat.R
+import com.example.quizzicat.SoloQuizActivity
 import com.example.quizzicat.Utils.CustomCallBack
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -43,7 +46,11 @@ class TopicCategoriesFragment : Fragment() {
             if (topicsLevel) {
                 AlertDialog.Builder(context!!)
                     .setView(R.layout.view_customize_solo_quiz)
-                    .setPositiveButton("Let's play", null)
+                    .setPositiveButton("Let's play", DialogInterface.OnClickListener { _, _ ->
+                        val soloQuizIntent = Intent(context, SoloQuizActivity::class.java)
+                        startActivity(soloQuizIntent)
+                    })
+                    .setNegativeButton("Cancel", null)
                     .show()
             } else {
                 val selectedCategory = topicCategoriesList!![position]
