@@ -33,6 +33,7 @@
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">
+        <item>Random</item>
         <item>Easy</item>
         <item>Medium</item>
         <item>Hard</item>

@@ -1,9 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    android:padding="10dp"
     tools:context=".SoloQuizActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:background="@drawable/shape_rect_yellow">
+
+            <TextView
+                android:id="@+id/solo_quiz_question_nr_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:singleLine="true"
+                android:text="01/05"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/solo_quiz_question_time_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="05:00"
+            android:textColor="@color/colorAccent"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/solo_quiz_question_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:indeterminateOnly="false"
+        android:max="30"
+        android:maxHeight="20dp"
+        android:minHeight="10dp"
+        android:progressDrawable="@drawable/progress_bar_horizontal" />
+
+    <TextView
+        android:id="@+id/solo_quiz_question_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Question Text"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/colorAccent" />
+
+    <RadioGroup
+        android:id="@+id/solo_quiz_question_answ_group"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        android:layout_weight="0.03">
+
+        <RadioButton
+            android:id="@+id/solo_quiz_question_answ_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Answer 1" />
+
+        <RadioButton
+            android:id="@+id/solo_quiz_question_answ_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Answer 2" />
+
+        <RadioButton
+            android:id="@+id/solo_quiz_question_answ_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Answer 3" />
+
+        <RadioButton
+            android:id="@+id/solo_quiz_question_answ_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Answer 4" />
+
+    </RadioGroup>
+
+</LinearLayout>
