@@ -1,5 +1,6 @@
 package com.example.quizzicat.Fragments
 
+import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridView
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -44,12 +46,20 @@ class TopicCategoriesFragment : Fragment() {
 
         topicCategoriesGridView?.setOnItemClickListener { _, _, position, _ ->
             if (topicsLevel) {
+                val inflater = LayoutInflater.from(context)
+                val customizingQuizView = inflater.inflate(R.layout.view_customize_solo_quiz, null)
+                val selectedDifficulty : Spinner = customizingQuizView.findViewById(R.id.customize_quiz_difficulty)
+                val selectedNumberOfQuestions : Spinner = customizingQuizView.findViewById(R.id.customize_quiz_number)
+
                 AlertDialog.Builder(context!!)
-                    .setView(R.layout.view_customize_solo_quiz)
-                    .setPositiveButton("Let's play", DialogInterface.OnClickListener { _, _ ->
-                        val soloQuizIntent = Intent(context, SoloQuizActivity::class.java)
+                    .setView(customizingQuizView)
+                    .setPositiveButton("Let's play") { _, _ ->
+                        val soloQuizIntent = Intent(activity, SoloQuizActivity::class.java)
+                        soloQuizIntent.putExtra("questionsDifficulty", selectedDifficulty.selectedItem.toString())
+                        soloQuizIntent.putExtra("questionsNumber", selectedNumberOfQuestions.selectedItem.toString())
+                        soloQuizIntent.putExtra("questionsTopic", topicsList!![position].TID)
                         startActivity(soloQuizIntent)
-                    })
+                    }
                     .setNegativeButton("Cancel", null)
                     .show()
             } else {
