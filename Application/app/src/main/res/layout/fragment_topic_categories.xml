@@ -22,8 +22,6 @@
         android:id="@+id/categories_grid_view"
         android:layout_width="match_parent"
         android:numColumns="4"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
         android:layout_height="match_parent" />
 
 </LinearLayout>
