@@ -99,6 +99,7 @@ class SoloQuizActivity : AppCompatActivity() {
                     val mainMenuIntent = Intent(applicationContext, MainMenuActivity::class.java)
                     startActivity(mainMenuIntent)
                 } else {
+                    randomizeQuestions()
                     val questionsQIDList = ArrayList<Long>()
                     for (question in questionList) {
                         questionsQIDList.add(question.QID)
@@ -113,6 +114,25 @@ class SoloQuizActivity : AppCompatActivity() {
                 }
             }
         }, intent.extras!!.getString("questionsDifficulty")!!, intent.extras!!.getString("questionsNumber")!!, intent.extras!!.getLong("questionsTopic"))
+    }
+
+    private fun randomizeQuestions() {
+        val numberOfQuestions = intent.extras!!.getString("questionsNumber")!!.toInt()
+        val randomQuestionPositions = ArrayList<Int>()
+        var idx = 1
+        while (idx <= numberOfQuestions && randomQuestionPositions.size < questionList.size) {
+            var randomValue = (0 until questionList.size).random()
+            while (randomValue in randomQuestionPositions) {
+                randomValue = (0 until questionList.size).random()
+            }
+            randomQuestionPositions.add(randomValue)
+            idx += 1
+        }
+        val randomizedQuestions = ArrayList<ActiveQuestion>()
+        for (i in randomQuestionPositions) {
+            randomizedQuestions.add(questionList[i])
+        }
+        questionList = randomizedQuestions
     }
 
     private fun getQuestions(callback: QuestionsCallBack, questionsDifficulty: String, questionsNumber: String, questionsTopic: Long) {
