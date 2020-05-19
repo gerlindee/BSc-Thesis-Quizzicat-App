@@ -94,6 +94,7 @@ class TopicCategoriesFragment : Fragment() {
 
     private fun getCategories(myCallback: CustomCallBack) {
         mFirestoreDatabase!!.collection("Topic_Categories")
+            .orderBy("Name")
             .get()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -114,7 +115,9 @@ class TopicCategoriesFragment : Fragment() {
 
     private fun getTopicsForCategory(myCallback: CustomCallBack, selectedCategory: Long) {
         topicsLevel = true
-        mFirestoreDatabase!!.collection("Topics").whereEqualTo("CID", selectedCategory)
+        mFirestoreDatabase!!.collection("Topics")
+            .whereEqualTo("CID", selectedCategory)
+            .orderBy("Name")
             .get()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
