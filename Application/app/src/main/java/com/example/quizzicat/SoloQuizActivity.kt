@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.quizzicat.Model.ActiveQuestion
 import com.example.quizzicat.Model.ActiveQuestionAnswer
+import com.example.quizzicat.Utils.AnswersCallBack
 import com.example.quizzicat.Utils.DesignUtils
 import com.example.quizzicat.Utils.QuestionsCallBack
 import com.google.firebase.firestore.FirebaseFirestore
@@ -94,8 +95,22 @@ class SoloQuizActivity : AppCompatActivity() {
         getQuestions(object: QuestionsCallBack {
             override fun onCallback(value: ArrayList<ActiveQuestion>) {
                 questionList = value
-                setQuestionView()
-                setTimer()
+                if (questionList.size == 0) {
+                    val mainMenuIntent = Intent(applicationContext, MainMenuActivity::class.java)
+                    startActivity(mainMenuIntent)
+                } else {
+                    val questionsQIDList = ArrayList<Long>()
+                    for (question in questionList) {
+                        questionsQIDList.add(question.QID)
+                    }
+                    getAnswers(object : AnswersCallBack {
+                        override fun onCallback(value: ArrayList<ActiveQuestionAnswer>) {
+                            answersList = value
+                            setQuestionView()
+                            setTimer()
+                        }
+                    }, questionsQIDList)
+                }
             }
         }, intent.extras!!.getString("questionsDifficulty")!!, intent.extras!!.getString("questionsNumber")!!, intent.extras!!.getLong("questionsTopic"))
     }
@@ -152,6 +167,29 @@ class SoloQuizActivity : AppCompatActivity() {
                     }
                 }
         }
+    }
+
+    private fun getAnswers(callback: AnswersCallBack, QIDList: ArrayList<Long>) {
+        mFirestoreDatabase!!.collection("Active_Question_Answers")
+            .whereIn("QID", QIDList)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val quizAnswers = ArrayList<ActiveQuestionAnswer>()
+                    for (document in task.result!!) {
+                        val answerAID = document.get("AID") as Long
+                        val answerText = document.get("Answer_Text") as String
+                        val answerCorrect = document.get("Is_Correct") as Boolean
+                        val answerQID = document.get("QID") as Long
+                        val quizAnswer = ActiveQuestionAnswer(answerAID, answerQID, answerText, answerCorrect)
+                        quizAnswers.add(quizAnswer)
+                    }
+                    callback.onCallback(quizAnswers)
+                } else {
+                    Log.d("AnswersQuery", task.exception.toString())
+                }
+            }
+
     }
 
     override fun onBackPressed() {
@@ -230,15 +268,15 @@ class SoloQuizActivity : AppCompatActivity() {
         val number = currentQuestionNr + 1
         questionNumberText!!.text = number.toString() + "/" + questionList.size.toString()
         questionText!!.text = currentQuestion.QuestionText
-//        val currentAnswers = ArrayList<ActiveQuestionAnswer>()
-//        for (answer in answersList) {
-//            if (answer.QID == currentQuestion.QID)
-//                currentAnswers.add(answer)
-//        }
-//        answer1!!.text = currentAnswers[0].Answer_Text
-//        answer2!!.text = currentAnswers[1].Answer_Text
-//        answer3!!.text = currentAnswers[2].Answer_Text
-//        answer4!!.text = currentAnswers[3].Answer_Text
+        val currentAnswers = ArrayList<ActiveQuestionAnswer>()
+        for (answer in answersList) {
+            if (answer.QID == currentQuestion.QID)
+                currentAnswers.add(answer)
+        }
+        answer1!!.text = currentAnswers[0].Answer_Text
+        answer2!!.text = currentAnswers[1].Answer_Text
+        answer3!!.text = currentAnswers[2].Answer_Text
+        answer4!!.text = currentAnswers[3].Answer_Text
     }
 
     private fun setupLayoutElements() {
