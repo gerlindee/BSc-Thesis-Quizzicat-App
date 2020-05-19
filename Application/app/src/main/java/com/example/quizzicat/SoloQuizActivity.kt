@@ -39,6 +39,7 @@ class SoloQuizActivity : AppCompatActivity() {
     private var questionProgress: ProgressBar? = null
     private var questionText: TextView? = null
     private var nextQuestionButton: Button? = null
+    private var timer: CountDownTimer? = null
 
     private var mFirestoreDatabase: FirebaseFirestore? = null
 
@@ -52,7 +53,7 @@ class SoloQuizActivity : AppCompatActivity() {
 
         getQuestionsAndAnswers()
 
-        answerGroup!!.setOnCheckedChangeListener({ _, i ->
+        answerGroup!!.setOnCheckedChangeListener { _, i ->
             nextQuestionButton!!.isEnabled = i == R.id.solo_quiz_question_answ_1 ||
                     i == R.id.solo_quiz_question_answ_2 ||
                     i == R.id.solo_quiz_question_answ_3 ||
@@ -81,7 +82,7 @@ class SoloQuizActivity : AppCompatActivity() {
                 answer1!!.background = answer2!!.background
                 answer3!!.background = answer2!!.background
             }
-        })
+        }
 
         questionProgress!!.max = questionList.size
         questionProgress!!.progress = 1
@@ -99,6 +100,7 @@ class SoloQuizActivity : AppCompatActivity() {
                 }
                 showResult(false)
             } else {
+                timer!!.cancel()
                 if (currentQuestionNr == (questionList.size - 2)) {
                     nextQuestionButton!!.text = getString(R.string.string_finish_quiz)
                 }
@@ -117,6 +119,7 @@ class SoloQuizActivity : AppCompatActivity() {
                     setQuestionView()
                     answerGroup!!.clearCheck()
                     selectedAnswer.background = getDrawable(R.drawable.shape_rect_light_yellow)
+                    timer!!.start()
                 }, 2000)
             }
         }
@@ -259,7 +262,7 @@ class SoloQuizActivity : AppCompatActivity() {
     }
 
     private fun setTimer() {
-        val timer = object: CountDownTimer(30000, 1000) {
+        timer = object: CountDownTimer(11000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val formattedSecondsLeft = String.format(
                     "%02d:%02d",
@@ -277,7 +280,7 @@ class SoloQuizActivity : AppCompatActivity() {
                 showResult(true)
             }
         }
-        timer.start()
+        timer!!.start()
     }
 
     private fun showResult(isOutOfTime: Boolean) {
@@ -310,7 +313,7 @@ class SoloQuizActivity : AppCompatActivity() {
         }
         return ActiveQuestionAnswer(1, 1, "a", false)
     }
-    
+
     private fun setQuestionView() {
         val currentQuestion = questionList[currentQuestionNr]
         val number = currentQuestionNr + 1
