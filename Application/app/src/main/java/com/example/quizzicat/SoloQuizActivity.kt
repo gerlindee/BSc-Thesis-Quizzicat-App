@@ -1,5 +1,6 @@
 package com.example.quizzicat
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -24,7 +25,7 @@ class SoloQuizActivity : AppCompatActivity() {
     private var questionList = ArrayList<ActiveQuestion>()
     private var answersList = ArrayList<ActiveQuestionAnswer>()
 
-    private var currentQuestionNr = 0;
+    private var currentQuestionNr = 0
     private var correctAnswers = 0
     private var incorrectAnswers = 0
 
@@ -51,7 +52,7 @@ class SoloQuizActivity : AppCompatActivity() {
 
         getQuestionsAndAnswers()
 
-        answerGroup!!.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { _, i ->
+        answerGroup!!.setOnCheckedChangeListener({ _, i ->
             nextQuestionButton!!.isEnabled = i == R.id.solo_quiz_question_answ_1 ||
                     i == R.id.solo_quiz_question_answ_2 ||
                     i == R.id.solo_quiz_question_answ_3 ||
@@ -112,7 +113,7 @@ class SoloQuizActivity : AppCompatActivity() {
                     incorrectAnswers += 1
                     setAnswerHighlight(selectedAnswer, false)
                 }
-                Handler().postDelayed(Runnable {
+                Handler().postDelayed({
                     setQuestionView()
                     answerGroup!!.clearCheck()
                     selectedAnswer.background = getDrawable(R.drawable.shape_rect_light_yellow)
@@ -246,13 +247,12 @@ class SoloQuizActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Quit")
             .setMessage("Are you sure you want to quit? All progress will be lost!")
-            .setPositiveButton("Exit", DialogInterface.OnClickListener{
-                    _, _ ->
+            .setPositiveButton("Exit") { _, _ ->
                 run {
                     val mainMenuIntent = Intent(this, MainMenuActivity::class.java)
                     startActivity(mainMenuIntent)
                 }
-            })
+            }
             .setNegativeButton("Cancel", null)
             .create()
             .show()
@@ -281,24 +281,22 @@ class SoloQuizActivity : AppCompatActivity() {
     }
 
     private fun showResult(isOutOfTime: Boolean) {
-        var titleAlertDialog = ""
-        if (isOutOfTime) {
-            titleAlertDialog = "Oops! Seems you ran out of time :("
+        val titleAlertDialog: String = if (isOutOfTime) {
+            "Oops! Seems you ran out of time :("
         } else {
-            titleAlertDialog = "Results"
+            "Results"
         }
         val resultText =
             "Correctly answered questions: $correctAnswers\nIncorrectly answered questions: $incorrectAnswers"
         AlertDialog.Builder(this)
             .setTitle(titleAlertDialog)
             .setMessage(resultText)
-            .setPositiveButton("Exit", DialogInterface.OnClickListener{
-                    _, _ ->
+            .setPositiveButton("Exit") { _, _ ->
                 run {
                     val mainMenuIntent = Intent(this, MainMenuActivity::class.java)
                     startActivity(mainMenuIntent)
                 }
-            })
+            }
             .setCancelable(false)
             .create()
             .show()
@@ -312,7 +310,7 @@ class SoloQuizActivity : AppCompatActivity() {
         }
         return ActiveQuestionAnswer(1, 1, "a", false)
     }
-
+    
     private fun setQuestionView() {
         val currentQuestion = questionList[currentQuestionNr]
         val number = currentQuestionNr + 1
