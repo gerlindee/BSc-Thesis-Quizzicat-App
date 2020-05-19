@@ -55,6 +55,30 @@ class SoloQuizActivity : AppCompatActivity() {
                     i == R.id.solo_quiz_question_answ_2 ||
                     i == R.id.solo_quiz_question_answ_3 ||
                     i == R.id.solo_quiz_question_answ_4
+            if (i == R.id.solo_quiz_question_answ_1) {
+                answer1!!.background = getDrawable(R.drawable.shape_rect_light_yellow_stroke)
+                answer2!!.background = getDrawable(R.drawable.shape_rect_light_yellow)
+                answer3!!.background = answer2!!.background
+                answer4!!.background = answer2!!.background
+            }
+            if (i == R.id.solo_quiz_question_answ_2) {
+                answer2!!.background = getDrawable(R.drawable.shape_rect_light_yellow_stroke)
+                answer1!!.background = getDrawable(R.drawable.shape_rect_light_yellow)
+                answer3!!.background = answer1!!.background
+                answer4!!.background = answer1!!.background
+            }
+            if (i == R.id.solo_quiz_question_answ_3) {
+                answer3!!.background = getDrawable(R.drawable.shape_rect_light_yellow_stroke)
+                answer2!!.background = getDrawable(R.drawable.shape_rect_light_yellow)
+                answer1!!.background = answer2!!.background
+                answer4!!.background = answer2!!.background
+            }
+            if (i == R.id.solo_quiz_question_answ_4) {
+                answer4!!.background = getDrawable(R.drawable.shape_rect_light_yellow_stroke)
+                answer2!!.background = getDrawable(R.drawable.shape_rect_light_yellow)
+                answer1!!.background = answer2!!.background
+                answer3!!.background = answer2!!.background
+            }
         })
 
         questionProgress!!.max = questionList.size

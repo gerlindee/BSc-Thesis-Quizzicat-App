@@ -27,7 +27,7 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:singleLine="true"
-                android:text="01/05"
+                android:text="@string/placeholder_nr_of_questions"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -40,6 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:textColor="@color/colorAccent"
+            android:text="@string/placeholder_time"
             android:textSize="25sp"
             android:textStyle="bold" />
 
@@ -50,9 +51,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="10dp"
         android:indeterminateOnly="false"
         android:max="30"
+        android:layout_marginVertical="5dp"
         android:maxHeight="20dp"
         android:minHeight="10dp"
         android:progressDrawable="@drawable/progress_bar_horizontal" />
@@ -61,15 +63,16 @@
         android:id="@+id/solo_quiz_question_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Question Text"
+        android:text="@string/placeholder_question_text"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_marginTop="5dp"
         android:textColor="@color/colorAccent" />
 
     <RadioGroup
         android:id="@+id/solo_quiz_question_answ_group"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:layout_weight="0.03">
 
         <RadioButton
@@ -77,28 +80,48 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="false"
-            android:text="Answer 1" />
+            android:background="@drawable/shape_rect_light_yellow"
+            android:button="@android:color/transparent"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
+            android:text="@string/placeholder_answer_text" />
 
         <RadioButton
             android:id="@+id/solo_quiz_question_answ_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="false"
-            android:text="Answer 2" />
+            android:background="@drawable/shape_rect_light_yellow"
+            android:button="@android:color/transparent"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
+            android:text="@string/placeholder_answer_text" />
 
         <RadioButton
             android:id="@+id/solo_quiz_question_answ_3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="false"
-            android:text="Answer 3" />
+            android:background="@drawable/shape_rect_light_yellow"
+            android:button="@android:color/transparent"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
+            android:text="@string/placeholder_answer_text" />
 
         <RadioButton
             android:id="@+id/solo_quiz_question_answ_4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="false"
-            android:text="Answer 4" />
+            android:background="@drawable/shape_rect_light_yellow"
+            android:button="@android:color/transparent"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
+            android:text="@string/placeholder_answer_text" />
 
     </RadioGroup>
 
@@ -107,6 +130,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:enabled="false"
-        android:text="NEXT" />
+        android:text="@string/placeholder_next_question" />
 
 </LinearLayout>
