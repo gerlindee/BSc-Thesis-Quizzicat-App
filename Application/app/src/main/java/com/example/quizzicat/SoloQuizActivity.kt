@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -90,8 +91,10 @@ class SoloQuizActivity : AppCompatActivity() {
                 val selectedAnswer = findViewById<RadioButton>(answerGroup!!.checkedRadioButtonId)
                 if (selectedAnswer.text == correctAnswer.Answer_Text) {
                     correctAnswers += 1
+                    setAnswerHighlight(selectedAnswer, true)
                 } else {
                     incorrectAnswers += 1
+                    setAnswerHighlight(selectedAnswer, false)
                 }
                 showResult(false)
             } else {
@@ -104,13 +107,16 @@ class SoloQuizActivity : AppCompatActivity() {
                 val selectedAnswer = findViewById<RadioButton>(answerGroup!!.checkedRadioButtonId)
                 if (selectedAnswer.text == correctAnswer.Answer_Text) {
                     correctAnswers += 1
-                    DesignUtils.showSnackbar(window.decorView.rootView, "Good job!", this)
+                    setAnswerHighlight(selectedAnswer, true)
                 } else {
                     incorrectAnswers += 1
-                    DesignUtils.showSnackbar(window.decorView.rootView, "Oh-oh, that doesn't seem right", this)
+                    setAnswerHighlight(selectedAnswer, false)
                 }
-                setQuestionView()
-                answerGroup!!.clearCheck()
+                Handler().postDelayed(Runnable {
+                    setQuestionView()
+                    answerGroup!!.clearCheck()
+                    selectedAnswer.background = getDrawable(R.drawable.shape_rect_light_yellow)
+                }, 2000)
             }
         }
     }
@@ -334,5 +340,13 @@ class SoloQuizActivity : AppCompatActivity() {
         answer3 = findViewById(R.id.solo_quiz_question_answ_3)
         answer4 = findViewById(R.id.solo_quiz_question_answ_4)
         nextQuestionButton = findViewById(R.id.solo_quiz_next_button)
+    }
+
+    private fun setAnswerHighlight(selectedAnswer: RadioButton, isCorrect: Boolean) {
+        if (isCorrect) {
+            selectedAnswer.background = getDrawable(R.drawable.shape_correct_answer)
+        } else {
+            selectedAnswer.background = getDrawable(R.drawable.shape_wrong_answer)
+        }
     }
 }
