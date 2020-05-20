@@ -17,7 +17,7 @@ class MainMenuViewPagerAdapter(fragmentActivity: FragmentActivity): FragmentStat
             0 -> return TopicCategoriesFragment()
             1 -> return MultiPlayerMenuFragment()
             2 -> return QuestionsLeaderboardFragment()
-            3 -> return UserProfileFragment()
+            3 -> return RecommendationsFragment()
             4 -> return SettingsFragment()
         }
         return TopicCategoriesFragment()

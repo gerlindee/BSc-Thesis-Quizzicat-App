@@ -9,6 +9,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
 import com.nostra13.universalimageloader.core.assist.FailReason
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener
 import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
 
 class ImageLoadingFacade(var context: Context) {
     private val imageLoader: ImageLoader = ImageLoader.getInstance()
@@ -19,6 +20,10 @@ class ImageLoadingFacade(var context: Context) {
 
     private fun loadImageWithPicasso(url: String, imageView: ImageView) {
         Picasso.with(context).load(url).into(imageView)
+    }
+
+    public fun loadImageIntoCircleView(url: String, circleImageView: CircleImageView) {
+        Picasso.with(context).load(url).into(circleImageView)
     }
 
     private fun loadImageWithUIL(url: String, imageView: ImageView) {
