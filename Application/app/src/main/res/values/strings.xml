@@ -42,8 +42,8 @@
     <string name="settings_delete_account">Delete account</string>
     <string name="settings_log_out">Log out</string>
     <string name="settings_delete_message">We\'re sad to see you go</string>
-    <string name="delete_acc_line_1">All the data associated with this account will \n be deleted, including your user profile information, \n playing history and statistics and recommendations.</string>
-    <string name="delete_acc_line_2">All the questions that you have submitted and  \n will remain part of the leaderboard and the question roster.</string>
+    <string name="delete_acc_line_1">All the data associated with this account will \n be deleted, including your user profile information, \n playing history, statistics and recommendations.</string>
+    <string name="delete_acc_line_2">All the questions that you have submitted will \n remain part of the leaderboard and the question roster.</string>
     <string name="delete_acc_confirm">Confirm your e-mail address</string>
     <string name="default_avatar"><![CDATA[https://firebasestorage.googleapis.com/v0/b/quizzicat-ca219.appspot.com/o/Avatars%2Fdefault_icon.png?alt=media&token=bfb09bfc-df91-4027-8242-5480e6c27e3f]]></string>
 
