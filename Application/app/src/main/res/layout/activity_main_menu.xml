@@ -30,9 +30,9 @@
 
                 <ImageView
                     android:id="@+id/sign_out_button"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:background="@drawable/sign"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/settings_log_out"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.95"

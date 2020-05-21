@@ -36,6 +36,11 @@
     <string name="placeholder_question_text">Question Text</string>
     <string name="placeholder_answer_text">Answer Text</string>
     <string name="placeholder_next_question">NEXT</string>
+    <string name="settings_change_profile">Change profile information</string>
+    <string name="settings_reset_password">Reset your password</string>
+    <string name="settings_delete_history">Delete playing history</string>
+    <string name="settings_delete_account">Delete account</string>
+    <string name="settings_log_out">Log out</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">
