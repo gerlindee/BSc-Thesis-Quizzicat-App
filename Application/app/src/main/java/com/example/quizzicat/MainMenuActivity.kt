@@ -1,6 +1,7 @@
 package com.example.quizzicat
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,7 @@ import android.widget.Toast
 import androidx.viewpager2.widget.ViewPager2
 import com.example.quizzicat.Adapters.MainMenuViewPagerAdapter
 import com.example.quizzicat.Facades.ImageLoadingFacade
+import com.example.quizzicat.Facades.UserDataRetrievalFacade
 import com.example.quizzicat.Fragments.TopicCategoriesFragment
 import com.example.quizzicat.Model.User
 import com.example.quizzicat.Utils.UserDataCallBack
@@ -39,7 +41,8 @@ class MainMenuActivity : AppCompatActivity() {
         profilePictureImageView = findViewById(R.id.avatar_display)
 
         setTitlesForTabs()
-        setUserAvatar()
+
+        setUserAvatar(mFirebaseAuth!!.currentUser!!.photoUrl)
 
         menuViewPager = findViewById(R.id.main_menu_viewpager)
         menuViewPager!!.adapter = MainMenuViewPagerAdapter(this)
@@ -71,32 +74,17 @@ class MainMenuActivity : AppCompatActivity() {
         mTabsTitles.add(R.drawable.settings_tab)
     }
 
-    private fun getUserDetails(callback: UserDataCallBack) {
-        mFirestoreDatabase!!.collection("Users")
-            .whereEqualTo("uid", mFirebaseAuth!!.currentUser!!.uid)
-            .get()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    var user: User ? = null
-                    for (document in task.result!!) {
-                        val userUID = document.get("uid") as String
-                        val userCity = document.get("city") as String
-                        val userCountry = document.get("country") as String
-                        val userDisplayName = document.get("displayName") as String
-                        val userPicture = document.get("profileImageURL") as String
-                        user = User(userUID, userDisplayName, userPicture, userCountry, userCity)
+    private fun setUserAvatar(URL: Uri?) {
+        if (URL == null) {
+            UserDataRetrievalFacade(mFirestoreDatabase!!, mFirebaseAuth!!.currentUser!!.uid)
+                .getUserDetails(object : UserDataCallBack {
+                    override fun onCallback(value: User) {
+                        ImageLoadingFacade(this@MainMenuActivity).loadImageIntoCircleView(value.profileImageURL, profilePictureImageView!!)
                     }
-                    callback.onCallback(user!!)
-                }
-            }
-    }
-
-    private fun setUserAvatar() {
-        getUserDetails(object: UserDataCallBack {
-            override fun onCallback(value: User) {
-                ImageLoadingFacade(this@MainMenuActivity).loadImageIntoCircleView(value.profileImageURL, profilePictureImageView!!)
-            }
-        })
+                })
+        } else {
+            ImageLoadingFacade(this@MainMenuActivity).loadImageIntoCircleView(URL.toString(), profilePictureImageView!!)
+        }
     }
 
     override fun onBackPressed() {
