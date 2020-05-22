@@ -2,6 +2,7 @@ package com.example.quizzicat
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import com.example.quizzicat.Facades.ImageLoadingFacade
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
 import com.example.quizzicat.Model.User
@@ -107,6 +109,9 @@ class ChangeUserProfileActivity : AppCompatActivity() {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             uploadAvatarToFirebaseStorage()
+                            if (emailTextView!!.text.toString() != currentUser.email) {
+                                updateEmailAddress()
+                            }
                         } else {
                             DesignUtils.showSnackbar(window.decorView.rootView, task.exception!!.message.toString(), this)
                         }
@@ -186,12 +191,28 @@ class ChangeUserProfileActivity : AppCompatActivity() {
             .set(updatedUser)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    update_profile_progress_bar.visibility = View.VISIBLE
+                    update_profile_progress_bar.visibility = View.GONE
                     pictureWasUpdated = true
                     DesignUtils.showSnackbar(window.decorView.rootView, "User profile successfully updated", this)
                 } else {
                     update_profile_progress_bar.visibility = View.GONE
                     DesignUtils.showSnackbar(window.decorView.rootView, task.exception!!.message!!, this)
+                }
+            }
+    }
+
+    private fun updateEmailAddress() {
+        mFirebaseAuth!!.currentUser!!.updateEmail(emailTextView!!.text.toString())
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    DesignUtils.showSnackbar(window.decorView.rootView, task.exception!!.message!!, this)
+                } else {
+                    AlertDialog.Builder(this)
+                        .setTitle("E-mail changed")
+                        .setMessage("The address associated with this account has been changed. Please verify your new e-mail address. If you do not receive an account validation e-mail, please contact the support team.")
+                        .setPositiveButton("Ok", null)
+                        .create()
+                        .show()
                 }
             }
     }
