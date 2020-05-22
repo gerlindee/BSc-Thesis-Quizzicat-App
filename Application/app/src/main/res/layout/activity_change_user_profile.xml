@@ -163,6 +163,7 @@
         app:layout_constraintTop_toBottomOf="@+id/input_layout_confirm_password" />
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="507dp"
         android:layout_height="236dp"
         android:layout_marginTop="220dp"
@@ -173,5 +174,16 @@
         app:layout_constraintTop_toBottomOf="@+id/layout_change_email"
         app:layout_constraintVertical_bias="0.13"
         tools:ignore="ContentDescription" />
+
+    <ProgressBar
+        android:id="@+id/update_profile_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

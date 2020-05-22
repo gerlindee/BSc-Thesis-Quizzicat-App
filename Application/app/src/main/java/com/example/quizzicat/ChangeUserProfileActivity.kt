@@ -7,14 +7,17 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import com.example.quizzicat.Facades.ImageLoadingFacade
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
 import com.example.quizzicat.Model.User
+import com.example.quizzicat.Utils.DesignUtils
 import com.example.quizzicat.Utils.UserDataCallBack
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -23,6 +26,7 @@ import com.google.firebase.storage.FirebaseStorage
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_change_user_profile.*
 import kotlinx.android.synthetic.main.activity_register.*
+import java.util.*
 
 class ChangeUserProfileActivity : AppCompatActivity() {
 
@@ -34,10 +38,12 @@ class ChangeUserProfileActivity : AppCompatActivity() {
     private var avatarImageView: CircleImageView? = null
     private var nameTextView: TextInputEditText? = null
     private var emailTextView: TextInputEditText? = null
-    private var passwordTextView: TextInputLayout? = null
+    private var passwordTextLayout: TextInputLayout? = null
+    private var passwordTextView: TextInputEditText? = null
     private var saveChangesButton: MaterialButton? = null
 
     private var selectedPhotoUri: Uri? = null
+    private var pictureWasUpdated = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,9 +72,14 @@ class ChangeUserProfileActivity : AppCompatActivity() {
         }
 
         button_change_email.setOnClickListener {
-            val wasEnabled = emailTextView!!.isEnabled
-            emailTextView!!.isEnabled = !wasEnabled
-            enableConfirmationAndSaving()
+            if (mFirebaseAuth!!.currentUser!!.providerData[1].providerId == "facebook.com" ||
+                mFirebaseAuth!!.currentUser!!.providerData[1].providerId == "google.com" ) {
+                DesignUtils.showSnackbar(window.decorView.rootView, "Can not change e-mail address for Facebook or Google accounts!", this)
+            } else {
+                val wasEnabled = emailTextView!!.isEnabled
+                emailTextView!!.isEnabled = !wasEnabled
+                enableConfirmationAndSaving()
+            }
         }
 
         change_icon.setOnClickListener {
@@ -83,25 +94,49 @@ class ChangeUserProfileActivity : AppCompatActivity() {
             ImageLoadingFacade(applicationContext).loadImageIntoCircleView(originalUserData!!.profileImageURL, avatarImageView!!)
             enableConfirmationAndSaving()
         }
+
+        change_confirm_button.setOnClickListener {
+            if(passwordTextView!!.text!!.isEmpty() && wereChangesMade()) {
+                DesignUtils.showSnackbar(window.decorView.rootView, "Please provide the password associated with your account in order to confirm the account changes!", this)
+            } else {
+                update_profile_progress_bar.visibility = View.VISIBLE
+                val currentUser = mFirebaseAuth!!.currentUser!!
+                val confirmedPassword = passwordTextView!!.text.toString()
+                val credential = EmailAuthProvider.getCredential(currentUser.email!!, confirmedPassword)
+                currentUser.reauthenticate(credential)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            uploadAvatarToFirebaseStorage()
+                        } else {
+                            DesignUtils.showSnackbar(window.decorView.rootView, task.exception!!.message.toString(), this)
+                        }
+                    }
+            }
+        }
+    }
+
+    private fun wereChangesMade() : Boolean {
+        return selectedPhotoUri != null ||
+               emailTextView!!.text.toString() != mFirebaseAuth!!.currentUser!!.email ||
+               nameTextView!!.text.toString()  != originalUserData!!.displayName
     }
 
     private fun setupLayoutElements() {
         avatarImageView = findViewById(R.id.change_icon)
         nameTextView = findViewById(R.id.change_name)
         emailTextView = findViewById(R.id.change_email)
-        passwordTextView = findViewById(R.id.input_layout_confirm_password)
+        passwordTextLayout = findViewById(R.id.input_layout_confirm_password)
+        passwordTextView = findViewById(R.id.change_confirm_password)
         saveChangesButton = findViewById(R.id.change_confirm_button)
     }
 
     private fun enableConfirmationAndSaving() {
-        if (passwordTextView!!.visibility == View.GONE) {
-            passwordTextView!!.visibility = View.VISIBLE
+        if (passwordTextLayout!!.visibility == View.GONE) {
+            passwordTextLayout!!.visibility = View.VISIBLE
             saveChangesButton!!.visibility = View.VISIBLE
         } else {
-            if (selectedPhotoUri == null &&
-                emailTextView!!.text.toString() == mFirebaseAuth!!.currentUser!!.email &&
-                nameTextView!!.text.toString()  == originalUserData!!.displayName ) {
-                passwordTextView!!.visibility = View.GONE
+            if (!wereChangesMade()) {
+                passwordTextLayout!!.visibility = View.GONE
                 saveChangesButton!!.visibility = View.GONE
             }
         }
@@ -123,4 +158,50 @@ class ChangeUserProfileActivity : AppCompatActivity() {
         val bitmap = ImageDecoder.decodeBitmap(source)
         change_icon.setImageBitmap(bitmap)
     }
+
+    private fun uploadAvatarToFirebaseStorage() {
+        if (selectedPhotoUri == null) {
+            updateUserInformation(originalUserData!!.profileImageURL)
+            return
+        }
+        val filename = UUID.randomUUID().toString()
+        val ref = mFirebaseStorage!!.getReference("/Avatars/$filename")
+        ref.putFile(selectedPhotoUri!!)
+            .addOnSuccessListener {
+                ref.downloadUrl.addOnSuccessListener {
+                    updateUserInformation(it.toString())
+                }
+            }
+            .addOnFailureListener {
+                update_profile_progress_bar.visibility = View.GONE
+                DesignUtils.showSnackbar(window.decorView.rootView, it.message!!, this)
+            }
+    }
+
+    private fun updateUserInformation(profilePictureURL: String) {
+        val updatedName = nameTextView!!.text.toString()
+        val updatedUser = User(originalUserData!!.uid, updatedName, profilePictureURL, originalUserData!!.country, originalUserData!!.city)
+        mFirestoreDatabase!!.collection("Users")
+            .document(originalUserData!!.uid)
+            .set(updatedUser)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    update_profile_progress_bar.visibility = View.VISIBLE
+                    pictureWasUpdated = true
+                    DesignUtils.showSnackbar(window.decorView.rootView, "User profile successfully updated", this)
+                } else {
+                    update_profile_progress_bar.visibility = View.GONE
+                    DesignUtils.showSnackbar(window.decorView.rootView, task.exception!!.message!!, this)
+                }
+            }
+    }
+
+    override fun onBackPressed() {
+        if (pictureWasUpdated) {
+            val mainMenuIntent = Intent(this, MainMenuActivity::class.java)
+            startActivity(mainMenuIntent)
+        }
+        super.onBackPressed()
+    }
+
 }
