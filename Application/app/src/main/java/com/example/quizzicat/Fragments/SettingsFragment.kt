@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.example.quizzicat.ChangeUserProfileActivity
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
 import com.example.quizzicat.LoginActivity
 import com.example.quizzicat.Model.User
@@ -139,6 +140,11 @@ class SettingsFragment : Fragment() {
                 .setNegativeButton("Cancel", null)
                 .create()
                 .show()
+        }
+
+        settings_change_profile.setOnClickListener {
+            val changeProfileIntent = Intent(context, ChangeUserProfileActivity::class.java)
+            startActivity(changeProfileIntent)
         }
     }
 

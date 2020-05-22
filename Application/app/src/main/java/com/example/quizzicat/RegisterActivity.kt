@@ -97,7 +97,6 @@ class RegisterActivity : AppCompatActivity() {
 
         register_avatar_remove.setOnClickListener {
             register_avatar_remove.visibility = View.GONE
-            Log.d("RegisterActivity", "Remove button has been pressed")
             selectedPhotoUri = null
             register_avatar_civ.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.default_icon, null))
         }

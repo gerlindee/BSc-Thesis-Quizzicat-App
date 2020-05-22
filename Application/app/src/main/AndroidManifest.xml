@@ -13,7 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".UserStatisticsActivity"></activity>
+        <activity android:name=".ChangeUserProfileActivity"></activity>
+        <activity android:name=".UserStatisticsActivity" />
         <activity android:name=".SoloQuizActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
