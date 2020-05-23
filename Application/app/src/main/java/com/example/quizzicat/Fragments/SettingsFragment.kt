@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Display
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -109,7 +110,7 @@ class SettingsFragment : Fragment() {
                             }
                             else -> {
                                 settings_progress_bar.visibility = View.VISIBLE
-                                deletePlayingHistory(mFirebaseAuth!!.currentUser!!.uid)
+                                deletePlayingHistory()
                                 val photoURL = mFirebaseAuth!!.currentUser!!.photoUrl
                                 if (photoURL == null) {
                                     UserDataRetrievalFacade(mFirestoreDatabase!!, mFirebaseAuth!!.currentUser!!.uid)
@@ -146,6 +147,20 @@ class SettingsFragment : Fragment() {
             val changeProfileIntent = Intent(context, ChangeUserProfileActivity::class.java)
             startActivity(changeProfileIntent)
         }
+
+        settings_delete_history.setOnClickListener {
+            AlertDialog.Builder(context!!)
+                .setTitle("Delete history")
+                .setMessage("Are you sure you want to delete your game history?")
+                .setPositiveButton("Confirm") { _, _ ->
+                    run {
+                        deletePlayingHistory()
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show()
+        }
     }
 
     private fun deleteDatabaseAuth() {
@@ -172,8 +187,21 @@ class SettingsFragment : Fragment() {
             }
     }
 
-    private fun deletePlayingHistory(UID: String) {
-
+    private fun deletePlayingHistory() {
+        val topicsPlayedCollection = mFirestoreDatabase!!.collection("Topics_Played")
+        mFirestoreDatabase!!.collection("Topics_Played")
+            .whereEqualTo("uid", mFirebaseAuth!!.currentUser!!.uid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    for (document in task.result!!) {
+                        topicsPlayedCollection.document(document.id).delete()
+                    }
+                    Toast.makeText(context, "Game history was successfully deleted", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
     }
 
 }
