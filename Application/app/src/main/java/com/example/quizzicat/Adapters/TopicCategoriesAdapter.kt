@@ -18,7 +18,7 @@ class TopicCategoriesAdapter(var context: Context, var arrayList: ArrayList<Abst
     }
 
     override fun getItemId(position: Int): Long {
-        return arrayList[position].CID.toLong()
+        return arrayList[position].cid.toLong()
     }
 
     override fun getCount(): Int {
@@ -31,7 +31,7 @@ class TopicCategoriesAdapter(var context: Context, var arrayList: ArrayList<Abst
         val categoryName = categoryView.findViewById<TextView>(R.id.category_name)
 
         val categoryItem = arrayList[position]
-        ImageLoadingFacade(context).loadImage(categoryItem.iconURL, categoryIcon)
+        ImageLoadingFacade(context).loadImage(categoryItem.icon_url, categoryIcon)
         categoryName.text = categoryItem.name
 
         return categoryView

@@ -42,7 +42,7 @@ class MainMenuActivity : AppCompatActivity() {
 
         setTitlesForTabs()
 
-        setUserAvatar(mFirebaseAuth!!.currentUser!!.photoUrl)
+        setUserAvatar()
 
         menuViewPager = findViewById(R.id.main_menu_viewpager)
         menuViewPager!!.adapter = MainMenuViewPagerAdapter(this)
@@ -74,17 +74,16 @@ class MainMenuActivity : AppCompatActivity() {
         mTabsTitles.add(R.drawable.settings_tab)
     }
 
-    private fun setUserAvatar(URL: Uri?) {
-        if (URL == null) {
-            UserDataRetrievalFacade(mFirestoreDatabase!!, mFirebaseAuth!!.currentUser!!.uid)
-                .getUserDetails(object : UserDataCallBack {
-                    override fun onCallback(value: User) {
-                        ImageLoadingFacade(this@MainMenuActivity).loadImageIntoCircleView(value.profileImageURL, profilePictureImageView!!)
-                    }
-                })
-        } else {
-            ImageLoadingFacade(this@MainMenuActivity).loadImageIntoCircleView(URL.toString(), profilePictureImageView!!)
-        }
+    private fun setUserAvatar() {
+        UserDataRetrievalFacade(mFirestoreDatabase!!, mFirebaseAuth!!.currentUser!!.uid)
+            .getUserDetails(object : UserDataCallBack {
+                override fun onCallback(value: User) {
+                    ImageLoadingFacade(this@MainMenuActivity).loadImageIntoCircleView(
+                        value.avatar_url,
+                        profilePictureImageView!!
+                    )
+                }
+            })
     }
 
     override fun onBackPressed() {

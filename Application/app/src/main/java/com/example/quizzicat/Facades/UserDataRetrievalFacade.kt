@@ -17,8 +17,8 @@ class UserDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore, 
                         val userUID = document.get("uid") as String
                         val userCity = document.get("city") as String
                         val userCountry = document.get("country") as String
-                        val userDisplayName = document.get("displayName") as String
-                        val userPicture = document.get("profileImageURL") as String
+                        val userDisplayName = document.get("display_name") as String
+                        val userPicture = document.get("avatar_url") as String
                         user = User(userUID, userDisplayName, userPicture, userCountry, userCity)
                     }
                     callback.onCallback(user!!)

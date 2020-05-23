@@ -1,7 +1,7 @@
 package com.example.quizzicat.Model
 
 interface AbstractTopic {
-    val CID: Long
+    val cid: Long
     val name: String
-    val iconURL: String
+    val icon_url: String
 }

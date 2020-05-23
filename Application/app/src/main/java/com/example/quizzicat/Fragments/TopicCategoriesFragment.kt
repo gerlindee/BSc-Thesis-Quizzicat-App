@@ -57,7 +57,7 @@ class TopicCategoriesFragment : Fragment() {
                         val soloQuizIntent = Intent(activity, SoloQuizActivity::class.java)
                         soloQuizIntent.putExtra("questionsDifficulty", selectedDifficulty.selectedItem.toString())
                         soloQuizIntent.putExtra("questionsNumber", selectedNumberOfQuestions.selectedItem.toString())
-                        soloQuizIntent.putExtra("questionsTopic", topicsList!![position].TID)
+                        soloQuizIntent.putExtra("questionsTopic", topicsList!![position].tid)
                         startActivity(soloQuizIntent)
                     }
                     .setNegativeButton("Cancel", null)
@@ -70,7 +70,7 @@ class TopicCategoriesFragment : Fragment() {
                         topicCategoriesAdapter!!.arrayList = topicsList as ArrayList<AbstractTopic>
                         topicCategoriesAdapter!!.notifyDataSetChanged()
                     }
-                }, selectedCategory.CID)
+                }, selectedCategory.cid)
                 categories_go_back.visibility = View.VISIBLE
             }
         }
@@ -94,15 +94,15 @@ class TopicCategoriesFragment : Fragment() {
 
     private fun getCategories(myCallback: CustomCallBack) {
         mFirestoreDatabase!!.collection("Topic_Categories")
-            .orderBy("Name")
+            .orderBy("name")
             .get()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val topicCategories = ArrayList<TopicCategory>()
                     for (document in task.result!!) {
-                        val topicCategoryID = document.get("CID") as Long
-                        val topicCategoryURL = document.get("Icon_URL") as String
-                        val topicCategoryName = document.get("Name") as String
+                        val topicCategoryID = document.get("cid") as Long
+                        val topicCategoryURL = document.get("icon_url") as String
+                        val topicCategoryName = document.get("name") as String
                         val topicCategory = TopicCategory(topicCategoryID, topicCategoryURL, topicCategoryName)
                         topicCategories.add(topicCategory)
                     }
@@ -116,17 +116,17 @@ class TopicCategoriesFragment : Fragment() {
     private fun getTopicsForCategory(myCallback: CustomCallBack, selectedCategory: Long) {
         topicsLevel = true
         mFirestoreDatabase!!.collection("Topics")
-            .whereEqualTo("CID", selectedCategory)
-            .orderBy("Name")
+            .whereEqualTo("cid", selectedCategory)
+            .orderBy("name")
             .get()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val topics = ArrayList<Topic>()
                     for (document in task.result!!) {
-                        val topicCID = document.get("CID") as Long
-                        val topicTID = document.get("TID") as Long
-                        val topicURL = document.get("Icon_URL") as String
-                        val topicName = document.get("Name") as String
+                        val topicCID = document.get("cid") as Long
+                        val topicTID = document.get("tid") as Long
+                        val topicURL = document.get("icon_url") as String
+                        val topicName = document.get("name") as String
                         val topic = Topic(topicTID, topicCID, topicURL, topicName)
                         topics.add(topic)
                     }

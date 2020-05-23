@@ -1,7 +1,7 @@
 package com.example.quizzicat.Model
 
 class User(val uid: String,
-           val displayName: String,
-           val profileImageURL: String,
+           val display_name: String,
+           val avatar_url: String,
            val country: String,
            val city: String)

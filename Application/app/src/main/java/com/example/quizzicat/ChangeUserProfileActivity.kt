@@ -61,8 +61,8 @@ class ChangeUserProfileActivity : AppCompatActivity() {
             .getUserDetails(object: UserDataCallBack {
                 override fun onCallback(value: User) {
                     originalUserData = value
-                    ImageLoadingFacade(applicationContext).loadImageIntoCircleView(value.profileImageURL, avatarImageView!!)
-                    nameTextView!!.setText(value.displayName)
+                    ImageLoadingFacade(applicationContext).loadImageIntoCircleView(value.avatar_url, avatarImageView!!)
+                    nameTextView!!.setText(value.display_name)
                     emailTextView!!.setText(mFirebaseAuth!!.currentUser!!.email)
                 }
             })
@@ -93,7 +93,7 @@ class ChangeUserProfileActivity : AppCompatActivity() {
         change_icon_remove.setOnClickListener {
             change_icon_remove.visibility = View.GONE
             selectedPhotoUri = null
-            ImageLoadingFacade(applicationContext).loadImageIntoCircleView(originalUserData!!.profileImageURL, avatarImageView!!)
+            ImageLoadingFacade(applicationContext).loadImageIntoCircleView(originalUserData!!.avatar_url, avatarImageView!!)
             enableConfirmationAndSaving()
         }
 
@@ -113,6 +113,7 @@ class ChangeUserProfileActivity : AppCompatActivity() {
                                 updateEmailAddress()
                             }
                         } else {
+                            update_profile_progress_bar.visibility = View.GONE
                             DesignUtils.showSnackbar(window.decorView.rootView, task.exception!!.message.toString(), this)
                         }
                     }
@@ -123,7 +124,7 @@ class ChangeUserProfileActivity : AppCompatActivity() {
     private fun wereChangesMade() : Boolean {
         return selectedPhotoUri != null ||
                emailTextView!!.text.toString() != mFirebaseAuth!!.currentUser!!.email ||
-               nameTextView!!.text.toString()  != originalUserData!!.displayName
+               nameTextView!!.text.toString()  != originalUserData!!.display_name
     }
 
     private fun setupLayoutElements() {
@@ -166,7 +167,7 @@ class ChangeUserProfileActivity : AppCompatActivity() {
 
     private fun uploadAvatarToFirebaseStorage() {
         if (selectedPhotoUri == null) {
-            updateUserInformation(originalUserData!!.profileImageURL)
+            updateUserInformation(originalUserData!!.avatar_url)
             return
         }
         val filename = UUID.randomUUID().toString()

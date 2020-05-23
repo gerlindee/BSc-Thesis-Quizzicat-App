@@ -165,7 +165,7 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) {
                 login_progress_bar.visibility = View.GONE
                 if (it.isSuccessful) {
-                    saveUserData()
+                    socialMediaAccountExists()
                     checkUserSession()
                 } else {
                     DesignUtils.showSnackbar(window.decorView.rootView, it.exception!!.message.toString(), this)
@@ -203,8 +203,8 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 login_progress_bar.visibility = View.GONE
                 if (task.isSuccessful) {
-                    // save the user's information to the database
-                    saveUserData()
+                    // save the user's information to the database if the account with the social media account does not already exist
+                    socialMediaAccountExists()
                     // update UI with the signed-in user's information
                     checkUserSession()
                 } else {
@@ -238,6 +238,19 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(mainMenuIntent)
             }
         }
+    }
+
+    private fun socialMediaAccountExists() {
+        // the check is needed so that we don't overwrite the user data every time they log in with a social media account
+        mFirestoreDatabase!!.collection("Users")
+            .document(mFirebaseAuth!!.currentUser!!.uid)
+            .get()
+            .addOnCompleteListener { task ->
+                val result = task.result
+                if (!result!!.exists()) {
+                    saveUserData()
+                }
+            }
     }
 
     private fun saveUserData() {

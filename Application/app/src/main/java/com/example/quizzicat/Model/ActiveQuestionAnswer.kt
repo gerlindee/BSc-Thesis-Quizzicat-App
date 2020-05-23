@@ -1,6 +1,6 @@
 package com.example.quizzicat.Model
 
-class ActiveQuestionAnswer(val AID: Long,
-                           val QID: Long,
-                           val Answer_Text: String,
-                           val Is_Correct: Boolean)
+class ActiveQuestionAnswer(val aid: Long,
+                           val qid: Long,
+                           val answer_text: String,
+                           val is_correct: Boolean)

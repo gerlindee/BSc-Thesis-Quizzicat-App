@@ -115,10 +115,10 @@ class SettingsFragment : Fragment() {
                                     UserDataRetrievalFacade(mFirestoreDatabase!!, mFirebaseAuth!!.currentUser!!.uid)
                                         .getUserDetails(object : UserDataCallBack {
                                             override fun onCallback(value: User) {
-                                                if (value.profileImageURL == getString(R.string.default_avatar)) {
+                                                if (value.avatar_url == getString(R.string.default_avatar)) {
                                                     deleteDatabaseAuth()
                                                 } else {
-                                                    mFirebaseStorage!!.getReferenceFromUrl(value.profileImageURL).delete()
+                                                    mFirebaseStorage!!.getReferenceFromUrl(value.avatar_url).delete()
                                                         .addOnCompleteListener { task ->
                                                             if (task.isSuccessful) {
                                                                 deleteDatabaseAuth()

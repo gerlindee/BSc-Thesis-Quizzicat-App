@@ -91,7 +91,7 @@ class SoloQuizActivity : AppCompatActivity() {
             if (currentQuestionNr == (questionList.size - 1)) {
                 val correctAnswer = getCorrectAnswer(currentQuestionNr)
                 val selectedAnswer = findViewById<RadioButton>(answerGroup!!.checkedRadioButtonId)
-                if (selectedAnswer.text == correctAnswer.Answer_Text) {
+                if (selectedAnswer.text == correctAnswer.answer_text) {
                     correctAnswers += 1
                     setAnswerHighlight(selectedAnswer, true)
                 } else {
@@ -108,7 +108,7 @@ class SoloQuizActivity : AppCompatActivity() {
                 currentQuestionNr += 1
                 questionProgress!!.progress += 1
                 val selectedAnswer = findViewById<RadioButton>(answerGroup!!.checkedRadioButtonId)
-                if (selectedAnswer.text == correctAnswer.Answer_Text) {
+                if (selectedAnswer.text == correctAnswer.answer_text) {
                     correctAnswers += 1
                     setAnswerHighlight(selectedAnswer, true)
                 } else {
@@ -136,7 +136,7 @@ class SoloQuizActivity : AppCompatActivity() {
                     randomizeQuestions()
                     val questionsQIDList = ArrayList<Long>()
                     for (question in questionList) {
-                        questionsQIDList.add(question.QID)
+                        questionsQIDList.add(question.qid)
                     }
                     getAnswers(object : AnswersCallBack {
                         override fun onCallback(value: ArrayList<ActiveQuestionAnswer>) {
@@ -179,17 +179,17 @@ class SoloQuizActivity : AppCompatActivity() {
         }
         if (difficultyKey == 0) {
             mFirestoreDatabase!!.collection("Active_Questions")
-                .whereEqualTo("TID", questionsTopic)
+                .whereEqualTo("tid", questionsTopic)
                 .limit(questionsNumber.toLong())
                 .get()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val quizQuestions = ArrayList<ActiveQuestion>()
                         for (document in task.result!!) {
-                            val quizQuestionDifficulty = document.get("Difficulty") as Long
-                            val quizQuestionQID = document.get("QID") as Long
-                            val quizQuestionText = document.get("QuestionText") as String
-                            val quizQuestionTID = document.get("TID") as Long
+                            val quizQuestionDifficulty = document.get("difficulty") as Long
+                            val quizQuestionQID = document.get("qid") as Long
+                            val quizQuestionText = document.get("question_text") as String
+                            val quizQuestionTID = document.get("tid") as Long
                             val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty)
                             quizQuestions.add(quizQuestion)
                         }
@@ -200,18 +200,18 @@ class SoloQuizActivity : AppCompatActivity() {
                 }
         } else {
             mFirestoreDatabase!!.collection("Active_Questions")
-                .whereEqualTo("TID", questionsTopic)
-                .whereEqualTo("Difficulty", difficultyKey)
+                .whereEqualTo("tid", questionsTopic)
+                .whereEqualTo("difficulty", difficultyKey)
                 .limit(questionsNumber.toLong())
                 .get()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val quizQuestions = ArrayList<ActiveQuestion>()
                         for (document in task.result!!) {
-                            val quizQuestionDifficulty = document.get("Difficulty") as Long
-                            val quizQuestionQID = document.get("QID") as Long
-                            val quizQuestionText = document.get("QuestionText") as String
-                            val quizQuestionTID = document.get("TID") as Long
+                            val quizQuestionDifficulty = document.get("difficulty") as Long
+                            val quizQuestionQID = document.get("qid") as Long
+                            val quizQuestionText = document.get("question_text") as String
+                            val quizQuestionTID = document.get("tid") as Long
                             val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty)
                             quizQuestions.add(quizQuestion)
                         }
@@ -225,16 +225,16 @@ class SoloQuizActivity : AppCompatActivity() {
 
     private fun getAnswers(callback: AnswersCallBack, QIDList: ArrayList<Long>) {
         mFirestoreDatabase!!.collection("Active_Question_Answers")
-            .whereIn("QID", QIDList)
+            .whereIn("qid", QIDList)
             .get()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val quizAnswers = ArrayList<ActiveQuestionAnswer>()
                     for (document in task.result!!) {
-                        val answerAID = document.get("AID") as Long
-                        val answerText = document.get("Answer_Text") as String
-                        val answerCorrect = document.get("Is_Correct") as Boolean
-                        val answerQID = document.get("QID") as Long
+                        val answerAID = document.get("aid") as Long
+                        val answerText = document.get("answer_text") as String
+                        val answerCorrect = document.get("is_correct") as Boolean
+                        val answerQID = document.get("qid") as Long
                         val quizAnswer = ActiveQuestionAnswer(answerAID, answerQID, answerText, answerCorrect)
                         quizAnswers.add(quizAnswer)
                     }
@@ -308,7 +308,7 @@ class SoloQuizActivity : AppCompatActivity() {
     private fun getCorrectAnswer(questionNumber: Int) : ActiveQuestionAnswer {
         val currentQuestion = questionList[questionNumber]
         for (answer in answersList) {
-            if (answer.QID == currentQuestion.QID && answer.Is_Correct)
+            if (answer.qid == currentQuestion.qid && answer.is_correct)
                 return answer
         }
         return ActiveQuestionAnswer(1, 1, "a", false)
@@ -318,16 +318,16 @@ class SoloQuizActivity : AppCompatActivity() {
         val currentQuestion = questionList[currentQuestionNr]
         val number = currentQuestionNr + 1
         questionNumberText!!.text = number.toString() + "/" + questionList.size.toString()
-        questionText!!.text = currentQuestion.QuestionText
+        questionText!!.text = currentQuestion.question_text
         val currentAnswers = ArrayList<ActiveQuestionAnswer>()
         for (answer in answersList) {
-            if (answer.QID == currentQuestion.QID)
+            if (answer.qid == currentQuestion.qid)
                 currentAnswers.add(answer)
         }
-        answer1!!.text = currentAnswers[0].Answer_Text
-        answer2!!.text = currentAnswers[1].Answer_Text
-        answer3!!.text = currentAnswers[2].Answer_Text
-        answer4!!.text = currentAnswers[3].Answer_Text
+        answer1!!.text = currentAnswers[0].answer_text
+        answer2!!.text = currentAnswers[1].answer_text
+        answer3!!.text = currentAnswers[2].answer_text
+        answer4!!.text = currentAnswers[3].answer_text
     }
 
     private fun setupLayoutElements() {
