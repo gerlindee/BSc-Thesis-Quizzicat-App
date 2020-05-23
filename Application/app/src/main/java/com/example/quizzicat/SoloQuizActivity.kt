@@ -12,14 +12,19 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.quizzicat.Model.ActiveQuestion
 import com.example.quizzicat.Model.ActiveQuestionAnswer
+import com.example.quizzicat.Model.TopicPlayed
 import com.example.quizzicat.Utils.AnswersCallBack
 import com.example.quizzicat.Utils.DesignUtils
 import com.example.quizzicat.Utils.QuestionsCallBack
+import com.example.quizzicat.Utils.TopicsPlayedCallBack
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class SoloQuizActivity : AppCompatActivity() {
     private var questionList = ArrayList<ActiveQuestion>()
@@ -98,7 +103,8 @@ class SoloQuizActivity : AppCompatActivity() {
                     incorrectAnswers += 1
                     setAnswerHighlight(selectedAnswer, false)
                 }
-                showResult(false)
+                timer!!.cancel()
+                timer!!.onFinish()
             } else {
                 timer!!.cancel()
                 if (currentQuestionNr == (questionList.size - 2)) {
@@ -277,13 +283,18 @@ class SoloQuizActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                showResult(true)
+                if (correctAnswers + incorrectAnswers == questionList.size) {
+                    showResult(false)
+                } else {
+                    showResult(true)
+                }
             }
         }
         timer!!.start()
     }
 
     private fun showResult(isOutOfTime: Boolean) {
+        recordPlayerHistory()
         val titleAlertDialog: String = if (isOutOfTime) {
             "Oops! Seems you ran out of time :("
         } else {
@@ -303,6 +314,74 @@ class SoloQuizActivity : AppCompatActivity() {
             .setCancelable(false)
             .create()
             .show()
+    }
+
+    private fun recordPlayerHistory() {
+        val currentUser = FirebaseAuth.getInstance().currentUser!!
+        mFirestoreDatabase!!.collection("Topics_Played")
+            .whereEqualTo("uid", currentUser.uid)
+            .whereEqualTo("tid", intent.extras!!.getLong("questionsTopic"))
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    var topicsPlayed = ArrayList<TopicPlayed>()
+                    for (document in task.result!!) {
+                        val correct_answers = document.get("correct_answers") as Long
+                        val incorrect_answers = document.get("incorrect_answers") as Long
+                        val pid = document.get("pid") as String
+                        val tid = document.get("tid") as Long
+                        val times_played_multi = document.get("times_played_multi") as Long
+                        val times_played_solo = document.get("times_played_solo") as Long
+                        val times_won = document.get("times_won") as Long
+                        val uid = document.get("uid") as String
+                        val topicPlayed = TopicPlayed(pid, tid, uid, correct_answers, incorrect_answers, times_played_solo, times_played_multi, times_won)
+                        topicsPlayed.add(topicPlayed)
+                    }
+                    if (topicsPlayed.size == 0) {
+                        val pid = UUID.randomUUID().toString()
+                        val tid = intent.extras!!.getLong("questionsTopic")
+                        val uid = FirebaseAuth.getInstance().uid
+                        val topicPlayed = TopicPlayed(pid, tid, uid!!, correctAnswers.toLong(), incorrectAnswers.toLong(), 1, 0, 0)
+                        createHistoryTableEntry(topicPlayed)
+                    } else {
+                        val topicPlayed = topicsPlayed[0]
+                        topicPlayed.correct_answers += correctAnswers.toLong()
+                        topicPlayed.incorrect_answers += incorrectAnswers.toLong()
+                        topicPlayed.times_played_solo += 1
+                        updateHistoryTable(topicPlayed)
+                    }
+                } else {
+                    Toast.makeText(this, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    private fun updateHistoryTable(topicPlayed: TopicPlayed) {
+        mFirestoreDatabase!!.collection("Topics_Played")
+            .document(topicPlayed.pid)
+            .set(topicPlayed)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("UpdatedTopicsPlayed", "Successfully updated user playing history")
+                } else {
+                    Log.d("UpdatedTopicsPlayed", "Could not update user playing history")
+                    Log.d("UpdatedTopicsPlayed", task.exception!!.message.toString())
+                }
+            }
+    }
+
+    private fun createHistoryTableEntry(topicPlayed: TopicPlayed) {
+        mFirestoreDatabase!!.collection("Topics_Played")
+            .document(topicPlayed.pid)
+            .set(topicPlayed)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("CreatedTopicsPlayed", "Successfully created user playing history")
+                } else {
+                    Log.d("CreatedTopicsPlayed", "Could not create user playing history")
+                    Log.d("CreatedTopicsPlayed", task.exception!!.message.toString())
+                }
+            }
     }
 
     private fun getCorrectAnswer(questionNumber: Int) : ActiveQuestionAnswer {
