@@ -48,6 +48,7 @@
     <string name="default_avatar"><![CDATA[https://firebasestorage.googleapis.com/v0/b/quizzicat-ca219.appspot.com/o/Avatars%2Fdefault_icon.png?alt=media&token=bfb09bfc-df91-4027-8242-5480e6c27e3f]]></string>
     <string name="string_change_acc_password">Confirm account changes</string>
     <string name="string_save_changes">Save changes</string>
+    <string name="string_no_statistics">Seems like you have not played any quizzes yet!</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">
