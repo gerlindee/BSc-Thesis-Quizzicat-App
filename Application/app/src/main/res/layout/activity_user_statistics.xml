@@ -110,7 +110,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/layout_games_played"
+            android:id="@+id/layout_solo_games_played"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="-20dp"
@@ -147,14 +147,13 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/statistics_solo_wins_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif-condensed-light"
-                    android:text="solo quizzes"
+                    android:text="@string/solo_quizzes_text"
                     android:textColor="@color/colorAccent"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -180,7 +179,7 @@
                     tools:ignore="ContentDescription" />
 
                 <TextView
-                    android:id="@+id/statistics_multi_plays"
+                    android:id="@+id/statistics_solo_correct"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
@@ -193,14 +192,13 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/statistics_multi_plays_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:fontFamily="sans-serif-condensed-light"
-                    android:text="group quizzes"
+                    android:text="@string/solo_correct_answers"
                     android:textColor="@color/colorAccent"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -226,7 +224,7 @@
                     tools:ignore="ContentDescription" />
 
                 <TextView
-                    android:id="@+id/statistics_multi_wins"
+                    android:id="@+id/statistics_solo_wrong"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
@@ -239,14 +237,13 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/statistics_multi_wins_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif-condensed-light"
-                    android:text="groups wins"
+                    android:text="incorrect answers"
                     android:textColor="@color/colorAccent"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

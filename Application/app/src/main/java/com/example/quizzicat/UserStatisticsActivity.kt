@@ -27,8 +27,8 @@ class UserStatisticsActivity : AppCompatActivity() {
     private var userDisplayName: TextView? = null
     private var progressBar: ProgressBar? = null
     private var soloGames: TextView? = null
-    private var groupWins: TextView? = null
-    private var groupGames: TextView? = null
+    private var soloGamesCorrect: TextView? = null
+    private var soloGamesIncorrect: TextView? = null
     private var noGamesPlayed: LinearLayout? = null
     private var gamesPlayed: LinearLayout? = null
 
@@ -48,7 +48,9 @@ class UserStatisticsActivity : AppCompatActivity() {
                 if (value.isEmpty()) {
                     noGamesPlayed!!.visibility = View.VISIBLE
                 } else {
+                    noGamesPlayed!!.visibility = View.GONE
                     gamesPlayed!!.visibility = View.VISIBLE
+                    determineGamesPlayed(value as ArrayList<TopicPlayed>)
                 }
             }
         })
@@ -76,15 +78,27 @@ class UserStatisticsActivity : AppCompatActivity() {
                     val incorrect_answers = document.get("incorrect_answers") as Long
                     val pid = document.get("pid") as String
                     val tid = document.get("tid") as Long
-                    val times_played_multi = document.get("times_played_multi") as Long
                     val times_played_solo = document.get("times_played_solo") as Long
-                    val times_won = document.get("times_won") as Long
                     val uid = document.get("uid") as String
-                    val topicPlayed = TopicPlayed(pid, tid, uid, correct_answers, incorrect_answers, times_played_solo, times_played_multi, times_won)
+                    val topicPlayed = TopicPlayed(pid, tid, uid, correct_answers, incorrect_answers, times_played_solo)
                     topicsPlayed.add(topicPlayed)
                 }
                 callback.onCallback(topicsPlayed)
             }
+    }
+
+    private fun determineGamesPlayed(topicsPlayed: ArrayList<TopicPlayed>) {
+        var soloGamesPlayed = 0
+        var soloCorrectAnswers = 0
+        var soloIncorrectAnswers = 0
+        for (topic in topicsPlayed) {
+            soloGamesPlayed += topic.times_played_solo.toInt()
+            soloCorrectAnswers += topic.correct_answers.toInt()
+            soloIncorrectAnswers += topic.incorrect_answers.toInt()
+        }
+        soloGames!!.text = soloGamesPlayed.toString()
+        soloGamesCorrect!!.text = soloCorrectAnswers.toString()
+        soloGamesIncorrect!!.text = soloIncorrectAnswers.toString()
     }
 
     private fun setupLayoutElements() {
@@ -93,9 +107,9 @@ class UserStatisticsActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.statistics_progress_bar)
         progressBar!!.visibility = View.VISIBLE
         soloGames = findViewById(R.id.statistics_solo_wins)
-        groupGames = findViewById(R.id.statistics_multi_plays)
-        groupWins = findViewById(R.id.statistics_multi_wins)
+        soloGamesCorrect = findViewById(R.id.statistics_solo_correct)
+        soloGamesIncorrect = findViewById(R.id.statistics_solo_wrong)
         noGamesPlayed = findViewById(R.id.layout_no_games_played)
-        gamesPlayed = findViewById(R.id.layout_games_played)
+        gamesPlayed = findViewById(R.id.layout_solo_games_played)
     }
 }
