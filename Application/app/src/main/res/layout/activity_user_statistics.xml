@@ -267,13 +267,13 @@
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/solo_chart_categories"
                 android:layout_weight="1"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="200dp" />
 
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/solo_chart_topics"
                 android:layout_weight="1"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="200dp"/>
 
         </LinearLayout>

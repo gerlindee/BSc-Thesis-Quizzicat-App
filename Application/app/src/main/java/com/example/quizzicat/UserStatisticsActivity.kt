@@ -76,6 +76,7 @@ class UserStatisticsActivity : AppCompatActivity() {
                                 override fun onCallback(value: List<AbstractTopic>) {
                                     categoriesPlayed = value as ArrayList<TopicCategory>
                                     createCategoriesPieChart(createCategoriesPieChartDataset(topicsHistory))
+                                    createTopicsPieChart()
                                     noGamesPlayed!!.visibility = View.GONE
                                     gamesPlayed!!.visibility = View.VISIBLE
                                     soloGamesPieCharts!!.visibility = View.VISIBLE
@@ -220,6 +221,7 @@ class UserStatisticsActivity : AppCompatActivity() {
         pieDataSet.valueTextColor = Color.WHITE
         categoriesPieChart!!.data = PieData((pieDataSet))
         categoriesPieChart!!.legend.isEnabled = true
+        categoriesPieChart!!.legend.isWordWrapEnabled = true
         categoriesPieChart!!.invalidate()
     }
 
@@ -227,6 +229,39 @@ class UserStatisticsActivity : AppCompatActivity() {
         for (category in categoriesPlayed) {
             if (category.cid == cid)
                 return category.name
+        }
+        return ""
+    }
+
+    private fun createTopicsPieChart() {
+        val pieEntries = ArrayList<PieEntry>()
+        for (topic in topicsHistory) {
+            pieEntries.add(PieEntry(topic.times_played_solo.toFloat(), getTopicByID(topic.tid)))
+        }
+        topicsPieChart!!.description.isEnabled = false
+        topicsPieChart!!.isDrawHoleEnabled = true
+        topicsPieChart!!.setUsePercentValues(false)
+        topicsPieChart!!.setHoleColor(Color.WHITE)
+        topicsPieChart!!.transparentCircleRadius = 60f
+        topicsPieChart!!.animateY(1000, Easing.EaseInOutCubic)
+        topicsPieChart!!.setDrawEntryLabels(false)
+
+        val pieDataSet = PieDataSet(pieEntries, "")
+        pieDataSet.sliceSpace = 3f
+        pieDataSet.selectionShift = 5f
+        pieDataSet.colors = ColorTemplate.PASTEL_COLORS.toList()
+        pieDataSet.valueTextSize = 14f
+        pieDataSet.valueTextColor = Color.WHITE
+        topicsPieChart!!.data = PieData((pieDataSet))
+        topicsPieChart!!.legend.isEnabled = true
+        topicsPieChart!!.legend.isWordWrapEnabled = true
+        topicsPieChart!!.invalidate()
+    }
+
+    private fun getTopicByID(tid: Long): String {
+        for (topic in topicsPlayed) {
+            if (topic.tid == tid)
+                return topic.name
         }
         return ""
     }
