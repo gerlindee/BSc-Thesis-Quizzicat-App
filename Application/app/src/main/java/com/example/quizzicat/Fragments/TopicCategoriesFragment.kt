@@ -58,6 +58,7 @@ class TopicCategoriesFragment : Fragment() {
                         soloQuizIntent.putExtra("questionsDifficulty", selectedDifficulty.selectedItem.toString())
                         soloQuizIntent.putExtra("questionsNumber", selectedNumberOfQuestions.selectedItem.toString())
                         soloQuizIntent.putExtra("questionsTopic", topicsList!![position].tid)
+                        soloQuizIntent.putExtra("questionsCategory", topicsList!![position].cid)
                         startActivity(soloQuizIntent)
                     }
                     .setNegativeButton("Cancel", null)

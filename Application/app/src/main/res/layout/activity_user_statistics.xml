@@ -241,7 +241,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif-condensed-light"
-                    android:text="incorrect answers"
+                    android:text="@string/solo_incorrect_answers"
                     android:textColor="@color/colorAccent"
                     android:textSize="12sp"
                     android:textStyle="bold"
@@ -252,6 +252,29 @@
                     app:layout_constraintVertical_bias="0.6" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_solo_pie_charts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_marginTop="20dp">
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/solo_chart_categories"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="200dp" />
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/solo_chart_topics"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="200dp"/>
 
         </LinearLayout>
 

@@ -330,16 +330,18 @@ class SoloQuizActivity : AppCompatActivity() {
                         val incorrect_answers = document.get("incorrect_answers") as Long
                         val pid = document.get("pid") as String
                         val tid = document.get("tid") as Long
+                        val cid = document.get("cid") as Long
                         val times_played_solo = document.get("times_played_solo") as Long
                         val uid = document.get("uid") as String
-                        val topicPlayed = TopicPlayed(pid, tid, uid, correct_answers, incorrect_answers, times_played_solo)
+                        val topicPlayed = TopicPlayed(pid, tid, cid, uid, correct_answers, incorrect_answers, times_played_solo)
                         topicsPlayed.add(topicPlayed)
                     }
                     if (topicsPlayed.size == 0) {
                         val pid = UUID.randomUUID().toString()
                         val tid = intent.extras!!.getLong("questionsTopic")
+                        val cid = intent.extras!!.getLong("questionsCategory")
                         val uid = FirebaseAuth.getInstance().uid
-                        val topicPlayed = TopicPlayed(pid, tid, uid!!, correctAnswers.toLong(), incorrectAnswers.toLong(), 1)
+                        val topicPlayed = TopicPlayed(pid, tid, cid, uid!!, correctAnswers.toLong(), incorrectAnswers.toLong(), 1)
                         createHistoryTableEntry(topicPlayed)
                     } else {
                         val topicPlayed = topicsPlayed[0]

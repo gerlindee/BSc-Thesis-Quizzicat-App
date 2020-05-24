@@ -51,6 +51,7 @@
     <string name="string_no_statistics">Seems like you have not played any quizzes yet!</string>
     <string name="solo_quizzes_text">solo quizzes</string>
     <string name="solo_correct_answers">correct answers</string>
+    <string name="solo_incorrect_answers">incorrect answers</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">

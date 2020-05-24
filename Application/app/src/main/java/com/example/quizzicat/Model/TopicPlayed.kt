@@ -3,6 +3,7 @@ package com.example.quizzicat.Model
 class TopicPlayed(
     val pid: String,
     val tid: Long,
+    val cid: Long,
     val uid: String,
     // for the solo games
     var correct_answers: Long,
