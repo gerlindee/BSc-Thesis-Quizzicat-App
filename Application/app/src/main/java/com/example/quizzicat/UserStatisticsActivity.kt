@@ -191,9 +191,9 @@ class UserStatisticsActivity : AppCompatActivity() {
         for (topic in topicsPlayed) {
             val categoryName = getCategoryByID(topic.cid)
             if (!categoriesMap.containsKey(categoryName)) {
-                categoriesMap[categoryName] = 1
+                categoriesMap[categoryName] = topic.times_played_solo.toInt()
             } else {
-                val timesPlayed = categoriesMap[categoryName]!!.plus(1)
+                val timesPlayed = categoriesMap[categoryName]!!.plus(topic.times_played_solo.toInt())
                 categoriesMap[categoryName] = timesPlayed
             }
         }
