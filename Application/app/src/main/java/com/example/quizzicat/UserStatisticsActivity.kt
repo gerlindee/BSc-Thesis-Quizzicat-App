@@ -1,11 +1,14 @@
 package com.example.quizzicat
 
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.*
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.quizzicat.Facades.ImageLoadingFacade
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
 import com.example.quizzicat.Model.*
@@ -14,15 +17,19 @@ import com.example.quizzicat.Utils.TopicsPlayedCallBack
 import com.example.quizzicat.Utils.UserDataCallBack
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import de.hdodenhof.circleimageview.CircleImageView
+
 
 class UserStatisticsActivity : AppCompatActivity() {
 
@@ -89,6 +96,19 @@ class UserStatisticsActivity : AppCompatActivity() {
                     }, topicsHistory)
                 }
             }
+        })
+
+        categoriesPieChart!!.setOnChartValueSelectedListener(object: OnChartValueSelectedListener {
+            override fun onNothingSelected() {
+                createTopicsPieChart()
+            }
+
+            override fun onValueSelected(e: Entry?, h: Highlight?) {
+                val selectedEntry = e as PieEntry
+                val selectedCategory = getCIDByName(selectedEntry.label)
+                updateTopicsPieChartCategory(selectedCategory)
+            }
+
         })
     }
 
@@ -207,24 +227,7 @@ class UserStatisticsActivity : AppCompatActivity() {
         for (category in dataset.keys) {
             pieEntries.add(PieEntry(dataset[category]!!.toFloat(), category))
         }
-        categoriesPieChart!!.description.isEnabled = false
-        categoriesPieChart!!.isDrawHoleEnabled = true
-        categoriesPieChart!!.setUsePercentValues(false)
-        categoriesPieChart!!.setHoleColor(Color.WHITE)
-        categoriesPieChart!!.transparentCircleRadius = 60f
-        categoriesPieChart!!.animateY(1000, Easing.EaseInOutCubic)
-        categoriesPieChart!!.setDrawEntryLabels(false)
-
-        val pieDataSet = PieDataSet(pieEntries, "")
-        pieDataSet.sliceSpace = 3f
-        pieDataSet.selectionShift = 5f
-        pieDataSet.colors = ColorTemplate.JOYFUL_COLORS.toList()
-        pieDataSet.valueTextSize = 14f
-        pieDataSet.valueTextColor = Color.WHITE
-        categoriesPieChart!!.data = PieData((pieDataSet))
-        categoriesPieChart!!.legend.isEnabled = true
-        categoriesPieChart!!.legend.isWordWrapEnabled = true
-        categoriesPieChart!!.invalidate()
+        setupPieChart(categoriesPieChart!!, pieEntries, "JOY")
     }
 
     private fun getCategoryByID(cid: Long) : String {
@@ -235,29 +238,20 @@ class UserStatisticsActivity : AppCompatActivity() {
         return ""
     }
 
+    private fun getCIDByName(name: String): Long {
+        for (category in categoriesPlayed) {
+            if (category.name == name)
+                return category.cid
+        }
+        return -1
+    }
+
     private fun createTopicsPieChart() {
         val pieEntries = ArrayList<PieEntry>()
         for (topic in topicsHistory) {
             pieEntries.add(PieEntry(topic.times_played_solo.toFloat(), getTopicByID(topic.tid)))
         }
-        topicsPieChart!!.description.isEnabled = false
-        topicsPieChart!!.isDrawHoleEnabled = true
-        topicsPieChart!!.setUsePercentValues(false)
-        topicsPieChart!!.setHoleColor(Color.WHITE)
-        topicsPieChart!!.transparentCircleRadius = 60f
-        topicsPieChart!!.animateY(1000, Easing.EaseInOutCubic)
-        topicsPieChart!!.setDrawEntryLabels(false)
-
-        val pieDataSet = PieDataSet(pieEntries, "")
-        pieDataSet.sliceSpace = 3f
-        pieDataSet.selectionShift = 5f
-        pieDataSet.colors = ColorTemplate.PASTEL_COLORS.toList()
-        pieDataSet.valueTextSize = 14f
-        pieDataSet.valueTextColor = Color.WHITE
-        topicsPieChart!!.data = PieData((pieDataSet))
-        topicsPieChart!!.legend.isEnabled = true
-        topicsPieChart!!.legend.isWordWrapEnabled = true
-        topicsPieChart!!.invalidate()
+        setupPieChart(topicsPieChart!!, pieEntries, "PASTEL")
     }
 
     private fun getTopicByID(tid: Long): String {
@@ -278,6 +272,41 @@ class UserStatisticsActivity : AppCompatActivity() {
         val totalQuestions = correctAnswers + incorrectAnswers
         correctIncorrectBar!!.max = totalQuestions
         correctIncorrectBar!!.progress = correctAnswers
+    }
+
+    private fun updateTopicsPieChartCategory(cid: Long) {
+        val pieEntries = ArrayList<PieEntry>()
+        for (topic in topicsHistory) {
+            if (topic.cid == cid) {
+                pieEntries.add(PieEntry(topic.times_played_solo.toFloat(), getTopicByID(topic.tid)))
+            }
+        }
+        setupPieChart(topicsPieChart!!, pieEntries, "PASTEL")
+    }
+
+    private fun setupPieChart(pieChart: PieChart, pieEntries: ArrayList<PieEntry>, colors: String) {
+        pieChart.description.isEnabled = false
+        pieChart.isDrawHoleEnabled = true
+        pieChart.setUsePercentValues(false)
+        pieChart.setHoleColor(Color.WHITE)
+        pieChart.transparentCircleRadius = 60f
+        pieChart.animateY(1000, Easing.EaseInOutCubic)
+        pieChart.setDrawEntryLabels(false)
+
+        val pieDataSet = PieDataSet(pieEntries, "")
+        pieDataSet.sliceSpace = 3f
+        pieDataSet.selectionShift = 5f
+        if (colors == "JOY") {
+            pieDataSet.colors = ColorTemplate.JOYFUL_COLORS.toList()
+        } else {
+            pieDataSet.colors = ColorTemplate.PASTEL_COLORS.toList()
+        }
+        pieDataSet.valueTextSize = 14f
+        pieDataSet.valueTextColor = Color.WHITE
+        pieChart.data = PieData((pieDataSet))
+        pieChart.legend.isEnabled = true
+        pieChart.legend.isWordWrapEnabled = true
+        pieChart.invalidate()
     }
 
     private fun setupLayoutElements() {
