@@ -256,13 +256,67 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/layout_correct_answers_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:visibility="gone"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/string_correct"
+                    android:fontFamily="sans-serif-condensed-light"
+                    android:textStyle="bold"
+                    android:layout_alignParentStart="true"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/string_incorrect"
+                    android:fontFamily="sans-serif-condensed-light"
+                    android:textStyle="bold"
+                    android:layout_alignParentEnd="true"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp"
+                    tools:ignore="RelativeOverlap" />
+
+            </RelativeLayout>
+
+            <ProgressBar
+                android:id="@+id/answers_correct_incorrect_bar"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:layout_marginTop="5dp"
+                android:indeterminateOnly="false"
+                android:max="30"
+                android:progress="10"
+                android:maxHeight="20dp"
+                android:minHeight="10dp"
+                android:progressDrawable="@drawable/progress_bar_correct_incorrect" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/layout_solo_pie_charts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
             android:visibility="gone"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="30dp">
 
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/solo_chart_categories"

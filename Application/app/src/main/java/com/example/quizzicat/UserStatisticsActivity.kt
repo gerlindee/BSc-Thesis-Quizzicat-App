@@ -5,10 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.example.quizzicat.Facades.ImageLoadingFacade
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
 import com.example.quizzicat.Model.*
@@ -43,6 +40,8 @@ class UserStatisticsActivity : AppCompatActivity() {
     private var soloGamesPieCharts: LinearLayout? = null
     private var categoriesPieChart: PieChart? = null
     private var topicsPieChart: PieChart? = null
+    private var correctIncorrectBarLayout: LinearLayout? = null
+    private var correctIncorrectBar: ProgressBar? = null
 
     private var topicsPlayed = ArrayList<Topic>()
     private var categoriesPlayed = ArrayList<TopicCategory>()
@@ -67,6 +66,7 @@ class UserStatisticsActivity : AppCompatActivity() {
                     noGamesPlayed!!.visibility = View.VISIBLE
                     gamesPlayed!!.visibility = View.GONE
                     soloGamesPieCharts!!.visibility = View.GONE
+                    correctIncorrectBarLayout!!.visibility = View.GONE
                 } else {
                     determineGamesPlayed(topicsHistory)
                     getTopicsPlayedData(object: CustomCallBack {
@@ -77,9 +77,11 @@ class UserStatisticsActivity : AppCompatActivity() {
                                     categoriesPlayed = value as ArrayList<TopicCategory>
                                     createCategoriesPieChart(createCategoriesPieChartDataset(topicsHistory))
                                     createTopicsPieChart()
+                                    createCorrectIncorrectBar()
                                     noGamesPlayed!!.visibility = View.GONE
                                     gamesPlayed!!.visibility = View.VISIBLE
                                     soloGamesPieCharts!!.visibility = View.VISIBLE
+                                    correctIncorrectBarLayout!!.visibility = View.VISIBLE
                                     progressBar!!.visibility = View.GONE
                                 }
                             }, topicsPlayed)
@@ -266,6 +268,18 @@ class UserStatisticsActivity : AppCompatActivity() {
         return ""
     }
 
+    private fun createCorrectIncorrectBar() {
+        var correctAnswers = 0
+        var incorrectAnswers = 0
+        for (topicPlayed in topicsHistory) {
+           correctAnswers += topicPlayed.correct_answers.toInt()
+           incorrectAnswers += topicPlayed.incorrect_answers.toInt()
+        }
+        val totalQuestions = correctAnswers + incorrectAnswers
+        correctIncorrectBar!!.max = totalQuestions
+        correctIncorrectBar!!.progress = correctAnswers
+    }
+
     private fun setupLayoutElements() {
         userProfilePicture = findViewById(R.id.statistics_avatar)
         userDisplayName = findViewById(R.id.statistics_username)
@@ -279,5 +293,7 @@ class UserStatisticsActivity : AppCompatActivity() {
         soloGamesPieCharts = findViewById(R.id.layout_solo_pie_charts)
         categoriesPieChart = findViewById(R.id.solo_chart_categories)
         topicsPieChart = findViewById(R.id.solo_chart_topics)
+        correctIncorrectBarLayout = findViewById(R.id.layout_correct_answers_bar)
+        correctIncorrectBar = findViewById(R.id.answers_correct_incorrect_bar)
     }
 }
