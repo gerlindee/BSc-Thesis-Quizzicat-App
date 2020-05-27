@@ -1,8 +1,7 @@
 package com.example.quizzicat.Model
 
-class PendingQuestions(
+class PendingQuestion(
     val pqid: String,
-    val cid: Long,
     val tid: Long,
     val difficulty: Long,
     val question_text: String,
