@@ -196,7 +196,8 @@ class SoloQuizActivity : AppCompatActivity() {
                             val quizQuestionQID = document.get("qid") as Long
                             val quizQuestionText = document.get("question_text") as String
                             val quizQuestionTID = document.get("tid") as Long
-                            val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty)
+                            val quizSubmittedBy = document.get("submittedBy") as String
+                            val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty, quizSubmittedBy)
                             quizQuestions.add(quizQuestion)
                         }
                         callback.onCallback(quizQuestions)
@@ -218,7 +219,8 @@ class SoloQuizActivity : AppCompatActivity() {
                             val quizQuestionQID = document.get("qid") as Long
                             val quizQuestionText = document.get("question_text") as String
                             val quizQuestionTID = document.get("tid") as Long
-                            val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty)
+                            val quizSubmittedBy = document.get("submittedBy") as String
+                            val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty, quizSubmittedBy)
                             quizQuestions.add(quizQuestion)
                         }
                         callback.onCallback(quizQuestions)
