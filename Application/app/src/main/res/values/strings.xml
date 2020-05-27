@@ -54,6 +54,7 @@
     <string name="solo_incorrect_answers">incorrect answers</string>
     <string name="string_correct">Correct</string>
     <string name="string_incorrect">Incorrect</string>
+    <string name="string_questions_factory">Questions Factory</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">

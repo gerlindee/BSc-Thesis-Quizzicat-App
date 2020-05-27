@@ -6,7 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class UserDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore, private val uid: String) {
-    public fun getUserDetails(callback: UserDataCallBack) {
+    fun getUserDetails(callback: UserDataCallBack) {
         firebaseFirestore.collection("Users")
             .whereEqualTo("uid", uid)
             .get()
