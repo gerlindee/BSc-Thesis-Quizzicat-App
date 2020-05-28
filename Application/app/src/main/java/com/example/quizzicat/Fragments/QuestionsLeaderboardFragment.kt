@@ -44,6 +44,10 @@ class QuestionsLeaderboardFragment : Fragment() {
                 }
             }
         })
+
+        questionsFactoryNavigation!!.setOnClickListener {
+
+        }
     }
 
     private fun initializeLayoutElements() {

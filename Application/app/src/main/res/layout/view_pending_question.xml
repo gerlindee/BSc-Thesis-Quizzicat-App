@@ -4,13 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardPreventCornerOverlap="true"
-    android:layout_gravity="center">
+    android:layout_gravity="center"
+    app:cardPreventCornerOverlap="true">
 
     <TableRow
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/pending_question_topic_icon"
@@ -28,19 +27,35 @@
             <TextView
                 android:id="@+id/pending_question_topic_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="55dp"
                 android:padding="7dp"
                 android:text="@string/placeholder_question_text" />
 
-            <RatingBar
-                android:id="@+id/pending_question_rating"
-                style="@android:style/Widget.Material.RatingBar.Small"
-                android:isIndicator="false"
-                android:layout_width="wrap_content"
+            <TableRow
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numStars="5"
-                android:rating="3.5"
-                android:stepSize="0.5" />
+                android:gravity="end"
+                android:layout_marginEnd="10dp">
+
+                <RatingBar
+                    android:id="@+id/pending_question_rating"
+                    style="@android:style/Widget.Material.RatingBar.Small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="5dp"
+                    android:isIndicator="false"
+                    android:numStars="5"
+                    android:stepSize="0.5" />
+
+                <ImageView
+                    android:id="@+id/pending_question_report"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:background="@drawable/report_icon"
+                    tools:ignore="ContentDescription" />
+
+            </TableRow>
 
         </LinearLayout>
 
