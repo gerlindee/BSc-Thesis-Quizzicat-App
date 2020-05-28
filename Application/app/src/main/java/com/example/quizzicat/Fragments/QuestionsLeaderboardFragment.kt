@@ -1,5 +1,6 @@
 package com.example.quizzicat.Fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Adapters.PendingQuestionsAdapter
 import com.example.quizzicat.Model.PendingQuestion
+import com.example.quizzicat.NoInternetConnectionActivity
+import com.example.quizzicat.QuestionsFactoryActivity
 import com.example.quizzicat.R
 import com.example.quizzicat.Utils.PendingQuestionsCallBack
 import com.google.android.material.button.MaterialButton
@@ -46,7 +49,8 @@ class QuestionsLeaderboardFragment : Fragment() {
         })
 
         questionsFactoryNavigation!!.setOnClickListener {
-
+            val questionsFactoryIntent = Intent(activity, QuestionsFactoryActivity::class.java)
+            startActivity(questionsFactoryIntent)
         }
     }
 
