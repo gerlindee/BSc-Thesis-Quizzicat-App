@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.quizzicat.Facades.ImageLoadingFacade
+import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
 import com.example.quizzicat.Model.*
 import com.example.quizzicat.Utils.CustomCallBack
@@ -35,6 +36,7 @@ class UserStatisticsActivity : AppCompatActivity() {
 
     private var mFirebaseAuth: FirebaseAuth? = null
     private var mFirestoreDatabase: FirebaseFirestore? = null
+    private var topicsDataRetrievalFacade: TopicsDataRetrievalFacade? = null
 
     private var userProfilePicture: CircleImageView? = null
     private var userDisplayName: TextView? = null
@@ -60,6 +62,7 @@ class UserStatisticsActivity : AppCompatActivity() {
 
         mFirebaseAuth = FirebaseAuth.getInstance()
         mFirestoreDatabase = Firebase.firestore
+        topicsDataRetrievalFacade = TopicsDataRetrievalFacade(mFirestoreDatabase!!, this)
 
         setupLayoutElements()
 
@@ -79,7 +82,7 @@ class UserStatisticsActivity : AppCompatActivity() {
                     getTopicsPlayedData(object: CustomCallBack {
                         override fun onCallback(value: List<AbstractTopic>) {
                             topicsPlayed = value as ArrayList<Topic>
-                            getCategoriesPlayedData(object: CustomCallBack {
+                            topicsDataRetrievalFacade!!.getCategoriesPlayedData(object: CustomCallBack {
                                 override fun onCallback(value: List<AbstractTopic>) {
                                     categoriesPlayed = value as ArrayList<TopicCategory>
                                     createCategoriesPieChart(createCategoriesPieChartDataset(topicsHistory))
@@ -179,31 +182,6 @@ class UserStatisticsActivity : AppCompatActivity() {
                     callback.onCallback(topics)
                 } else {
                     Toast.makeText(this, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
-                }
-            }
-    }
-
-    private fun getCategoriesPlayedData(callback: CustomCallBack, topicList: ArrayList<Topic>) {
-        val playedCategories = ArrayList<Long>()
-        for (topic in topicList) {
-            playedCategories.add(topic.cid)
-        }
-        mFirestoreDatabase!!.collection("Topic_Categories")
-            .whereIn("cid", playedCategories)
-            .get()
-            .addOnCompleteListener { task1 ->
-                if (task1.isSuccessful) {
-                    val categories = ArrayList<TopicCategory>()
-                    for (document in task1.result!!) {
-                        val topicCategoryID = document.get("cid") as Long
-                        val topicCategoryURL = document.get("icon_url") as String
-                        val topicCategoryName = document.get("name") as String
-                        val topicCategory = TopicCategory(topicCategoryID, topicCategoryURL, topicCategoryName)
-                        categories.add(topicCategory)
-                    }
-                    callback.onCallback(categories)
-                } else {
-                    Toast.makeText(this, task1.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                 }
             }
     }

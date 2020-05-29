@@ -196,7 +196,7 @@ class SoloQuizActivity : AppCompatActivity() {
                             val quizQuestionQID = document.get("qid") as Long
                             val quizQuestionText = document.get("question_text") as String
                             val quizQuestionTID = document.get("tid") as Long
-                            val quizSubmittedBy = document.get("submittedBy") as String
+                            val quizSubmittedBy = document.get("submitted_by") as String
                             val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty, quizSubmittedBy)
                             quizQuestions.add(quizQuestion)
                         }

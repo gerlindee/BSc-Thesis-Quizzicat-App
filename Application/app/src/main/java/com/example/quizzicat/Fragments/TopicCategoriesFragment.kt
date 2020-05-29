@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.quizzicat.Adapters.TopicCategoriesAdapter
+import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
 import com.example.quizzicat.Model.AbstractTopic
 import com.example.quizzicat.Model.Topic
 import com.example.quizzicat.Model.TopicCategory
@@ -33,6 +34,7 @@ class TopicCategoriesFragment : Fragment() {
     private var topicsList: ArrayList<Topic> ? = null
     private var mFirestoreDatabase: FirebaseFirestore? = null
     private var topicsLevel: Boolean = false
+    private var topicsDataRetrievalFacade: TopicsDataRetrievalFacade? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_topic_categories, container, false)
@@ -40,6 +42,7 @@ class TopicCategoriesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         mFirestoreDatabase = Firebase.firestore
+        topicsDataRetrievalFacade = TopicsDataRetrievalFacade(mFirestoreDatabase!!, context!!)
 
         topicCategoriesGridView = view.findViewById(R.id.categories_grid_view)
         setCategoriesData()
@@ -65,7 +68,8 @@ class TopicCategoriesFragment : Fragment() {
                     .show()
             } else {
                 val selectedCategory = topicCategoriesList!![position]
-                getTopicsForCategory(object: CustomCallBack {
+                topicsLevel = true
+                topicsDataRetrievalFacade!!.getTopicsForACategory(object: CustomCallBack {
                     override fun onCallback(value: List<AbstractTopic>) {
                         topicsList = value as ArrayList<Topic>
                         topicCategoriesAdapter!!.arrayList = topicsList as ArrayList<AbstractTopic>
@@ -84,58 +88,13 @@ class TopicCategoriesFragment : Fragment() {
     }
 
     private fun setCategoriesData() {
-        getCategories(object: CustomCallBack {
+        topicsDataRetrievalFacade!!.getTopicCategories(object: CustomCallBack {
             override fun onCallback(value: List<AbstractTopic>) {
                 topicCategoriesList = value as ArrayList<TopicCategory>
                 topicCategoriesAdapter = TopicCategoriesAdapter(context!!, topicCategoriesList as ArrayList<AbstractTopic>)
                 topicCategoriesGridView?.adapter = topicCategoriesAdapter
             }
         })
-    }
-
-    private fun getCategories(myCallback: CustomCallBack) {
-        mFirestoreDatabase!!.collection("Topic_Categories")
-            .orderBy("name")
-            .get()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val topicCategories = ArrayList<TopicCategory>()
-                    for (document in task.result!!) {
-                        val topicCategoryID = document.get("cid") as Long
-                        val topicCategoryURL = document.get("icon_url") as String
-                        val topicCategoryName = document.get("name") as String
-                        val topicCategory = TopicCategory(topicCategoryID, topicCategoryURL, topicCategoryName)
-                        topicCategories.add(topicCategory)
-                    }
-                    myCallback.onCallback(topicCategories)
-                } else {
-                    Log.d("TopicCategoryQuery", task.exception.toString())
-                }
-            }
-    }
-
-    private fun getTopicsForCategory(myCallback: CustomCallBack, selectedCategory: Long) {
-        topicsLevel = true
-        mFirestoreDatabase!!.collection("Topics")
-            .whereEqualTo("cid", selectedCategory)
-            .orderBy("name")
-            .get()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val topics = ArrayList<Topic>()
-                    for (document in task.result!!) {
-                        val topicCID = document.get("cid") as Long
-                        val topicTID = document.get("tid") as Long
-                        val topicURL = document.get("icon_url") as String
-                        val topicName = document.get("name") as String
-                        val topic = Topic(topicTID, topicCID, topicURL, topicName)
-                        topics.add(topic)
-                    }
-                    myCallback.onCallback(topics)
-                } else {
-                    Log.d("TopicQuery", task.exception.toString())
-                }
-            }
     }
 
 }

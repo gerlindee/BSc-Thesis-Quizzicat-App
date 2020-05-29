@@ -25,6 +25,7 @@
         </activity>
         <activity android:name=".NoInternetConnectionActivity" />
         <activity android:name=".QuestionsFactoryActivity" />
+        <activity android:name=".CreateQuestionActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".MainMenuActivity" />
 
