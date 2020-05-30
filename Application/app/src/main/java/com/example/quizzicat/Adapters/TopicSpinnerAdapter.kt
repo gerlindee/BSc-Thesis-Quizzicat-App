@@ -2,6 +2,7 @@ package com.example.quizzicat.Adapters
 
 import android.R
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,13 @@ class TopicSpinnerAdapter(
         return initializeView(position, convertView, parent)
     }
 
+    override fun isEnabled(position: Int): Boolean {
+        if (position == 0) {
+            return false
+        }
+        return true
+    }
+
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
         return initializeView(position, convertView, parent)
     }
@@ -32,6 +40,9 @@ class TopicSpinnerAdapter(
         val currentItem = getItem(position)
         ImageLoadingFacade(mainContext).loadImage(currentItem!!.category_icon, categoryIcon)
         categoryName.text = currentItem.category_name
+        if (position == 0) {
+            categoryName.setTextColor(Color.GRAY)
+        }
         return categoryView
     }
 

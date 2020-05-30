@@ -63,6 +63,8 @@
     <string name="factory_pending_desc">Questions need at least 85% of positive votes to be approved</string>
     <string name="factory_rejected_title">Rejected questions</string>
     <string name="factory_rejected_desc">Questions that have been rejected by other players</string>
+    <string name="hint_question_text">Question text</string>
+    <string name="string_create_text_button">Create Question</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">
