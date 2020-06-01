@@ -54,6 +54,19 @@ class QuestionsLeaderboardFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        getPendingQuestions(object: PendingQuestionsCallBack {
+            override fun onCallback(value: ArrayList<PendingQuestion>) {
+                pendingQuestions!!.apply {
+                    layoutManager = LinearLayoutManager(activity)
+                    adapter = PendingQuestionsAdapter(context, mFirestoreDatabase!!, value)
+                    addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                }
+            }
+        })
+    }
+
     private fun initializeLayoutElements() {
         questionsFactoryNavigation = view?.findViewById(R.id.button_user_questions)
         pendingQuestions = view?.findViewById(R.id.pending_questions_list)

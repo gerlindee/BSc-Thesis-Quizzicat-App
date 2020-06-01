@@ -65,10 +65,21 @@
     <string name="factory_rejected_desc">Questions that have been rejected by other players</string>
     <string name="hint_question_text">Question text</string>
     <string name="string_create_text_button">Create Question</string>
+    <string name="string_first_answ_text">First Answer Text</string>
+    <string name="string_second_answ_text">Second Answer Text</string>
+    <string name="string_third_answ_text">Third Answer Text</string>
+    <string name="string_fourth_answ_text">Fourth Answer Text</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">
         <item>Random</item>
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+    </string-array>
+
+    <string-array name="create_quiz_difficulties">
+        <item>Difficulty</item>
         <item>Easy</item>
         <item>Medium</item>
         <item>Hard</item>

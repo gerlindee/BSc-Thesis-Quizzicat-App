@@ -7,22 +7,34 @@
     tools:context=".CreateQuestionActivity">
 
     <Spinner
-        android:id="@+id/create_question_category"
+        android:id="@+id/create_question_difficulty"
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:entries="@array/create_quiz_difficulties"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/create_question_category"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/create_question_difficulty" />
 
     <Spinner
         android:id="@+id/create_question_topic"
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -46,7 +58,7 @@
         <EditText
             android:id="@+id/create_question_text"
             android:layout_width="match_parent"
-            android:layout_height="130dp"
+            android:layout_height="100dp"
             android:gravity="top|start"
             android:hint="@string/hint_question_text"
             android:importantForAutofill="no"
@@ -64,25 +76,27 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/create_question_text_layout">
 
         <CheckBox
+            android:id="@+id/first_answer_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp" />
 
         <EditText
+            android:id="@+id/first_answer_text"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@drawable/shape_rect_light_yellow"
-            android:hint="First Answer Text"
+            android:gravity="center"
+            android:hint="@string/string_first_answ_text"
             android:importantForAutofill="no"
             android:inputType="text"
-            android:padding="10dp"
             android:textColor="@color/colorAccent" />
     </TableRow>
 
@@ -91,25 +105,27 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/first_answer_row">
 
         <CheckBox
+            android:id="@+id/second_answer_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp" />
 
         <EditText
+            android:id="@+id/second_answer_text"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@drawable/shape_rect_light_yellow"
-            android:hint="Second Answer Text"
+            android:gravity="center"
+            android:hint="@string/string_second_answ_text"
             android:importantForAutofill="no"
             android:inputType="text"
-            android:padding="10dp"
             android:textColor="@color/colorAccent" />
     </TableRow>
 
@@ -118,25 +134,27 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/second_answer_row">
 
         <CheckBox
+            android:id="@+id/third_answer_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp" />
 
         <EditText
+            android:id="@+id/third_answer_text"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@drawable/shape_rect_light_yellow"
-            android:hint="Third Answer Text"
+            android:gravity="center"
+            android:hint="@string/string_third_answ_text"
             android:importantForAutofill="no"
             android:inputType="text"
-            android:padding="10dp"
             android:textColor="@color/colorAccent" />
     </TableRow>
 
@@ -144,41 +162,43 @@
         android:id="@+id/fourth_answer_row"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/create_question_submit_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/third_answer_row">
+        app:layout_constraintTop_toBottomOf="@+id/third_answer_row"
+        app:layout_constraintVertical_bias="0.0">
 
         <CheckBox
+            android:id="@+id/fourth_answer_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"/>
+            android:layout_marginStart="10dp" />
 
         <EditText
+            android:id="@+id/fourth_answer_text"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@drawable/shape_rect_light_yellow"
+            android:hint="@string/string_fourth_answ_text"
             android:importantForAutofill="no"
-            android:padding="10dp"
-            android:textColor="@color/colorAccent"
             android:inputType="text"
-            android:hint="Third Answer Text" />
+            android:textColor="@color/colorAccent"
+            android:gravity="center" />
     </TableRow>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/create_question_submit_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:text="@string/string_create_text_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/fourth_answer_row"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
