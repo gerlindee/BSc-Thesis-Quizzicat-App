@@ -29,6 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:padding="7dp"
+                android:layout_marginEnd="5dp"
                 android:text="@string/placeholder_question_text" />
 
             <TableRow
@@ -50,9 +51,10 @@
 
                 <ImageView
                     android:id="@+id/pending_question_report"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:background="@drawable/report_icon"
+                    android:layout_marginBottom="5dp"
                     tools:ignore="ContentDescription" />
 
             </TableRow>

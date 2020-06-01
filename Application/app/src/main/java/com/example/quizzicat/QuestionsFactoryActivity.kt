@@ -22,6 +22,11 @@ class QuestionsFactoryActivity : AppCompatActivity() {
             val createQuestionIntent = Intent(this, CreateQuestionActivity::class.java)
             startActivity(createQuestionIntent)
         }
+
+        pending_questions_card!!.setOnClickListener {
+            val pendingQuestionsIntent = Intent(this, UserQuestionsPendingActivity::class.java)
+            startActivity(pendingQuestionsIntent)
+        }
     }
 
     private fun setupLayoutElements() {

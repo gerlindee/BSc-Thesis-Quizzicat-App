@@ -42,7 +42,7 @@ class QuestionsLeaderboardFragment : Fragment() {
             override fun onCallback(value: ArrayList<PendingQuestion>) {
                 pendingQuestions!!.apply {
                     layoutManager = LinearLayoutManager(activity)
-                    adapter = PendingQuestionsAdapter(context, mFirestoreDatabase!!, value)
+                    adapter = PendingQuestionsAdapter("LEADERBOARD", context, mFirestoreDatabase!!, value)
                     addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                 }
             }
@@ -60,7 +60,7 @@ class QuestionsLeaderboardFragment : Fragment() {
             override fun onCallback(value: ArrayList<PendingQuestion>) {
                 pendingQuestions!!.apply {
                     layoutManager = LinearLayoutManager(activity)
-                    adapter = PendingQuestionsAdapter(context, mFirestoreDatabase!!, value)
+                    adapter = PendingQuestionsAdapter("LEADERBOARD", context, mFirestoreDatabase!!, value)
                     addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                 }
             }
