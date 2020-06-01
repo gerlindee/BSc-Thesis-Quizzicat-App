@@ -17,6 +17,7 @@ import com.example.quizzicat.QuestionsFactoryActivity
 import com.example.quizzicat.R
 import com.example.quizzicat.Utils.PendingQuestionsCallBack
 import com.google.android.material.button.MaterialButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -79,16 +80,18 @@ class QuestionsLeaderboardFragment : Fragment() {
                 if (task.isSuccessful) {
                     val pendingQuestions = ArrayList<PendingQuestion>()
                     for (document in task.result!!) {
-                        val pqid = document.get("pqid") as String
-                        val tid = document.get("tid") as Long
-                        val difficulty = document.get("difficulty") as Long
-                        val question_text = document.get("question_text") as String
                         val submitted_by = document.get("submitted_by") as String
-                        val nr_votes = document.get("nr_votes") as Long
-                        val avg_rating = document.get("avg_rating") as Long
-                        val nr_reports = document.get("nr_reports") as Long
-                        val pendingQuestion = PendingQuestion(pqid, tid, difficulty, question_text, submitted_by, nr_votes, avg_rating, nr_reports)
-                        pendingQuestions.add(pendingQuestion)
+                        if (submitted_by != FirebaseAuth.getInstance().currentUser!!.uid) { // user can't vote for their own questions
+                            val pqid = document.get("pqid") as String
+                            val tid = document.get("tid") as Long
+                            val difficulty = document.get("difficulty") as Long
+                            val question_text = document.get("question_text") as String
+                            val nr_votes = document.get("nr_votes") as Long
+                            val avg_rating = document.get("avg_rating") as Long
+                            val nr_reports = document.get("nr_reports") as Long
+                            val pendingQuestion = PendingQuestion(pqid, tid, difficulty, question_text, submitted_by, nr_votes, avg_rating, nr_reports)
+                            pendingQuestions.add(pendingQuestion)
+                        }
                     }
                     callback.onCallback(pendingQuestions)
                 } else {
