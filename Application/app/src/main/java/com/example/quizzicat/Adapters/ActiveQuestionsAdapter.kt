@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Facades.ImageLoadingFacade
-import com.example.quizzicat.Facades.TopicDataRetrievalFacade
+import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
 import com.example.quizzicat.Model.ActiveQuestion
 import com.example.quizzicat.Model.PendingQuestion
 import com.example.quizzicat.Model.Topic
@@ -48,7 +48,7 @@ class ActiveQuestionsAdapter(
         }
 
         fun bind(firebaseFirestore: FirebaseFirestore, mainContext: Context, question: ActiveQuestion) {
-            TopicDataRetrievalFacade(firebaseFirestore, question.tid).getTopicDetails(object :
+            TopicsDataRetrievalFacade(firebaseFirestore, mainContext).getTopicDetails(object :
                 TopicCallBack {
                 override fun onCallback(value: Topic) {
                     question_text!!.text = question.question_text
@@ -61,7 +61,7 @@ class ActiveQuestionsAdapter(
                     question_difficulty!!.text = questionDifficultyString
                     ImageLoadingFacade(mainContext).loadImage(value.icon_url, question_topic_icon!!)
                 }
-            })
+            }, question.tid)
         }
     }
 }

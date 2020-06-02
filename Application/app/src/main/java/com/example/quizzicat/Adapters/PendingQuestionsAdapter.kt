@@ -11,10 +11,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Facades.ImageLoadingFacade
-import com.example.quizzicat.Facades.TopicDataRetrievalFacade
+import com.example.quizzicat.Facades.PendingDataRetrievalFacade
+import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
 import com.example.quizzicat.Model.PendingQuestion
+import com.example.quizzicat.Model.PendingQuestionAnswer
 import com.example.quizzicat.Model.Topic
 import com.example.quizzicat.R
+import com.example.quizzicat.Utils.PendingAnswersCallback
 import com.example.quizzicat.Utils.TopicCallBack
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -35,9 +38,40 @@ class PendingQuestionsAdapter(
         return list.size
     }
 
+    fun setAnswerData(answerText: TextView, pendingAnswer: PendingQuestionAnswer) {
+        answerText.text = pendingAnswer.answer_text
+        if (pendingAnswer.correct)
+            answerText.setBackgroundResource(R.drawable.shape_rect_green)
+    }
+
     override fun onBindViewHolder(holder: PendingQuestionViewHolder, position: Int) {
         val pendingQuestion = list[position]
         holder.bind(firebaseFirestore, mainContext!!, pendingQuestion)
+
+        holder.question_topic_icon!!.setOnClickListener {
+            PendingDataRetrievalFacade(firebaseFirestore, mainContext)
+                .getAnswersForAQuestion(object: PendingAnswersCallback {
+                    override fun onCallback(value: ArrayList<PendingQuestionAnswer>) {
+                        val inflated = LayoutInflater.from(mainContext)
+                        val questionAnswersView = inflated.inflate(R.layout.view_pending_question_answers, null)
+                        val questionText = questionAnswersView.findViewById<TextView>(R.id.display_question_answer_text)
+                        questionText!!.text = list[position].question_text
+                        val firstAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_first_answer_text)
+                        setAnswerData(firstAnswerText, value[0])
+                        val secondAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_second_answer_text)
+                        setAnswerData(secondAnswerText, value[1])
+                        val thirdAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_third_answer_text)
+                        setAnswerData(thirdAnswerText, value[2])
+                        val fourthAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_fourth_answer_text)
+                        setAnswerData(fourthAnswerText, value[3])
+
+                        AlertDialog.Builder(mainContext)
+                            .setView(questionAnswersView)
+                            .setPositiveButton("Exit", null)
+                            .show()
+                    }
+                }, pendingQuestion.pqid)
+        }
 
         holder.report_question!!.setOnClickListener {
             if (source == "USER_PENDING") {
@@ -48,7 +82,7 @@ class PendingQuestionsAdapter(
                         run {
                             val pendingQuestionsCollection = firebaseFirestore.collection("Pending_Questions")
                             firebaseFirestore.collection("Pending_Questions")
-                                .whereEqualTo("pqid", list[position].pqid)
+                                .whereEqualTo("pqid", pendingQuestion.pqid)
                                 .get()
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
@@ -57,7 +91,7 @@ class PendingQuestionsAdapter(
                                         }
                                         val pendingAnswersCollection = firebaseFirestore.collection("Pending_Question_Answers")
                                         firebaseFirestore.collection("Pending_Question_Answers")
-                                            .whereEqualTo("pqid", list[position].pqid)
+                                            .whereEqualTo("pqid", pendingQuestion.pqid)
                                             .get()
                                             .addOnCompleteListener { task1 ->
                                                 if (task1.isSuccessful) {
@@ -87,7 +121,7 @@ class PendingQuestionsAdapter(
     class PendingQuestionViewHolder(val source: String, inflater: LayoutInflater, parent: ViewGroup) :
         RecyclerView.ViewHolder(inflater.inflate(R.layout.view_pending_question, parent, false)) {
 
-        private var question_topic_icon: ImageView? = null
+        var question_topic_icon: ImageView? = null
         private var question_text: TextView? = null
         private var question_rating: RatingBar? = null
         var report_question: ImageView? = null
@@ -100,7 +134,7 @@ class PendingQuestionsAdapter(
         }
 
         fun bind(firebaseFirestore: FirebaseFirestore, mainContext: Context, question: PendingQuestion) {
-            TopicDataRetrievalFacade(firebaseFirestore, question.tid).getTopicDetails(object :
+            TopicsDataRetrievalFacade(firebaseFirestore, mainContext).getTopicDetails(object :
                 TopicCallBack {
                 override fun onCallback(value: Topic) {
                     question_text!!.text = question.question_text
@@ -111,7 +145,7 @@ class PendingQuestionsAdapter(
                     }
                     ImageLoadingFacade(mainContext).loadImage(value.icon_url, question_topic_icon!!)
                 }
-            })
+            }, question.tid)
         }
 
     }
