@@ -38,7 +38,7 @@ class PendingQuestionsAdapter(
         return list.size
     }
 
-    fun setAnswerData(answerText: TextView, pendingAnswer: PendingQuestionAnswer) {
+    private fun setAnswerData(answerText: TextView, pendingAnswer: PendingQuestionAnswer) {
         answerText.text = pendingAnswer.answer_text
         if (pendingAnswer.correct)
             answerText.setBackgroundResource(R.drawable.shape_rect_green)

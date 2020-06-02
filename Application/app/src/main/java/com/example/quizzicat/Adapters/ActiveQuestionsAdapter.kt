@@ -5,13 +5,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Facades.ImageLoadingFacade
+import com.example.quizzicat.Facades.QuestionsDataRetrievalFacade
 import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
-import com.example.quizzicat.Model.ActiveQuestion
-import com.example.quizzicat.Model.PendingQuestion
-import com.example.quizzicat.Model.Topic
+import com.example.quizzicat.Model.*
 import com.example.quizzicat.R
+import com.example.quizzicat.Utils.AnswersCallBack
 import com.example.quizzicat.Utils.TopicCallBack
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -29,15 +30,46 @@ class ActiveQuestionsAdapter(
         return list.size
     }
 
+    private fun setAnswerData(answerText: TextView, activeAnswer: ActiveQuestionAnswer) {
+        answerText.text = activeAnswer.answer_text
+        if (activeAnswer.is_correct)
+            answerText.setBackgroundResource(R.drawable.shape_rect_green)
+    }
+
     override fun onBindViewHolder(holder: ActiveQuestionViewHolder, position: Int) {
         val activeQuestion = list[position]
         holder.bind(firebaseFirestore, mainContext!!, activeQuestion)
+
+        holder.question_topic_icon!!.setOnClickListener {
+            QuestionsDataRetrievalFacade(firebaseFirestore, mainContext)
+                .getAnswersForQuestion(object: AnswersCallBack {
+                    override fun onCallback(value: ArrayList<ActiveQuestionAnswer>) {
+                        val inflated = LayoutInflater.from(mainContext)
+                        val questionAnswersView = inflated.inflate(R.layout.view_pending_question_answers, null)
+                        val questionText = questionAnswersView.findViewById<TextView>(R.id.display_question_answer_text)
+                        questionText!!.text = list[position].question_text
+                        val firstAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_first_answer_text)
+                        setAnswerData(firstAnswerText, value[0])
+                        val secondAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_second_answer_text)
+                        setAnswerData(secondAnswerText, value[1])
+                        val thirdAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_third_answer_text)
+                        setAnswerData(thirdAnswerText, value[2])
+                        val fourthAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_fourth_answer_text)
+                        setAnswerData(fourthAnswerText, value[3])
+
+                        AlertDialog.Builder(mainContext)
+                            .setView(questionAnswersView)
+                            .setPositiveButton("Exit", null)
+                            .show()
+                    }
+                }, activeQuestion.qid)
+        }
     }
 
     class ActiveQuestionViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         RecyclerView.ViewHolder(inflater.inflate(R.layout.view_question_card, parent, false)) {
 
-        private var question_topic_icon: ImageView? = null
+        var question_topic_icon: ImageView? = null
         private var question_text: TextView? = null
         private var question_difficulty: TextView? = null
 
