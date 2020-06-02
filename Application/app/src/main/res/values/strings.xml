@@ -69,6 +69,7 @@
     <string name="string_second_answ_text">Second Answer Text</string>
     <string name="string_third_answ_text">Third Answer Text</string>
     <string name="string_fourth_answ_text">Fourth Answer Text</string>
+    <string name="string_difficulty">Difficulty:</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">

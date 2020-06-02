@@ -27,6 +27,11 @@ class QuestionsFactoryActivity : AppCompatActivity() {
             val pendingQuestionsIntent = Intent(this, UserQuestionsPendingActivity::class.java)
             startActivity(pendingQuestionsIntent)
         }
+
+        approved_questions_card!!.setOnClickListener {
+            val activeQuestionsIntent = Intent(this, UserQuestionsAcceptedActivity::class.java)
+            startActivity(activeQuestionsIntent)
+        }
     }
 
     private fun setupLayoutElements() {
