@@ -27,7 +27,7 @@
             <TextView
                 android:id="@+id/pending_question_topic_text"
                 android:layout_width="match_parent"
-                android:layout_height="55dp"
+                android:layout_height="wrap_content"
                 android:padding="7dp"
                 android:layout_marginEnd="5dp"
                 android:text="@string/placeholder_question_text" />
