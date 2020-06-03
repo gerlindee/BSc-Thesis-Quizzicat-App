@@ -22,7 +22,7 @@ class ImageLoadingFacade(var context: Context) {
         Picasso.with(context).load(url).into(imageView)
     }
 
-    public fun loadImageIntoCircleView(url: String, circleImageView: CircleImageView) {
+    fun loadImageIntoCircleView(url: String, circleImageView: CircleImageView) {
         Picasso.with(context).load(url).into(circleImageView)
     }
 

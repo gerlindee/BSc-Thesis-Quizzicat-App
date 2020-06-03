@@ -1,27 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/categories_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".Fragments.TopicCategoriesFragment">
+    android:layout_height="match_parent">
 
-    <com.google.android.material.button.MaterialButton
-        android:layout_width="match_parent"
+    <ProgressBar
+        android:id="@+id/topics_progress_bar"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
+        android:indeterminate="true"
         android:visibility="gone"
-        android:id="@+id/categories_go_back"
-        android:text="@string/string_all_categories" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <GridView
-        android:id="@+id/categories_grid_view"
+    <LinearLayout
+        android:id="@+id/categories_layout"
         android:layout_width="match_parent"
-        android:numColumns="4"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".Fragments.TopicCategoriesFragment">
 
-</LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/categories_go_back"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:text="@string/string_all_categories"
+            android:visibility="gone" />
+
+        <GridView
+            android:id="@+id/categories_grid_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:numColumns="4" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

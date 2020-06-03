@@ -9,7 +9,7 @@
     <Spinner
         android:id="@+id/create_question_difficulty"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
@@ -21,7 +21,7 @@
     <Spinner
         android:id="@+id/create_question_category"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
@@ -32,7 +32,7 @@
     <Spinner
         android:id="@+id/create_question_topic"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
@@ -67,7 +67,7 @@
             android:padding="15dp"
             android:scrollbarStyle="insideInset"
             android:scrollbars="vertical"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -91,9 +91,10 @@
         <EditText
             android:id="@+id/first_answer_text"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/shape_rect_light_yellow"
             android:gravity="center"
+            android:textSize="16sp"
             android:hint="@string/string_first_answ_text"
             android:importantForAutofill="no"
             android:inputType="text"
@@ -120,9 +121,10 @@
         <EditText
             android:id="@+id/second_answer_text"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/shape_rect_light_yellow"
             android:gravity="center"
+            android:textSize="16sp"
             android:hint="@string/string_second_answ_text"
             android:importantForAutofill="no"
             android:inputType="text"
@@ -149,9 +151,10 @@
         <EditText
             android:id="@+id/third_answer_text"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/shape_rect_light_yellow"
             android:gravity="center"
+            android:textSize="16sp"
             android:hint="@string/string_third_answ_text"
             android:importantForAutofill="no"
             android:inputType="text"
@@ -180,11 +183,12 @@
         <EditText
             android:id="@+id/fourth_answer_text"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/shape_rect_light_yellow"
             android:hint="@string/string_fourth_answ_text"
             android:importantForAutofill="no"
             android:inputType="text"
+            android:textSize="16sp"
             android:textColor="@color/colorAccent"
             android:gravity="center" />
     </TableRow>

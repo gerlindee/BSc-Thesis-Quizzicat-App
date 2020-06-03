@@ -2,9 +2,11 @@ package com.example.quizzicat.Fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -29,6 +31,7 @@ class QuestionsLeaderboardFragment : Fragment() {
 
     private var questionsFactoryNavigation: MaterialButton? = null
     private var pendingQuestions: RecyclerView? = null
+    private var progressBar: ProgressBar? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_questions_leaderboard, container, false)
@@ -46,6 +49,8 @@ class QuestionsLeaderboardFragment : Fragment() {
                     adapter = PendingQuestionsAdapter("LEADERBOARD", context, mFirestoreDatabase!!, value)
                     addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                 }
+                progressBar!!.visibility = View.GONE
+                pendingQuestions!!.visibility = View.VISIBLE
             }
         })
 
@@ -64,6 +69,8 @@ class QuestionsLeaderboardFragment : Fragment() {
                     adapter = PendingQuestionsAdapter("LEADERBOARD", context, mFirestoreDatabase!!, value)
                     addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                 }
+                progressBar!!.visibility = View.GONE
+                pendingQuestions!!.visibility = View.VISIBLE
             }
         })
     }
@@ -71,9 +78,12 @@ class QuestionsLeaderboardFragment : Fragment() {
     private fun initializeLayoutElements() {
         questionsFactoryNavigation = view?.findViewById(R.id.button_user_questions)
         pendingQuestions = view?.findViewById(R.id.pending_questions_list)
+        progressBar = view?.findViewById(R.id.questions_leaderboard_progress_bar)
     }
 
     private fun getPendingQuestions(callback: PendingQuestionsCallBack) {
+        progressBar!!.visibility = View.VISIBLE
+        pendingQuestions!!.visibility = View.GONE
         mFirestoreDatabase!!.collection("Pending_Questions")
             .get()
             .addOnCompleteListener { task ->

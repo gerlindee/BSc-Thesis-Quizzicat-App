@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/category_spinner_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription" />
@@ -17,16 +17,14 @@
     <TextView
         android:id="@+id/category_spinner_name"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/category_spinner_icon"
         android:gravity="center|start"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:fontFamily="sans-serif-condensed-light"
         android:text="@string/string_all_categories"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:textSize="16sp"
         android:textColor="@color/colorAccent"
         app:layout_constraintTop_toTopOf="parent" />
 
