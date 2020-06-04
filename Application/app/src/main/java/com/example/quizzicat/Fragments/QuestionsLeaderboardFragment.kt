@@ -3,6 +3,7 @@ package com.example.quizzicat.Fragments
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,11 +14,14 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Adapters.PendingQuestionsAdapter
+import com.example.quizzicat.Facades.PendingDataRetrievalFacade
 import com.example.quizzicat.Model.PendingQuestion
+import com.example.quizzicat.Model.UserReports
 import com.example.quizzicat.NoInternetConnectionActivity
 import com.example.quizzicat.QuestionsFactoryActivity
 import com.example.quizzicat.R
 import com.example.quizzicat.Utils.PendingQuestionsCallBack
+import com.example.quizzicat.Utils.UserReportsCallBack
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -42,17 +46,7 @@ class QuestionsLeaderboardFragment : Fragment() {
 
         initializeLayoutElements()
 
-        getPendingQuestions(object: PendingQuestionsCallBack {
-            override fun onCallback(value: ArrayList<PendingQuestion>) {
-                pendingQuestions!!.apply {
-                    layoutManager = LinearLayoutManager(activity)
-                    adapter = PendingQuestionsAdapter("LEADERBOARD", context, mFirestoreDatabase!!, value)
-                    addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-                }
-                progressBar!!.visibility = View.GONE
-                pendingQuestions!!.visibility = View.VISIBLE
-            }
-        })
+        setupQuestions()
 
         questionsFactoryNavigation!!.setOnClickListener {
             val questionsFactoryIntent = Intent(activity, QuestionsFactoryActivity::class.java)
@@ -62,15 +56,32 @@ class QuestionsLeaderboardFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        setupQuestions()
+    }
+
+    private fun setupQuestions() {
         getPendingQuestions(object: PendingQuestionsCallBack {
             override fun onCallback(value: ArrayList<PendingQuestion>) {
-                pendingQuestions!!.apply {
-                    layoutManager = LinearLayoutManager(activity)
-                    adapter = PendingQuestionsAdapter("LEADERBOARD", context, mFirestoreDatabase!!, value)
-                    addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-                }
-                progressBar!!.visibility = View.GONE
-                pendingQuestions!!.visibility = View.VISIBLE
+                // remove questions reported by the user
+                val pendingQuestionsLocal = value
+                PendingDataRetrievalFacade(mFirestoreDatabase!!, context!!)
+                    .getReportedQuestionsForUser(object: UserReportsCallBack {
+                        override fun onCallback(value: ArrayList<UserReports>) {
+                            val nonReportedQuestions = ArrayList<PendingQuestion>()
+                            for (question in pendingQuestionsLocal) {
+                                if (!isQuestionReported(value, question.pqid)) {
+                                    nonReportedQuestions.add(question)
+                                }
+                            }
+                            pendingQuestions!!.apply {
+                                layoutManager = LinearLayoutManager(activity)
+                                adapter = PendingQuestionsAdapter("LEADERBOARD", context, mFirestoreDatabase!!, nonReportedQuestions)
+                                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                            }
+                            progressBar!!.visibility = View.GONE
+                            pendingQuestions!!.visibility = View.VISIBLE
+                        }
+                    })
             }
         })
     }
@@ -108,5 +119,13 @@ class QuestionsLeaderboardFragment : Fragment() {
                     Toast.makeText(context, "Unable to retrieve pending questions! Please try again.", Toast.LENGTH_LONG).show()
                 }
             }
+    }
+
+    private fun isQuestionReported(questions: ArrayList<UserReports>, pqid: String): Boolean {
+        for (question in questions) {
+            if (question.pqid == pqid)
+                return true
+        }
+        return false
     }
 }

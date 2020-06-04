@@ -142,7 +142,8 @@ class CreateQuestionActivity : AppCompatActivity() {
                 val submittedBy = FirebaseAuth.getInstance().currentUser!!.uid
                 val newQuestion = PendingQuestion(pqid, selectedTopicTID!!, difficulty, questionText.toString(), submittedBy, 0, 0, 0)
                 mFirestoreDatabase!!.collection("Pending_Questions")
-                    .add(newQuestion)
+                    .document(pqid)
+                    .set(newQuestion)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             val answersList = ArrayList<PendingQuestionAnswer>()
@@ -168,7 +169,8 @@ class CreateQuestionActivity : AppCompatActivity() {
 
                             for (answer in answersList) {
                                 mFirestoreDatabase!!.collection("Pending_Question_Answers")
-                                    .add(answer)
+                                    .document(answer.paid)
+                                    .set(answer)
                                     .addOnCompleteListener { task1 ->
                                         if (!task1.isSuccessful) {
                                             Toast.makeText(this, task1.exception!!.message, Toast.LENGTH_LONG).show()

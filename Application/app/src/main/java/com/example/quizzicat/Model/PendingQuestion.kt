@@ -6,7 +6,7 @@ class PendingQuestion(
     val difficulty: Long,
     val question_text: String,
     val submitted_by: String,
-    val nr_votes: Long,
-    val avg_rating: Long,
-    val nr_reports: Long
+    var nr_votes: Long,
+    var avg_rating: Long,
+    var nr_reports: Long
 )

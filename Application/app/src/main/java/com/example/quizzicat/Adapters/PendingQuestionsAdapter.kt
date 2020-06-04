@@ -115,6 +115,22 @@ class PendingQuestionsAdapter(
                     .create()
                     .show()
             }
+            if (source == "LEADERBOARD") {
+                val inflater = LayoutInflater.from(mainContext)
+                val reportInformation = inflater.inflate(R.layout.view_confirm_report_question, null)
+                AlertDialog.Builder(mainContext)
+                    .setView(reportInformation)
+                    .setPositiveButton("Confirm") { _, _ ->
+                        run {
+                            PendingDataRetrievalFacade(firebaseFirestore, mainContext!!)
+                                .reportPendingQuestion(pendingQuestion)
+                            list.remove(pendingQuestion)
+                            notifyDataSetChanged()
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
         }
     }
 

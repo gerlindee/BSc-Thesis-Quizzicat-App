@@ -28,6 +28,7 @@
     <string name="string_placeholder">Placeholder</string>
     <string name="string_all_categories">All categories</string>
     <string name="string_custom_quiz_duration">Each question needs to be answered in at most 10 seconds, regardless of the quiz difficulty or the number of questions. \n Good luck!</string>
+    <string name="string_report_question_text">Report a pending question only if you consider that its content is inappropriate, if it is a duplicate of an already existing question or if you believe that it is incorrectly labelled. </string>
     <string name="string_play_button">Play</string>
     <string name="string_quiz_details_title">QUIZ DETAILS</string>
     <string name="string_finish_quiz">Finish</string>
@@ -70,6 +71,7 @@
     <string name="string_third_answ_text">Third Answer Text</string>
     <string name="string_fourth_answ_text">Fourth Answer Text</string>
     <string name="string_difficulty">Difficulty:</string>
+    <string name="string_report_question">REPORT QUESTION</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">
