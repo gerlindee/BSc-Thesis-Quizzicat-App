@@ -1,7 +1,7 @@
 package com.example.quizzicat.Model
 
 class RejectedQuestion(
-    val rqid: Long,
+    val rqid: String,
     val tid: Long,
     val question_text: String,
     val difficulty: Long,

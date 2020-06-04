@@ -1,6 +1,7 @@
 package com.example.quizzicat.Facades
 
 import android.content.Context
+import android.service.autofill.UserData
 import android.util.Log
 import android.widget.Toast
 import com.example.quizzicat.Model.*
@@ -93,6 +94,72 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
                         .addOnCompleteListener { task1 ->
                             if (task1.isSuccessful) {
                                 Toast.makeText(context, "Question has been reported!", Toast.LENGTH_LONG).show()
+                                UserDataRetrievalFacade(firebaseFirestore, FirebaseAuth.getInstance().currentUser!!.uid)
+                                    .getNumberOfUsers(object: CounterCallBack {
+                                        override fun onCallback(value: Int) {
+                                            if (question.nr_reports >= (0.65 * value) ||
+                                               (question.nr_votes >= (0.65 * value) && question.avg_rating <= 2)) {
+                                                removeReportedQuestion(question)
+                                            }
+                                        }
+                                    })
+                            } else {
+                                Toast.makeText(context, task1.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                } else {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    private fun insertRejectedQuestions(question: RejectedQuestion) {
+        firebaseFirestore.collection("Rejected_Questions")
+            .document(question.rqid)
+            .set(question)
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    private fun insertRejectedAnswers(answer: RejectedQuestionAnswer) {
+        firebaseFirestore.collection("Rejected_Question_Answers")
+            .document(answer.raid)
+            .set(answer)
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    fun removeReportedQuestion(question: PendingQuestion) {
+        val pendingQuestionsCollection = firebaseFirestore.collection("Pending_Questions")
+        firebaseFirestore.collection("Pending_Questions")
+            .whereEqualTo("pqid", question.pqid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    insertRejectedQuestions(RejectedQuestion(question.pqid, question.tid, question.question_text, question.difficulty, question.submitted_by))
+                    for (document in task.result!!) {
+                        pendingQuestionsCollection.document(document.id).delete()
+                    }
+                    val pendingAnswersCollection = firebaseFirestore.collection("Pending_Question_Answers")
+                    firebaseFirestore.collection("Pending_Question_Answers")
+                        .whereEqualTo("pqid", question.pqid)
+                        .get()
+                        .addOnCompleteListener { task1 ->
+                            if (task1.isSuccessful) {
+                                for (document in task1.result!!) {
+                                    val raid = document.get("paid") as String
+                                    val rqid = document.get("pqid") as String
+                                    val answer_text = document.get("answer_text") as String
+                                    val is_correct = document.get("correct") as Boolean
+                                    insertRejectedAnswers(RejectedQuestionAnswer(raid, rqid, answer_text, is_correct))
+                                    pendingAnswersCollection.document(document.id).delete()
+                                }
                             } else {
                                 Toast.makeText(context, task1.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                             }
