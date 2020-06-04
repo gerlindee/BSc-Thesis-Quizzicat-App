@@ -2,7 +2,10 @@ package com.example.quizzicat.Adapters
 
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RatingBar
@@ -17,7 +20,9 @@ import com.example.quizzicat.Model.PendingQuestion
 import com.example.quizzicat.Model.PendingQuestionAnswer
 import com.example.quizzicat.Model.Topic
 import com.example.quizzicat.R
+import com.example.quizzicat.Utils.CounterCallBack
 import com.example.quizzicat.Utils.PendingAnswersCallback
+import com.example.quizzicat.Utils.PendingQuestionsCallBack
 import com.example.quizzicat.Utils.TopicCallBack
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -27,7 +32,7 @@ class PendingQuestionsAdapter(
     private val source: String,
     private val mainContext: Context?,
     private val firebaseFirestore: FirebaseFirestore,
-    private val list: ArrayList<PendingQuestion>): RecyclerView.Adapter<PendingQuestionsAdapter.PendingQuestionViewHolder>() {
+    private var list: ArrayList<PendingQuestion>): RecyclerView.Adapter<PendingQuestionsAdapter.PendingQuestionViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PendingQuestionViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -132,19 +137,34 @@ class PendingQuestionsAdapter(
                     .show()
             }
         }
+
+        holder.question_rating!!.setOnRatingBarChangeListener { _, rating, fromUser ->
+            if (fromUser) {
+                PendingDataRetrievalFacade(firebaseFirestore, mainContext)
+                    .ratePendingQuestion(object: PendingQuestionsCallBack {
+                        override fun onCallback(value: ArrayList<PendingQuestion>) {
+                            holder.question_rating!!.setIsIndicator(true)
+                            holder.question_rating!!.rating = value[0].avg_rating.toFloat()
+                            holder.user_question_rating!!.visibility = View.VISIBLE
+                        }
+                    }, pendingQuestion, rating)
+            }
+        }
     }
 
     class PendingQuestionViewHolder(val source: String, inflater: LayoutInflater, parent: ViewGroup) :
         RecyclerView.ViewHolder(inflater.inflate(R.layout.view_pending_question, parent, false)) {
 
         var question_topic_icon: ImageView? = null
-        private var question_text: TextView? = null
-        private var question_rating: RatingBar? = null
+        var question_rating: RatingBar? = null
         var report_question: ImageView? = null
+        var user_question_rating: TextView? = null
+        private var question_text: TextView? = null
 
         init {
             question_topic_icon = itemView.findViewById(R.id.pending_question_topic_icon)
             question_text = itemView.findViewById(R.id.pending_question_topic_text)
+            user_question_rating = itemView.findViewById(R.id.pending_question_rating_done)
             question_rating = itemView.findViewById(R.id.pending_question_rating)
             report_question = itemView.findViewById(R.id.pending_question_report)
         }
@@ -158,6 +178,16 @@ class PendingQuestionsAdapter(
                     if (source == "USER_PENDING") {
                         question_rating!!.setIsIndicator(true)
                         report_question!!.setBackgroundResource(R.drawable.delete_bin)
+                    } else {
+                        PendingDataRetrievalFacade(firebaseFirestore, mainContext)
+                            .hasUserRatedTheQuestion(object: CounterCallBack {
+                                override fun onCallback(value: Int) {
+                                    if (value != 0) {
+                                        question_rating!!.setIsIndicator(true)
+                                        user_question_rating!!.visibility = View.VISIBLE
+                                    }
+                                }
+                            }, question)
                     }
                     ImageLoadingFacade(mainContext).loadImage(value.icon_url, question_topic_icon!!)
                 }

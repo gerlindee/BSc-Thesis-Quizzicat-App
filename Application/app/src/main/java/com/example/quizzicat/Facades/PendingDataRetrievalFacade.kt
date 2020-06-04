@@ -1,12 +1,12 @@
 package com.example.quizzicat.Facades
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
-import com.example.quizzicat.Model.PendingQuestion
-import com.example.quizzicat.Model.PendingQuestionAnswer
-import com.example.quizzicat.Model.User
-import com.example.quizzicat.Model.UserReports
+import com.example.quizzicat.Model.*
+import com.example.quizzicat.Utils.CounterCallBack
 import com.example.quizzicat.Utils.PendingAnswersCallback
+import com.example.quizzicat.Utils.PendingQuestionsCallBack
 import com.example.quizzicat.Utils.UserReportsCallBack
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -29,6 +29,51 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
                         pendingAnswers.add(answer)
                     }
                     callback.onCallback(pendingAnswers)
+                } else {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    fun ratePendingQuestion(callback: PendingQuestionsCallBack, question: PendingQuestion, rating: Float) {
+        UserDataRetrievalFacade(firebaseFirestore, FirebaseAuth.getInstance().currentUser!!.uid)
+            .getNumberOfUsers(object: CounterCallBack {
+                override fun onCallback(value: Int) {
+                    question.nr_votes += 1
+                    question.avg_rating = ( question.avg_rating + rating ).toLong() / question.nr_votes
+                    firebaseFirestore.collection("Pending_Questions")
+                        .document(question.pqid)
+                        .set(question)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val userRating = UserRatings(FirebaseAuth.getInstance().currentUser!!.uid, question.pqid, rating.toLong())
+                                firebaseFirestore.collection("User_Ratings")
+                                    .add(userRating)
+                                    .addOnCompleteListener { task1 ->
+                                        if (task1.isSuccessful) {
+                                            val result = ArrayList<PendingQuestion>()
+                                            result.add(question)
+                                            callback.onCallback(result)
+                                        } else {
+                                            Toast.makeText(context, task1.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                            } else {
+                                Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                }
+            })
+    }
+
+    fun hasUserRatedTheQuestion(callback: CounterCallBack, question: PendingQuestion) {
+        firebaseFirestore.collection("User_Ratings")
+            .whereEqualTo("uid", FirebaseAuth.getInstance().currentUser!!.uid)
+            .whereEqualTo("pqid", question.pqid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    callback.onCallback(task.result!!.size())
                 } else {
                     Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                 }

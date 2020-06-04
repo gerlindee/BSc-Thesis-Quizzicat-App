@@ -28,34 +28,51 @@
                 android:id="@+id/pending_question_topic_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="52dp"
                 android:padding="7dp"
                 android:layout_marginEnd="5dp"
                 android:text="@string/placeholder_question_text" />
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:layout_marginEnd="10dp">
+                android:layout_height="wrap_content">
 
-                <RatingBar
-                    android:id="@+id/pending_question_rating"
-                    style="@android:style/Widget.Material.RatingBar.Small"
+                <TextView
+                    android:id="@+id/pending_question_rating_done"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="5dp"
-                    android:isIndicator="false"
-                    android:numStars="5"
-                    android:stepSize="0.5" />
+                    android:visibility="gone"
+                    android:textColor="@color/green"
+                    android:textSize="16sp"
+                    android:layout_marginStart="7dp"
+                    android:text="@string/string_rated" />
 
-                <ImageView
-                    android:id="@+id/pending_question_report"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="@drawable/report_icon"
-                    android:layout_marginBottom="5dp"
-                    tools:ignore="ContentDescription" />
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:layout_marginEnd="10dp">
+
+                    <RatingBar
+                        android:id="@+id/pending_question_rating"
+                        style="@android:style/Widget.Material.RatingBar.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="7dp"
+                        android:isIndicator="false"
+                        android:layout_marginTop="3dp"
+                        android:numStars="5"
+                        android:stepSize="1" />
+
+                    <ImageView
+                        android:id="@+id/pending_question_report"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/report_icon"
+                        android:layout_marginBottom="5dp"
+                        tools:ignore="ContentDescription" />
+
+                </TableRow>
 
             </TableRow>
 

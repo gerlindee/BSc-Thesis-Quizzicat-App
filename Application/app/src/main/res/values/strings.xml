@@ -72,6 +72,7 @@
     <string name="string_fourth_answ_text">Fourth Answer Text</string>
     <string name="string_difficulty">Difficulty:</string>
     <string name="string_report_question">REPORT QUESTION</string>
+    <string name="string_rated">Rated!</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">
