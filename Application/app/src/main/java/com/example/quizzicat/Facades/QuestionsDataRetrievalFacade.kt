@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore, private val context: Context) {
-    fun getAnswersForQuestion(callback: AnswersCallBack, qid: Long) {
+    fun getAnswersForQuestion(callback: AnswersCallBack, qid: String) {
         firebaseFirestore.collection("Active_Question_Answers")
             .whereEqualTo("qid", qid)
             .get()
@@ -19,10 +19,10 @@ class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirest
                 if (task.isSuccessful) {
                     val quizAnswers = ArrayList<ActiveQuestionAnswer>()
                     for (document in task.result!!) {
-                        val answerAID = document.get("aid") as Long
+                        val answerAID = document.get("aid") as String
                         val answerText = document.get("answer_text") as String
-                        val answerCorrect = document.get("is_correct") as Boolean
-                        val answerQID = document.get("qid") as Long
+                        val answerCorrect = document.get("correct") as Boolean
+                        val answerQID = document.get("qid") as String
                         val quizAnswer = ActiveQuestionAnswer(answerAID, answerQID, answerText, answerCorrect)
                         quizAnswers.add(quizAnswer)
                     }
@@ -34,7 +34,7 @@ class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirest
     }
 
     fun getAcceptedQuestionsForUser(callback: QuestionsCallBack) {
-        firebaseFirestore!!.collection("Active_Questions")
+        firebaseFirestore.collection("Active_Questions")
             .whereEqualTo("submitted_by", FirebaseAuth.getInstance().currentUser!!.uid)
             .get()
             .addOnCompleteListener { task ->
@@ -42,7 +42,7 @@ class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirest
                     val activeQuestions = ArrayList<ActiveQuestion>()
                     for (document in task.result!!) {
                         val quizQuestionDifficulty = document.get("difficulty") as Long
-                        val quizQuestionQID = document.get("qid") as Long
+                        val quizQuestionQID = document.get("qid") as String
                         val quizQuestionText = document.get("question_text") as String
                         val quizQuestionTID = document.get("tid") as Long
                         val quizSubmittedBy = document.get("submitted_by") as String

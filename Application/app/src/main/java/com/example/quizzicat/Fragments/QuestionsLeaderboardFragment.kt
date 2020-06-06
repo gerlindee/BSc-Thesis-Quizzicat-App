@@ -58,7 +58,6 @@ class QuestionsLeaderboardFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        setupQuestions()
     }
 
     private fun setupQuestions() {

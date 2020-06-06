@@ -32,7 +32,7 @@ class ActiveQuestionsAdapter(
 
     private fun setAnswerData(answerText: TextView, activeAnswer: ActiveQuestionAnswer) {
         answerText.text = activeAnswer.answer_text
-        if (activeAnswer.is_correct)
+        if (activeAnswer.correct)
             answerText.setBackgroundResource(R.drawable.shape_rect_green)
     }
 

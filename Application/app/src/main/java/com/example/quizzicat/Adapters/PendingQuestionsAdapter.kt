@@ -140,12 +140,18 @@ class PendingQuestionsAdapter(
 
         holder.question_rating!!.setOnRatingBarChangeListener { _, rating, fromUser ->
             if (fromUser) {
+                Log.d("QUESTION", pendingQuestion.question_text)
                 PendingDataRetrievalFacade(firebaseFirestore, mainContext)
                     .ratePendingQuestion(object: PendingQuestionsCallBack {
                         override fun onCallback(value: ArrayList<PendingQuestion>) {
-                            holder.question_rating!!.setIsIndicator(true)
-                            holder.question_rating!!.rating = value[0].avg_rating.toFloat()
-                            holder.user_question_rating!!.visibility = View.VISIBLE
+                            if (value.size == 0) {
+                                list.remove(pendingQuestion)
+                                notifyDataSetChanged()
+                            } else {
+                                holder.question_rating!!.setIsIndicator(true)
+                                holder.question_rating!!.rating = value[0].avg_rating.toFloat()
+                                holder.user_question_rating!!.visibility = View.VISIBLE
+                            }
                         }
                     }, pendingQuestion, rating)
             }
@@ -176,7 +182,7 @@ class PendingQuestionsAdapter(
                     question_text!!.text = question.question_text
                     question_rating!!.rating = question.avg_rating.toFloat()
                     if (source == "USER_PENDING") {
-                        question_rating!!.setIsIndicator(true)
+                        question_rating!!.visibility = View.GONE
                         report_question!!.setBackgroundResource(R.drawable.delete_bin)
                     } else {
                         PendingDataRetrievalFacade(firebaseFirestore, mainContext)

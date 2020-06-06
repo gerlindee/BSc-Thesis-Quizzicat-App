@@ -14,6 +14,7 @@
         <ImageView
             android:id="@+id/pending_question_topic_icon"
             android:layout_width="75dp"
+            android:layout_gravity="center"
             android:layout_height="75dp"
             android:padding="7dp"
             app:srcCompat="@mipmap/ic_launcher_round"
@@ -28,7 +29,7 @@
                 android:id="@+id/pending_question_topic_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="52dp"
+                android:minHeight="50dp"
                 android:padding="7dp"
                 android:layout_marginEnd="5dp"
                 android:text="@string/placeholder_question_text" />
@@ -62,7 +63,7 @@
                         android:isIndicator="false"
                         android:layout_marginTop="3dp"
                         android:numStars="5"
-                        android:stepSize="1" />
+                        android:stepSize="0.5" />
 
                     <ImageView
                         android:id="@+id/pending_question_report"

@@ -33,49 +33,94 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
             }
     }
 
+    private fun insertActiveQuestion(question: ActiveQuestion) {
+        firebaseFirestore.collection("Active_Questions")
+            .document(question.qid)
+            .set(question)
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    private fun insertActiveQuestionAnswer(answer: ActiveQuestionAnswer) {
+        firebaseFirestore.collection("Active_Question_Answers")
+            .document(answer.aid)
+            .set(answer)
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
     fun ratePendingQuestion(callback: PendingQuestionsCallBack, question: PendingQuestion, rating: Float) {
         UserDataRetrievalFacade(firebaseFirestore, FirebaseAuth.getInstance().currentUser!!.uid)
             .getNumberOfUsers(object: CounterCallBack {
                 override fun onCallback(value: Int) {
                     question.nr_votes += 1
                     question.avg_rating = ( question.avg_rating + rating ).toLong() / question.nr_votes
-                    firebaseFirestore.collection("Pending_Questions")
-                        .document(question.pqid)
-                        .set(question)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val userRating = UserRatings(FirebaseAuth.getInstance().currentUser!!.uid, question.pqid, rating.toLong())
-                                firebaseFirestore.collection("User_Ratings")
-                                    .add(userRating)
-                                    .addOnCompleteListener { task1 ->
-                                        if (task1.isSuccessful) {
-                                            val result = ArrayList<PendingQuestion>()
-                                            result.add(question)
-                                            callback.onCallback(result)
-                                        } else {
-                                            Toast.makeText(context, task1.exception!!.message.toString(), Toast.LENGTH_LONG).show()
-                                        }
+                    if (question.nr_votes >= (0.65 * value) && question.avg_rating <= 2) {
+                        removeQuestion(question, "REJECT")
+                    } else {
+                        if ((question.nr_votes >= (0.85 * value) || (question.nr_votes.toInt() == (value - 1))) && (question.avg_rating >= 4)) {
+                            insertActiveQuestion(ActiveQuestion(question.pqid, question.tid, question.question_text, question.difficulty, question.submitted_by))
+                            getAnswersForAQuestion(object: PendingAnswersCallback {
+                                override fun onCallback(value: ArrayList<PendingQuestionAnswer>) {
+                                    for (newAnswer in value) {
+                                        insertActiveQuestionAnswer(ActiveQuestionAnswer(newAnswer.paid, newAnswer.pqid, newAnswer.answer_text, newAnswer.correct))
                                     }
-                            } else {
-                                Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
-                            }
+                                    removeQuestion(question, "ACCEPT")
+                                }
+                            }, question.pqid)
+                            callback.onCallback(ArrayList())
+                        } else {
+                            firebaseFirestore.collection("Pending_Questions")
+                                .document(question.pqid)
+                                .set(question)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        val userRating = UserRatings(FirebaseAuth.getInstance().currentUser!!.uid, question.pqid, rating.toLong())
+                                        firebaseFirestore.collection("User_Ratings")
+                                            .add(userRating)
+                                            .addOnCompleteListener { task1 ->
+                                                if (task1.isSuccessful) {
+                                                    val result = ArrayList<PendingQuestion>()
+                                                    result.add(question)
+                                                    callback.onCallback(result)
+                                                } else {
+                                                    Toast.makeText(context, task1.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                                                }
+                                            }
+                                    } else {
+                                        Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                                    }
+                                }
                         }
+                    }
                 }
             })
     }
 
     fun hasUserRatedTheQuestion(callback: CounterCallBack, question: PendingQuestion) {
-        firebaseFirestore.collection("User_Ratings")
-            .whereEqualTo("uid", FirebaseAuth.getInstance().currentUser!!.uid)
-            .whereEqualTo("pqid", question.pqid)
-            .get()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    callback.onCallback(task.result!!.size())
-                } else {
-                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+        if (FirebaseAuth.getInstance().uid != null) {
+            firebaseFirestore.collection("User_Ratings")
+                .whereEqualTo("uid", FirebaseAuth.getInstance().currentUser!!.uid)
+                .whereEqualTo("pqid", question.pqid)
+                .get()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        callback.onCallback(task.result!!.size())
+                    } else {
+                        Toast.makeText(
+                            context,
+                            task.exception!!.message.toString(),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
-            }
+        }
     }
 
     fun reportPendingQuestion(question: PendingQuestion) {
@@ -96,7 +141,7 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
                                         override fun onCallback(value: Int) {
                                             if (question.nr_reports >= (0.65 * value) ||
                                                (question.nr_votes >= (0.65 * value) && question.avg_rating <= 2)) {
-                                                removeReportedQuestion(question)
+                                                removeQuestion(question, "REJECT")
                                             }
                                         }
                                     })
@@ -146,14 +191,16 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
             }
     }
 
-    fun removeReportedQuestion(question: PendingQuestion) {
+    fun removeQuestion(question: PendingQuestion, reason: String) {
         val pendingQuestionsCollection = firebaseFirestore.collection("Pending_Questions")
         firebaseFirestore.collection("Pending_Questions")
             .whereEqualTo("pqid", question.pqid)
             .get()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    insertRejectedQuestions(RejectedQuestion(question.pqid, question.tid, question.question_text, question.difficulty, question.submitted_by))
+                    if (reason == "REJECT") {
+                        insertRejectedQuestions(RejectedQuestion(question.pqid, question.tid, question.question_text, question.difficulty, question.submitted_by))
+                    }
                     for (document in task.result!!) {
                         pendingQuestionsCollection.document(document.id).delete()
                     }
@@ -169,7 +216,9 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
                                     val rqid = document.get("pqid") as String
                                     val answer_text = document.get("answer_text") as String
                                     val is_correct = document.get("correct") as Boolean
-                                    insertRejectedAnswers(RejectedQuestionAnswer(raid, rqid, answer_text, is_correct))
+                                    if (reason == "REJECT") {
+                                        insertRejectedAnswers(RejectedQuestionAnswer(raid, rqid, answer_text, is_correct))
+                                    }
                                     pendingAnswersCollection.document(document.id).delete()
                                 }
                             } else {

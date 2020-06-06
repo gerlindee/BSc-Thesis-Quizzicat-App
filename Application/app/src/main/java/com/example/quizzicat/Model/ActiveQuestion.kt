@@ -1,7 +1,7 @@
 package com.example.quizzicat.Model
 
 class ActiveQuestion(
-    val qid: Long,
+    val qid: String,
     val tid: Long,
     val question_text: String,
     val difficulty: Long,
