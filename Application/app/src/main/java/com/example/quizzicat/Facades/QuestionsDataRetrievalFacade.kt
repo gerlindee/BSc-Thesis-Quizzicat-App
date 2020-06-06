@@ -3,8 +3,11 @@ package com.example.quizzicat.Facades
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import com.example.quizzicat.Model.ActiveQuestion
 import com.example.quizzicat.Model.ActiveQuestionAnswer
 import com.example.quizzicat.Utils.AnswersCallBack
+import com.example.quizzicat.Utils.QuestionsCallBack
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore, private val context: Context) {
@@ -27,6 +30,30 @@ class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirest
                 } else {
                     Toast.makeText(context, task.exception!!.message, Toast.LENGTH_LONG).show()
                 }
+            }
+    }
+
+    fun getAcceptedQuestionsForUser(callback: QuestionsCallBack) {
+        firebaseFirestore!!.collection("Active_Questions")
+            .whereEqualTo("submitted_by", FirebaseAuth.getInstance().currentUser!!.uid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val activeQuestions = ArrayList<ActiveQuestion>()
+                    for (document in task.result!!) {
+                        val quizQuestionDifficulty = document.get("difficulty") as Long
+                        val quizQuestionQID = document.get("qid") as Long
+                        val quizQuestionText = document.get("question_text") as String
+                        val quizQuestionTID = document.get("tid") as Long
+                        val quizSubmittedBy = document.get("submitted_by") as String
+                        val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty, quizSubmittedBy)
+                        activeQuestions.add(quizQuestion)
+                    }
+                    callback.onCallback(activeQuestions)
+                } else {
+                    Toast.makeText(context, "Unable to retrieve active questions! Please try again.", Toast.LENGTH_LONG).show()
+                }
+
             }
     }
 }

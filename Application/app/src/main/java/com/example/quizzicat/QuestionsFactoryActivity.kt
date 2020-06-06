@@ -30,6 +30,13 @@ class QuestionsFactoryActivity : AppCompatActivity() {
 
         approved_questions_card!!.setOnClickListener {
             val activeQuestionsIntent = Intent(this, UserQuestionsAcceptedActivity::class.java)
+            activeQuestionsIntent.putExtra("TYPE_DISPLAYED", "ACCEPTED")
+            startActivity(activeQuestionsIntent)
+        }
+
+        rejected_questions_card!!.setOnClickListener {
+            val activeQuestionsIntent = Intent(this, UserQuestionsAcceptedActivity::class.java)
+            activeQuestionsIntent.putExtra("TYPE_DISPLAYED", "REJECTED")
             startActivity(activeQuestionsIntent)
         }
     }

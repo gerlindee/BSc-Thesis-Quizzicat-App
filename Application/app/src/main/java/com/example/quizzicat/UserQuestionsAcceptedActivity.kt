@@ -9,8 +9,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Adapters.ActiveQuestionsAdapter
 import com.example.quizzicat.Adapters.PendingQuestionsAdapter
+import com.example.quizzicat.Adapters.RejectedQuestionsAdapter
+import com.example.quizzicat.Facades.PendingDataRetrievalFacade
+import com.example.quizzicat.Facades.QuestionsDataRetrievalFacade
 import com.example.quizzicat.Model.ActiveQuestion
+import com.example.quizzicat.Model.RejectedQuestion
 import com.example.quizzicat.Utils.QuestionsCallBack
+import com.example.quizzicat.Utils.RejectedQuestionsCallBack
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -28,39 +33,31 @@ class UserQuestionsAcceptedActivity: AppCompatActivity() {
 
         acceptedQuestions = findViewById(R.id.pending_questions_user_list)
 
-        getAcceptedQuestionsForUser(object: QuestionsCallBack {
-            override fun onCallback(value: ArrayList<ActiveQuestion>) {
-                acceptedQuestions!!.apply {
-                    layoutManager = LinearLayoutManager(this@UserQuestionsAcceptedActivity)
-                    adapter = ActiveQuestionsAdapter(context, mFirestoreDatabase!!, value)
-                    addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-                }
+        when (intent.extras!!.getString("TYPE_DISPLAYED")!!) {
+            "ACCEPTED" -> {
+                QuestionsDataRetrievalFacade(mFirestoreDatabase!!, this)
+                    .getAcceptedQuestionsForUser(object : QuestionsCallBack {
+                        override fun onCallback(value: ArrayList<ActiveQuestion>) {
+                            acceptedQuestions!!.apply {
+                                layoutManager = LinearLayoutManager(this@UserQuestionsAcceptedActivity)
+                                adapter = ActiveQuestionsAdapter(context, mFirestoreDatabase!!, value)
+                                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                            }
+                        }
+                    })
             }
-        })
-
-    }
-
-    private fun getAcceptedQuestionsForUser(callback: QuestionsCallBack) {
-        mFirestoreDatabase!!.collection("Active_Questions")
-            .whereEqualTo("submitted_by", FirebaseAuth.getInstance().currentUser!!.uid)
-            .get()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val activeQuestions = ArrayList<ActiveQuestion>()
-                    for (document in task.result!!) {
-                        val quizQuestionDifficulty = document.get("difficulty") as Long
-                        val quizQuestionQID = document.get("qid") as Long
-                        val quizQuestionText = document.get("question_text") as String
-                        val quizQuestionTID = document.get("tid") as Long
-                        val quizSubmittedBy = document.get("submitted_by") as String
-                        val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty, quizSubmittedBy)
-                        activeQuestions.add(quizQuestion)
-                    }
-                    callback.onCallback(activeQuestions)
-                } else {
-                    Toast.makeText(this, "Unable to retrieve active questions! Please try again.", Toast.LENGTH_LONG).show()
-                }
-
+            "REJECTED" -> {
+                PendingDataRetrievalFacade(mFirestoreDatabase!!, this)
+                    .getRejectedQuestionsForUser(object: RejectedQuestionsCallBack {
+                        override fun onCallback(value: ArrayList<RejectedQuestion>) {
+                            acceptedQuestions!!.apply {
+                                layoutManager = LinearLayoutManager(this@UserQuestionsAcceptedActivity)
+                                adapter = RejectedQuestionsAdapter(context, mFirestoreDatabase!!, value)
+                                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                            }
+                        }
+                    })
             }
+        }
     }
 }

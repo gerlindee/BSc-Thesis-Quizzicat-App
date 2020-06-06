@@ -5,10 +5,7 @@ import android.service.autofill.UserData
 import android.util.Log
 import android.widget.Toast
 import com.example.quizzicat.Model.*
-import com.example.quizzicat.Utils.CounterCallBack
-import com.example.quizzicat.Utils.PendingAnswersCallback
-import com.example.quizzicat.Utils.PendingQuestionsCallBack
-import com.example.quizzicat.Utils.UserReportsCallBack
+import com.example.quizzicat.Utils.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -135,6 +132,20 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
             }
     }
 
+    private fun removeReportedFromUserReports(pqid: String) {
+        val userReportedQuestions = firebaseFirestore.collection("User_Reports")
+        firebaseFirestore.collection("User_Reports")
+            .whereEqualTo("pqid", pqid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    for (document in task.result!!) {
+                        userReportedQuestions.document(document.id).delete()
+                    }
+                }
+            }
+    }
+
     fun removeReportedQuestion(question: PendingQuestion) {
         val pendingQuestionsCollection = firebaseFirestore.collection("Pending_Questions")
         firebaseFirestore.collection("Pending_Questions")
@@ -146,6 +157,7 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
                     for (document in task.result!!) {
                         pendingQuestionsCollection.document(document.id).delete()
                     }
+                    removeReportedFromUserReports(question.pqid)
                     val pendingAnswersCollection = firebaseFirestore.collection("Pending_Question_Answers")
                     firebaseFirestore.collection("Pending_Question_Answers")
                         .whereEqualTo("pqid", question.pqid)
@@ -185,6 +197,50 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
                     callback.onCallback(reportedActivity)
                 } else {
                     Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    fun getRejectedQuestionsForUser(callback: RejectedQuestionsCallBack) {
+        firebaseFirestore.collection("Rejected_Questions")
+            .whereEqualTo("submitted_by", FirebaseAuth.getInstance().currentUser!!.uid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val rejectedQuestions = ArrayList<RejectedQuestion>()
+                    for (document in task.result!!) {
+                        val questionDifficulty = document.get("difficulty") as Long
+                        val questionQID = document.get("rqid") as String
+                        val questionText = document.get("question_text") as String
+                        val questionTID = document.get("tid") as Long
+                        val questionSubmittedBy = document.get("submitted_by") as String
+                        rejectedQuestions.add(RejectedQuestion(questionQID, questionTID, questionText, questionDifficulty, questionSubmittedBy))
+                    }
+                    callback.onCallback(rejectedQuestions)
+                } else {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    fun getAnswersForRejectedQuestion(callback: RejectedAnswerCallBack, rqid: String) {
+        firebaseFirestore.collection("Rejected_Question_Answers")
+            .whereEqualTo("rqid", rqid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val rejectedAnswers = ArrayList<RejectedQuestionAnswer>()
+                    for (document in task.result!!) {
+                        val answerRAID = document.get("raid") as String
+                        val answerText = document.get("answer_text") as String
+                        val answerCorrect = document.get("correct") as Boolean
+                        val answerRQID = document.get("rqid") as String
+                        val quizAnswer = RejectedQuestionAnswer(answerRAID, answerRQID, answerText, answerCorrect)
+                        rejectedAnswers.add(quizAnswer)
+                    }
+                    callback.onCallback(rejectedAnswers)
+                } else {
+                    Toast.makeText(context, task.exception!!.message, Toast.LENGTH_LONG).show()
                 }
             }
     }
