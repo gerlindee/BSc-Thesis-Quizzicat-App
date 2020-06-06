@@ -3,6 +3,7 @@ package com.example.quizzicat
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -21,6 +22,7 @@ class UserQuestionsPendingActivity : AppCompatActivity() {
     private var mFirestoreDatabase: FirebaseFirestore? = null
     private var pendingQuestions: RecyclerView? = null
     private var progressBar: ProgressBar? = null
+    private var noQuestionsLayout: LinearLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,26 +30,35 @@ class UserQuestionsPendingActivity : AppCompatActivity() {
 
         mFirestoreDatabase = Firebase.firestore
 
-        pendingQuestions = findViewById(R.id.pending_questions_user_list)
-        progressBar = findViewById(R.id.pending_user_progress_bar)
+        initializeLayoutElements()
 
         getPendingQuestionsForUser(object: PendingQuestionsCallBack {
             override fun onCallback(value: ArrayList<PendingQuestion>) {
-                pendingQuestions!!.apply {
-                    layoutManager = LinearLayoutManager(this@UserQuestionsPendingActivity)
-                    adapter = PendingQuestionsAdapter("USER_PENDING", this@UserQuestionsPendingActivity, mFirestoreDatabase!!, value)
-                    addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                if (value.size == 0) {
+                    noQuestionsLayout!!.visibility = View.VISIBLE
+                    progressBar!!.visibility = View.GONE
+                } else {
+                    pendingQuestions!!.apply {
+                        layoutManager = LinearLayoutManager(this@UserQuestionsPendingActivity)
+                        adapter = PendingQuestionsAdapter("USER_PENDING", this@UserQuestionsPendingActivity, mFirestoreDatabase!!, value)
+                        addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                    }
+                    pendingQuestions!!.visibility = View.VISIBLE
+                    progressBar!!.visibility = View.GONE
                 }
-                pendingQuestions!!.visibility = View.VISIBLE
-                progressBar!!.visibility = View.GONE
             }
         })
 
     }
 
+    private fun initializeLayoutElements() {
+        pendingQuestions = findViewById(R.id.pending_questions_user_list)
+        progressBar = findViewById(R.id.pending_user_progress_bar)
+        noQuestionsLayout = findViewById(R.id.layout_no_questions)
+    }
+
     private fun getPendingQuestionsForUser(callback: PendingQuestionsCallBack) {
         progressBar!!.visibility = View.VISIBLE
-        pendingQuestions!!.visibility = View.GONE
         mFirestoreDatabase!!.collection("Pending_Questions")
             .whereEqualTo("submitted_by", FirebaseAuth.getInstance().currentUser!!.uid)
             .get()

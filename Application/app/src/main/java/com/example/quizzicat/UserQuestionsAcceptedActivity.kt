@@ -2,6 +2,9 @@ package com.example.quizzicat
 
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -23,7 +26,11 @@ import com.google.firebase.ktx.Firebase
 
 class UserQuestionsAcceptedActivity: AppCompatActivity() {
     private var mFirestoreDatabase: FirebaseFirestore? = null
+
     private var acceptedQuestions: RecyclerView? = null
+    private var progressBar: ProgressBar? = null
+    private var noQuestionsLayout: LinearLayout? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,18 +38,25 @@ class UserQuestionsAcceptedActivity: AppCompatActivity() {
 
         mFirestoreDatabase = Firebase.firestore
 
-        acceptedQuestions = findViewById(R.id.pending_questions_user_list)
+        initializeLayoutElements()
 
         when (intent.extras!!.getString("TYPE_DISPLAYED")!!) {
             "ACCEPTED" -> {
+                progressBar!!.visibility = View.VISIBLE
                 QuestionsDataRetrievalFacade(mFirestoreDatabase!!, this)
                     .getAcceptedQuestionsForUser(object : QuestionsCallBack {
                         override fun onCallback(value: ArrayList<ActiveQuestion>) {
-                            acceptedQuestions!!.apply {
-                                layoutManager = LinearLayoutManager(this@UserQuestionsAcceptedActivity)
-                                adapter = ActiveQuestionsAdapter(context, mFirestoreDatabase!!, value)
-                                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                            if (value.size == 0) {
+                                noQuestionsLayout!!.visibility = View.VISIBLE
+                            } else {
+                                acceptedQuestions!!.apply {
+                                    layoutManager = LinearLayoutManager(this@UserQuestionsAcceptedActivity)
+                                    adapter = ActiveQuestionsAdapter(context, mFirestoreDatabase!!, value)
+                                    addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                                }
+                                acceptedQuestions!!.visibility = View.VISIBLE
                             }
+                            progressBar!!.visibility = View.GONE
                         }
                     })
             }
@@ -50,14 +64,26 @@ class UserQuestionsAcceptedActivity: AppCompatActivity() {
                 PendingDataRetrievalFacade(mFirestoreDatabase!!, this)
                     .getRejectedQuestionsForUser(object: RejectedQuestionsCallBack {
                         override fun onCallback(value: ArrayList<RejectedQuestion>) {
-                            acceptedQuestions!!.apply {
-                                layoutManager = LinearLayoutManager(this@UserQuestionsAcceptedActivity)
-                                adapter = RejectedQuestionsAdapter(context, mFirestoreDatabase!!, value)
-                                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                            if (value.size == 0) {
+                                noQuestionsLayout!!.visibility = View.VISIBLE
+                            } else {
+                                acceptedQuestions!!.apply {
+                                    layoutManager = LinearLayoutManager(this@UserQuestionsAcceptedActivity)
+                                    adapter = RejectedQuestionsAdapter(context, mFirestoreDatabase!!, value)
+                                    addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                                    acceptedQuestions!!.visibility = View.VISIBLE
+                                }
                             }
+                            progressBar!!.visibility = View.GONE
                         }
                     })
             }
         }
+    }
+
+    private fun initializeLayoutElements() {
+        acceptedQuestions = findViewById(R.id.pending_questions_user_list)
+        progressBar = findViewById(R.id.pending_user_progress_bar)
+        noQuestionsLayout = findViewById(R.id.layout_no_questions)
     }
 }

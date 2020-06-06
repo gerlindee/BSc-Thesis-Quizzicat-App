@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -36,6 +37,7 @@ class QuestionsLeaderboardFragment : Fragment() {
     private var questionsFactoryNavigation: MaterialButton? = null
     private var pendingQuestions: RecyclerView? = null
     private var progressBar: ProgressBar? = null
+    private var noQuestionsLayout: LinearLayout? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_questions_leaderboard, container, false)
@@ -73,13 +75,18 @@ class QuestionsLeaderboardFragment : Fragment() {
                                     nonReportedQuestions.add(question)
                                 }
                             }
-                            pendingQuestions!!.apply {
-                                layoutManager = LinearLayoutManager(activity)
-                                adapter = PendingQuestionsAdapter("LEADERBOARD", context, mFirestoreDatabase!!, nonReportedQuestions)
-                                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                            if (nonReportedQuestions.size == 0) {
+                                progressBar!!.visibility = View.GONE
+                                noQuestionsLayout!!.visibility = View.VISIBLE
+                            } else {
+                                pendingQuestions!!.apply {
+                                    layoutManager = LinearLayoutManager(activity)
+                                    adapter = PendingQuestionsAdapter("LEADERBOARD", context, mFirestoreDatabase!!, nonReportedQuestions)
+                                    addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                                }
+                                progressBar!!.visibility = View.GONE
+                                pendingQuestions!!.visibility = View.VISIBLE
                             }
-                            progressBar!!.visibility = View.GONE
-                            pendingQuestions!!.visibility = View.VISIBLE
                         }
                     })
             }
@@ -90,11 +97,11 @@ class QuestionsLeaderboardFragment : Fragment() {
         questionsFactoryNavigation = view?.findViewById(R.id.button_user_questions)
         pendingQuestions = view?.findViewById(R.id.pending_questions_list)
         progressBar = view?.findViewById(R.id.questions_leaderboard_progress_bar)
+        noQuestionsLayout = view?.findViewById(R.id.layout_no_leaderboard_questions)
     }
 
     private fun getPendingQuestions(callback: PendingQuestionsCallBack) {
         progressBar!!.visibility = View.VISIBLE
-        pendingQuestions!!.visibility = View.GONE
         mFirestoreDatabase!!.collection("Pending_Questions")
             .get()
             .addOnCompleteListener { task ->

@@ -73,6 +73,9 @@
     <string name="string_difficulty">Difficulty:</string>
     <string name="string_report_question">REPORT QUESTION</string>
     <string name="string_rated">Rated!</string>
+    <string name="placeholder_hm">Hmm...</string>
+    <string name="placeholder_empty_leaderboard">Seems like there are no questions currently in the leaderboard</string>
+    <string name="placeholder_no_pending_questions">Seems like you have not submitted any questions yet</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">
