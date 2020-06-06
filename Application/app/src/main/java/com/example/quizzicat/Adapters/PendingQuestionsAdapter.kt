@@ -166,6 +166,7 @@ class PendingQuestionsAdapter(
         var report_question: ImageView? = null
         var user_question_rating: TextView? = null
         private var question_text: TextView? = null
+        private var question_difficulty: TextView? = null
 
         init {
             question_topic_icon = itemView.findViewById(R.id.pending_question_topic_icon)
@@ -173,6 +174,7 @@ class PendingQuestionsAdapter(
             user_question_rating = itemView.findViewById(R.id.pending_question_rating_done)
             question_rating = itemView.findViewById(R.id.pending_question_rating)
             report_question = itemView.findViewById(R.id.pending_question_report)
+            question_difficulty = itemView.findViewById(R.id.view_question_difficulty)
         }
 
         fun bind(firebaseFirestore: FirebaseFirestore, mainContext: Context, question: PendingQuestion) {
@@ -181,6 +183,13 @@ class PendingQuestionsAdapter(
                 override fun onCallback(value: Topic) {
                     question_text!!.text = question.question_text
                     question_rating!!.rating = question.avg_rating.toFloat()
+                    var questionDifficultyString = ""
+                    when (question.difficulty) {
+                        1.toLong() -> questionDifficultyString = "Easy"
+                        2.toLong() -> questionDifficultyString = "Medium"
+                        3.toLong() -> questionDifficultyString = "Hard"
+                    }
+                    question_difficulty!!.text = questionDifficultyString
                     if (source == "USER_PENDING") {
                         question_rating!!.visibility = View.GONE
                         report_question!!.setBackgroundResource(R.drawable.delete_bin)
