@@ -13,8 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".MultiPlayerLobbyActivity"></activity>
         <activity android:name=".UserQuestionsPendingActivity" />
-        <activity android:name="UserQuestionsAcceptedActivity" />
+        <activity android:name=".UserQuestionsAcceptedActivity" />
         <activity android:name=".ChangeUserProfileActivity" />
         <activity android:name=".UserStatisticsActivity" />
         <activity android:name=".SoloQuizActivity" />
@@ -31,7 +32,9 @@
             android:name=".CreateQuestionActivity"
             android:windowSoftInputMode="adjustPan" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".MainMenuActivity" />
+        <activity
+            android:name=".MainMenuActivity"
+            android:windowSoftInputMode="adjustPan" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

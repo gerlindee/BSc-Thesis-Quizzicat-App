@@ -2,6 +2,7 @@ package com.example.quizzicat.Fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,16 +14,20 @@ import com.example.quizzicat.Adapters.TopicSpinnerAdapter
 import com.example.quizzicat.Facades.MultiPlayerDataRetrievalFacade
 import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
 import com.example.quizzicat.Model.AbstractTopic
+import com.example.quizzicat.Model.MultiPlayerGame
 import com.example.quizzicat.Model.Topic
 import com.example.quizzicat.Model.TopicCategory
 
 import com.example.quizzicat.R
 import com.example.quizzicat.SoloQuizActivity
 import com.example.quizzicat.Utils.CustomCallBack
+import com.example.quizzicat.Utils.MultiPlayerGamesCallBack
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import org.w3c.dom.Text
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -52,6 +57,34 @@ class MultiPlayerMenuFragment : Fragment() {
         initializeLayoutElements()
 
         noGamesLayout!!.visibility = View.VISIBLE
+
+        joinGame!!.setOnClickListener {
+            val inflater = LayoutInflater.from(context)
+            val joinView = inflater.inflate(R.layout.view_join_multi_player_game, null)
+            val gamePIN: TextInputEditText = joinView.findViewById(R.id.join_game_pin)
+
+            AlertDialog.Builder(context!!)
+                .setView(joinView)
+                .setPositiveButton("Join Game") { _, _ ->
+                    val dataAgent = MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, context!!)
+                    dataAgent.getGamesByPIN(gamePIN.text.toString(), object: MultiPlayerGamesCallBack {
+                        override fun onCallback(value: ArrayList<MultiPlayerGame>) {
+                            if (value.size == 0) {
+                                Toast.makeText(context, "The given PIN could not be recognised! Please check with the game host and try again.", Toast.LENGTH_LONG).show()
+                            } else {
+                                dataAgent.insertUserJoinedGame(gamePIN.text.toString(), "PLAYER")
+//                    val soloQuizIntent = Intent(activity, SoloQuizActivity::class.java)
+//                    soloQuizIntent.putExtra("questionsDifficulty", selectedDifficulty.selectedItem.toString())
+//                    soloQuizIntent.putExtra("questionsNumber", selectedNumberOfQuestions.selectedItem.toString())
+//                    startActivity(soloQuizIntent)
+                            }
+
+                        }
+                    })
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
 
         createNewGame!!.setOnClickListener {
             val inflater = LayoutInflater.from(context)
