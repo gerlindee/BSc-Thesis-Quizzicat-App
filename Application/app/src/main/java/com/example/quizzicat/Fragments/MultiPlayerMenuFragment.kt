@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Adapters.TopicSpinnerAdapter
+import com.example.quizzicat.Facades.MultiPlayerDataRetrievalFacade
 import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
 import com.example.quizzicat.Model.AbstractTopic
 import com.example.quizzicat.Model.Topic
@@ -50,6 +51,8 @@ class MultiPlayerMenuFragment : Fragment() {
 
         initializeLayoutElements()
 
+        noGamesLayout!!.visibility = View.VISIBLE
+
         createNewGame!!.setOnClickListener {
             val inflater = LayoutInflater.from(context)
             val customizingQuizView = inflater.inflate(R.layout.view_customize_multi_quiz, null)
@@ -89,6 +92,8 @@ class MultiPlayerMenuFragment : Fragment() {
             AlertDialog.Builder(context!!)
                 .setView(customizingQuizView)
                 .setPositiveButton("Create Game") { _, _ ->
+                    MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, context!!)
+                        .createMultiPlayerGame()
 //                    val soloQuizIntent = Intent(activity, SoloQuizActivity::class.java)
 //                    soloQuizIntent.putExtra("questionsDifficulty", selectedDifficulty.selectedItem.toString())
 //                    soloQuizIntent.putExtra("questionsNumber", selectedNumberOfQuestions.selectedItem.toString())
