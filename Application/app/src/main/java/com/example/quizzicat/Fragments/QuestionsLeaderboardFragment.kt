@@ -56,10 +56,6 @@ class QuestionsLeaderboardFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
     private fun setupQuestions() {
         getPendingQuestions(object: PendingQuestionsCallBack {
             override fun onCallback(value: ArrayList<PendingQuestion>) {

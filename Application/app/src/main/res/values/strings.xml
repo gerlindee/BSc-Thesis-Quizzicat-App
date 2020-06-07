@@ -76,6 +76,10 @@
     <string name="placeholder_hm">Hmm...</string>
     <string name="placeholder_empty_leaderboard">Seems like there are no questions currently in the leaderboard</string>
     <string name="placeholder_no_pending_questions">Seems like you have not submitted any questions yet</string>
+    <string name="string_create_multi_game">Create a new game</string>
+    <string name="placeholder_empty_multi_games">Seems like you have not played any games yet</string>
+    <string name="string_join_multi_game">Join a game</string>
+    <string name="string_multiplayer_quiz">MULTIPLAYER QUIZ</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">
