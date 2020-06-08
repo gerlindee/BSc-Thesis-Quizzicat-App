@@ -5,6 +5,7 @@
     <color name="colorAccent">#000000</color>
 
     <color name="green">#36c040</color>
+    <color name="white">#FFFFFF</color>
 
 <!--    colors for the blurred screen when the progress indicator is shown-->
     <color name="color_preloader_start">#000000</color>

@@ -5,7 +5,9 @@ import android.util.Log
 import android.widget.Toast
 import com.example.quizzicat.Model.MultiPlayerGame
 import com.example.quizzicat.Model.MultiPlayerUserJoined
+import com.example.quizzicat.Utils.CounterCallBack
 import com.example.quizzicat.Utils.MultiPlayerGamesCallBack
+import com.example.quizzicat.Utils.MultiPlayerUsersCallBack
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDateTime
@@ -37,7 +39,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
         }
     }
 
-    fun createMultiPlayerGame() {
+    fun createMultiPlayerGame(callback: CounterCallBack) {
         val gid = UUID.randomUUID().toString()
         val active = true
         val created_on = LocalDateTime.now().toString().split("T")[0]
@@ -68,6 +70,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             insertUserJoinedGame(newGame.gid, "CREATOR")
+                            callback.onCallback(newGame.game_pin.toInt())
                         } else {
                             Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                         }
@@ -124,7 +127,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
             }
     }
 
-    fun getAllActiveGames(callback: MultiPlayerGamesCallBack) {
+    private fun getAllActiveGames(callback: MultiPlayerGamesCallBack) {
         firebaseFirestore.collection("Multi_Player_Games")
             .whereEqualTo("active", true)
             .get()
@@ -144,5 +147,53 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
                     Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                 }
             }
+    }
+
+    fun userLeavesGame(gamePIN: String) {
+        getGamesByPIN(gamePIN, object: MultiPlayerGamesCallBack {
+            override fun onCallback(value: ArrayList<MultiPlayerGame>) {
+                val gid = value[0].gid
+                val multiPlayerUsersCollection = firebaseFirestore.collection("Multi_Player_Users_Joined")
+                firebaseFirestore.collection("Multi_Player_Users_Joined")
+                    .whereEqualTo("gid", gid)
+                    .whereEqualTo("uid", FirebaseAuth.getInstance().uid)
+                    .get()
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            for (document in task.result!!) {
+                                multiPlayerUsersCollection.document(document.id).delete()
+                            }
+                        } else {
+                            Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                        }
+                    }
+            }
+        })
+    }
+
+    fun getUsersForGame(gamePIN: String, callback: MultiPlayerUsersCallBack) {
+        getGamesByPIN(gamePIN, object: MultiPlayerGamesCallBack {
+            override fun onCallback(value: ArrayList<MultiPlayerGame>) {
+                val gid = value[0].gid
+                firebaseFirestore.collection("Multi_Player_Users_Joined")
+                    .whereEqualTo("gid", gid)
+                    .get()
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val users = ArrayList<MultiPlayerUserJoined>()
+                            for (document in task.result!!) {
+                                val role = document.get("role") as String
+                                val score = document.get("score") as Long
+                                val winner = document.get("winner") as Boolean
+                                val uid = document.get("uid") as String
+                                users.add(MultiPlayerUserJoined(gid, uid, score, role, winner))
+                            }
+                            callback.onCallback(users)
+                        } else {
+                            Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                        }
+                    }
+            }
+        })
     }
 }

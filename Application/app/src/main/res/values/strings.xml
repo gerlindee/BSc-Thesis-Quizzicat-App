@@ -83,6 +83,8 @@
     <string name="string_join_game">JOIN THE FUN</string>
     <string name="string_join_game_text">Join a multiplayer game with a PIN provided by the host and answer questions on your device. You have 10 seconds to answer each question.</string>
     <string name="hint_pin">PIN</string>
+    <string name="string_lobby_text">Waiting for others to join...</string>
+    <string name="string_start_game">Start Game</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">

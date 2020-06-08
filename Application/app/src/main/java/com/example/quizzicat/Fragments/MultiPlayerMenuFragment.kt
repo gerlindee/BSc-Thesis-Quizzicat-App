@@ -17,9 +17,11 @@ import com.example.quizzicat.Model.AbstractTopic
 import com.example.quizzicat.Model.MultiPlayerGame
 import com.example.quizzicat.Model.Topic
 import com.example.quizzicat.Model.TopicCategory
+import com.example.quizzicat.MultiPlayerLobbyActivity
 
 import com.example.quizzicat.R
 import com.example.quizzicat.SoloQuizActivity
+import com.example.quizzicat.Utils.CounterCallBack
 import com.example.quizzicat.Utils.CustomCallBack
 import com.example.quizzicat.Utils.MultiPlayerGamesCallBack
 import com.google.android.material.button.MaterialButton
@@ -27,6 +29,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.view_customize_multi_quiz.*
 import org.w3c.dom.Text
 import java.util.*
 import kotlin.collections.ArrayList
@@ -73,10 +76,10 @@ class MultiPlayerMenuFragment : Fragment() {
                                 Toast.makeText(context, "The given PIN could not be recognised! Please check with the game host and try again.", Toast.LENGTH_LONG).show()
                             } else {
                                 dataAgent.insertUserJoinedGame(gamePIN.text.toString(), "PLAYER")
-//                    val soloQuizIntent = Intent(activity, SoloQuizActivity::class.java)
-//                    soloQuizIntent.putExtra("questionsDifficulty", selectedDifficulty.selectedItem.toString())
-//                    soloQuizIntent.putExtra("questionsNumber", selectedNumberOfQuestions.selectedItem.toString())
-//                    startActivity(soloQuizIntent)
+                                val lobbyIntent = Intent(activity, MultiPlayerLobbyActivity::class.java)
+                                lobbyIntent.putExtra("gamePIN", gamePIN.text.toString())
+                                lobbyIntent.putExtra("userRole", "PLAYER")
+                                startActivity(lobbyIntent)
                             }
 
                         }
@@ -93,7 +96,7 @@ class MultiPlayerMenuFragment : Fragment() {
             val selectedTopic: Spinner = customizingQuizView.findViewById(R.id.customize_multi_quiz_topic)
             val selectedDifficulty : Spinner = customizingQuizView.findViewById(R.id.customize_multi_quiz_difficulty)
             val selectedNumberOfQuestions : Spinner = customizingQuizView.findViewById(R.id.customize_multi_quiz_number)
-            var selectedTopicItem: Topic
+            var selectedTopicItem: Topic = Topic(0, 0, "", "")
             var selectedCategoryItem: TopicCategory
             setCategoriesSpinnerValues(selectedCategory)
 
@@ -126,11 +129,17 @@ class MultiPlayerMenuFragment : Fragment() {
                 .setView(customizingQuizView)
                 .setPositiveButton("Create Game") { _, _ ->
                     MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, context!!)
-                        .createMultiPlayerGame()
-//                    val soloQuizIntent = Intent(activity, SoloQuizActivity::class.java)
-//                    soloQuizIntent.putExtra("questionsDifficulty", selectedDifficulty.selectedItem.toString())
-//                    soloQuizIntent.putExtra("questionsNumber", selectedNumberOfQuestions.selectedItem.toString())
-//                    startActivity(soloQuizIntent)
+                        .createMultiPlayerGame(object: CounterCallBack{
+                            override fun onCallback(value: Int) {
+                                val lobbyIntent = Intent(activity, MultiPlayerLobbyActivity::class.java)
+                                lobbyIntent.putExtra("gamePIN", value.toString())
+                                lobbyIntent.putExtra("userRole", "CREATOR")
+                                lobbyIntent.putExtra("questionsTopic", selectedTopicItem.tid.toString())
+                                lobbyIntent.putExtra("questionsDifficulty", selectedDifficulty.selectedItem.toString())
+                                lobbyIntent.putExtra("questionsNumber", selectedNumberOfQuestions.selectedItem.toString())
+                                startActivity(lobbyIntent)
+                            }
+                        })
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
