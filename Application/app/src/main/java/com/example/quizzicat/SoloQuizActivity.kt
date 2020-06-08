@@ -146,13 +146,14 @@ class SoloQuizActivity : AppCompatActivity() {
                         for (question in questionList) {
                             questionsQIDList.add(question.qid)
                         }
-                        getAnswers(object : AnswersCallBack {
-                            override fun onCallback(value: ArrayList<ActiveQuestionAnswer>) {
-                                answersList = value
-                                setQuestionView()
-                                setTimer()
-                            }
-                        }, questionsQIDList)
+                        QuestionsDataRetrievalFacade(mFirestoreDatabase!!, applicationContext)
+                            .getAnswers(object : AnswersCallBack {
+                                override fun onCallback(value: ArrayList<ActiveQuestionAnswer>) {
+                                    answersList = value
+                                    setQuestionView()
+                                    setTimer()
+                                }
+                            }, questionsQIDList)
                     }
                 }
             }, intent.extras!!.getString("questionsDifficulty")!!, intent.extras!!.getLong("questionsTopic"))
@@ -175,29 +176,6 @@ class SoloQuizActivity : AppCompatActivity() {
             randomizedQuestions.add(questionList[i])
         }
         questionList = randomizedQuestions
-    }
-
-    private fun getAnswers(callback: AnswersCallBack, QIDList: ArrayList<String>) {
-        mFirestoreDatabase!!.collection("Active_Question_Answers")
-            .whereIn("qid", QIDList)
-            .get()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val quizAnswers = ArrayList<ActiveQuestionAnswer>()
-                    for (document in task.result!!) {
-                        val answerAID = document.get("aid") as String
-                        val answerText = document.get("answer_text") as String
-                        val answerCorrect = document.get("correct") as Boolean
-                        val answerQID = document.get("qid") as String
-                        val quizAnswer = ActiveQuestionAnswer(answerAID, answerQID, answerText, answerCorrect)
-                        quizAnswers.add(quizAnswer)
-                    }
-                    callback.onCallback(quizAnswers)
-                } else {
-                    Log.d("AnswersQuery", task.exception.toString())
-                }
-            }
-
     }
 
     override fun onBackPressed() {

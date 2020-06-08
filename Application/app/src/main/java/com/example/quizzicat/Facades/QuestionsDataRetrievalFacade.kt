@@ -110,4 +110,50 @@ class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirest
                 }
         }
     }
+
+    fun getAnswers(callback: AnswersCallBack, QIDList: ArrayList<String>) {
+        firebaseFirestore.collection("Active_Question_Answers")
+            .whereIn("qid", QIDList)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val quizAnswers = ArrayList<ActiveQuestionAnswer>()
+                    for (document in task.result!!) {
+                        val answerAID = document.get("aid") as String
+                        val answerText = document.get("answer_text") as String
+                        val answerCorrect = document.get("correct") as Boolean
+                        val answerQID = document.get("qid") as String
+                        val quizAnswer = ActiveQuestionAnswer(answerAID, answerQID, answerText, answerCorrect)
+                        quizAnswers.add(quizAnswer)
+                    }
+                    callback.onCallback(quizAnswers)
+                } else {
+                    Log.d("AnswersQuery", task.exception.toString())
+                }
+            }
+    }
+
+    fun getQuestionsData(QIDList: ArrayList<String>, callback: QuestionsCallBack) {
+        firebaseFirestore.collection("Active_Questions")
+            .whereIn("qid", QIDList)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val questions = ArrayList<ActiveQuestion>()
+                    for (document in task.result!!) {
+                        val quizQuestionDifficulty = document.get("difficulty") as Long
+                        val quizQuestionQID = document.get("qid") as String
+                        val quizQuestionText = document.get("question_text") as String
+                        val quizQuestionTID = document.get("tid") as Long
+                        val quizSubmittedBy = document.get("submitted_by") as String
+                        val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty, quizSubmittedBy)
+                        questions.add(quizQuestion)
+                    }
+                    callback.onCallback(questions)
+                } else {
+                    Toast.makeText(context, task.exception!!.message, Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
 }

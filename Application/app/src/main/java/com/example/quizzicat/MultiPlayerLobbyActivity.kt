@@ -164,6 +164,7 @@ class MultiPlayerLobbyActivity : AppCompatActivity() {
                 if (gameID == gid) {
                     if (changes.type == DocumentChange.Type.MODIFIED) {
                         val gameIntent = Intent(this, MultiPlayerQuizActivity::class.java)
+                        gameIntent.putExtra("gid", gid)
                         startActivity(gameIntent)
                     }
                 }

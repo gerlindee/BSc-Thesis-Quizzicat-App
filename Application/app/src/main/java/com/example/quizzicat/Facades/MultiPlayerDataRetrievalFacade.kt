@@ -8,6 +8,7 @@ import com.example.quizzicat.Model.MultiPlayerGameQuestion
 import com.example.quizzicat.Model.MultiPlayerUserJoined
 import com.example.quizzicat.Utils.CounterCallBack
 import com.example.quizzicat.Utils.MultiPlayerGamesCallBack
+import com.example.quizzicat.Utils.MultiPlayerQuestionsCallBack
 import com.example.quizzicat.Utils.MultiPlayerUsersCallBack
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -221,5 +222,23 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
                     }
             }
         })
+    }
+
+    fun getQuestionsForQuiz(gid: String, callback: MultiPlayerQuestionsCallBack) {
+        firebaseFirestore.collection("Multi_Player_Quiz_Questions")
+            .whereEqualTo("gid", gid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val gameQuestions = ArrayList<MultiPlayerGameQuestion>()
+                    for (document in task.result!!) {
+                        val qid = document.get("qid") as String
+                        gameQuestions.add(MultiPlayerGameQuestion(qid, gid))
+                    }
+                    callback.onCallback(gameQuestions)
+                } else {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
     }
 }
