@@ -10,6 +10,7 @@ import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.example.quizzicat.Facades.QuestionsDataRetrievalFacade
 import com.example.quizzicat.Model.ActiveQuestion
 import com.example.quizzicat.Model.ActiveQuestionAnswer
 import com.example.quizzicat.Model.TopicPlayed
@@ -132,28 +133,29 @@ class SoloQuizActivity : AppCompatActivity() {
     }
 
     private fun getQuestionsAndAnswers() {
-        getQuestions(object: QuestionsCallBack {
-            override fun onCallback(value: ArrayList<ActiveQuestion>) {
-                questionList = value
-                if (questionList.size == 0) {
-                    val mainMenuIntent = Intent(applicationContext, MainMenuActivity::class.java)
-                    startActivity(mainMenuIntent)
-                } else {
-                    randomizeQuestions()
-                    val questionsQIDList = ArrayList<String>()
-                    for (question in questionList) {
-                        questionsQIDList.add(question.qid)
-                    }
-                    getAnswers(object : AnswersCallBack {
-                        override fun onCallback(value: ArrayList<ActiveQuestionAnswer>) {
-                            answersList = value
-                            setQuestionView()
-                            setTimer()
+        QuestionsDataRetrievalFacade(mFirestoreDatabase!!, this)
+            .getQuestionsForQuiz(object: QuestionsCallBack {
+                override fun onCallback(value: ArrayList<ActiveQuestion>) {
+                    questionList = value
+                    if (questionList.size == 0) {
+                        val mainMenuIntent = Intent(applicationContext, MainMenuActivity::class.java)
+                        startActivity(mainMenuIntent)
+                    } else {
+                        randomizeQuestions()
+                        val questionsQIDList = ArrayList<String>()
+                        for (question in questionList) {
+                            questionsQIDList.add(question.qid)
                         }
-                    }, questionsQIDList)
+                        getAnswers(object : AnswersCallBack {
+                            override fun onCallback(value: ArrayList<ActiveQuestionAnswer>) {
+                                answersList = value
+                                setQuestionView()
+                                setTimer()
+                            }
+                        }, questionsQIDList)
+                    }
                 }
-            }
-        }, intent.extras!!.getString("questionsDifficulty")!!, intent.extras!!.getString("questionsNumber")!!, intent.extras!!.getLong("questionsTopic"))
+            }, intent.extras!!.getString("questionsDifficulty")!!, intent.extras!!.getLong("questionsTopic"))
     }
 
     private fun randomizeQuestions() {
@@ -173,62 +175,6 @@ class SoloQuizActivity : AppCompatActivity() {
             randomizedQuestions.add(questionList[i])
         }
         questionList = randomizedQuestions
-    }
-
-    private fun getQuestions(callback: QuestionsCallBack, questionsDifficulty: String, questionsNumber: String, questionsTopic: Long) {
-        var difficultyKey: Int? = null
-        when (questionsDifficulty) {
-            "Random" -> difficultyKey = 0
-            "Easy" -> difficultyKey = 1
-            "Medium" -> difficultyKey = 2
-            "Hard" -> difficultyKey = 3
-        }
-        if (difficultyKey == 0) {
-            mFirestoreDatabase!!.collection("Active_Questions")
-                .whereEqualTo("tid", questionsTopic)
-                .limit(questionsNumber.toLong())
-                .get()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val quizQuestions = ArrayList<ActiveQuestion>()
-                        for (document in task.result!!) {
-                            val quizQuestionDifficulty = document.get("difficulty") as Long
-                            val quizQuestionQID = document.get("qid") as String
-                            val quizQuestionText = document.get("question_text") as String
-                            val quizQuestionTID = document.get("tid") as Long
-                            val quizSubmittedBy = document.get("submitted_by") as String
-                            val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty, quizSubmittedBy)
-                            quizQuestions.add(quizQuestion)
-                        }
-                        callback.onCallback(quizQuestions)
-                    } else {
-                        Log.d("QuestionsQuery", task.exception.toString())
-                    }
-                }
-        } else {
-            mFirestoreDatabase!!.collection("Active_Questions")
-                .whereEqualTo("tid", questionsTopic)
-                .whereEqualTo("difficulty", difficultyKey)
-                .limit(questionsNumber.toLong())
-                .get()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val quizQuestions = ArrayList<ActiveQuestion>()
-                        for (document in task.result!!) {
-                            val quizQuestionDifficulty = document.get("difficulty") as Long
-                            val quizQuestionQID = document.get("qid") as String
-                            val quizQuestionText = document.get("question_text") as String
-                            val quizQuestionTID = document.get("tid") as Long
-                            val quizSubmittedBy = document.get("submittedBy") as String
-                            val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty, quizSubmittedBy)
-                            quizQuestions.add(quizQuestion)
-                        }
-                        callback.onCallback(quizQuestions)
-                    } else {
-                        Log.d("QuestionsQuery", task.exception.toString())
-                    }
-                }
-        }
     }
 
     private fun getAnswers(callback: AnswersCallBack, QIDList: ArrayList<String>) {

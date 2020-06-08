@@ -56,4 +56,58 @@ class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirest
 
             }
     }
+
+    fun getQuestionsForQuiz(callback: QuestionsCallBack, questionsDifficulty: String, questionsTopic: Long) {
+        var difficultyKey: Int? = null
+        when (questionsDifficulty) {
+            "Random" -> difficultyKey = 0
+            "Easy" -> difficultyKey = 1
+            "Medium" -> difficultyKey = 2
+            "Hard" -> difficultyKey = 3
+        }
+        if (difficultyKey == 0) {
+            firebaseFirestore.collection("Active_Questions")
+                .whereEqualTo("tid", questionsTopic)
+                .get()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val quizQuestions = ArrayList<ActiveQuestion>()
+                        for (document in task.result!!) {
+                            val quizQuestionDifficulty = document.get("difficulty") as Long
+                            val quizQuestionQID = document.get("qid") as String
+                            val quizQuestionText = document.get("question_text") as String
+                            val quizQuestionTID = document.get("tid") as Long
+                            val quizSubmittedBy = document.get("submitted_by") as String
+                            val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty, quizSubmittedBy)
+                            quizQuestions.add(quizQuestion)
+                        }
+                        callback.onCallback(quizQuestions)
+                    } else {
+                        Log.d("QuestionsQuery", task.exception.toString())
+                    }
+                }
+        } else {
+            firebaseFirestore.collection("Active_Questions")
+                .whereEqualTo("tid", questionsTopic)
+                .whereEqualTo("difficulty", difficultyKey)
+                .get()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val quizQuestions = ArrayList<ActiveQuestion>()
+                        for (document in task.result!!) {
+                            val quizQuestionDifficulty = document.get("difficulty") as Long
+                            val quizQuestionQID = document.get("qid") as String
+                            val quizQuestionText = document.get("question_text") as String
+                            val quizQuestionTID = document.get("tid") as Long
+                            val quizSubmittedBy = document.get("submitted_by") as String
+                            val quizQuestion = ActiveQuestion(quizQuestionQID, quizQuestionTID, quizQuestionText, quizQuestionDifficulty, quizSubmittedBy)
+                            quizQuestions.add(quizQuestion)
+                        }
+                        callback.onCallback(quizQuestions)
+                    } else {
+                        Log.d("QuestionsQuery", task.exception.toString())
+                    }
+                }
+        }
+    }
 }

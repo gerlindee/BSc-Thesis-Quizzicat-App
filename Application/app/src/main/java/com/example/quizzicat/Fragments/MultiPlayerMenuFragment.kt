@@ -78,6 +78,7 @@ class MultiPlayerMenuFragment : Fragment() {
                                 dataAgent.insertUserJoinedGame(gamePIN.text.toString(), "PLAYER")
                                 val lobbyIntent = Intent(activity, MultiPlayerLobbyActivity::class.java)
                                 lobbyIntent.putExtra("gamePIN", gamePIN.text.toString())
+                                lobbyIntent.putExtra("gid", value[0].gid)
                                 lobbyIntent.putExtra("userRole", "PLAYER")
                                 startActivity(lobbyIntent)
                             }
@@ -129,12 +130,13 @@ class MultiPlayerMenuFragment : Fragment() {
                 .setView(customizingQuizView)
                 .setPositiveButton("Create Game") { _, _ ->
                     MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, context!!)
-                        .createMultiPlayerGame(object: CounterCallBack{
-                            override fun onCallback(value: Int) {
+                        .createMultiPlayerGame(object: MultiPlayerGamesCallBack{
+                            override fun onCallback(value: ArrayList<MultiPlayerGame>) {
                                 val lobbyIntent = Intent(activity, MultiPlayerLobbyActivity::class.java)
-                                lobbyIntent.putExtra("gamePIN", value.toString())
+                                lobbyIntent.putExtra("gamePIN", value[0].game_pin)
+                                lobbyIntent.putExtra("gid", value[0].gid)
                                 lobbyIntent.putExtra("userRole", "CREATOR")
-                                lobbyIntent.putExtra("questionsTopic", selectedTopicItem.tid.toString())
+                                lobbyIntent.putExtra("questionsTopic", selectedTopicItem.tid)
                                 lobbyIntent.putExtra("questionsDifficulty", selectedDifficulty.selectedItem.toString())
                                 lobbyIntent.putExtra("questionsNumber", selectedNumberOfQuestions.selectedItem.toString())
                                 startActivity(lobbyIntent)

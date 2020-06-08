@@ -81,7 +81,7 @@
     <string name="string_join_multi_game">Join a game</string>
     <string name="string_multiplayer_quiz">MULTIPLAYER QUIZ</string>
     <string name="string_join_game">JOIN THE FUN</string>
-    <string name="string_join_game_text">Join a multiplayer game with a PIN provided by the host and answer questions on your device. You have 10 seconds to answer each question.</string>
+    <string name="string_join_game_text">Join a multiplayer game with a PIN provided by the host and answer questions on your device. You have 10 seconds to answer each question and each correct answer is worth 10 points. \n Good luck!</string>
     <string name="hint_pin">PIN</string>
     <string name="string_lobby_text">Waiting for others to join...</string>
     <string name="string_start_game">Start Game</string>
