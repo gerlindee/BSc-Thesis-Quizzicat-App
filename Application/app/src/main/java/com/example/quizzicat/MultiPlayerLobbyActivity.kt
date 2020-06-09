@@ -154,12 +154,16 @@ class MultiPlayerLobbyActivity : AppCompatActivity() {
 
             for (changes in snapshot!!.documentChanges) {
                 val gameID = changes.document.data.get("gid") as String
+                val active = changes.document.data.get("active") as Boolean
+                val progress = changes.document.data.get("progress") as Boolean
                 if (gameID == gid) {
                     if (changes.type == DocumentChange.Type.MODIFIED) {
-                        val gameIntent = Intent(this, MultiPlayerQuizActivity::class.java)
-                        gameIntent.putExtra("gid", gid)
-                        gameIntent.putExtra("gamePIN", gamePIN)
-                        startActivity(gameIntent)
+                        if (active && progress) {
+                            val gameIntent = Intent(this, MultiPlayerQuizActivity::class.java)
+                            gameIntent.putExtra("gid", gid)
+                            gameIntent.putExtra("gamePIN", gamePIN)
+                            startActivity(gameIntent)
+                        }
                     }
                 }
             }

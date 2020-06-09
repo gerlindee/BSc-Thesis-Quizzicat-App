@@ -106,6 +106,10 @@ class MultiPlayerScoreboardActivity : AppCompatActivity() {
         if (scoreboardUsers!!.adapter != null) {
             scoreboardUsers!!.adapter!!.notifyDataSetChanged()
         }
+        if (usersJoined.size == 0) {
+            MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, this)
+                .endGame(gamePIN!!)
+        }
     }
 
     private fun setupLayoutElements() {

@@ -112,6 +112,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
     fun getGamesByPIN(pin: String, callback: MultiPlayerGamesCallBack) {
         firebaseFirestore.collection("Multi_Player_Games")
             .whereEqualTo("game_pin", pin)
+            .whereEqualTo("active", true)
             .get()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -266,5 +267,23 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
                     Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                 }
             }
+    }
+
+    fun endGame(gamePIN: String) {
+        getGamesByPIN(gamePIN, object: MultiPlayerGamesCallBack {
+            override fun onCallback(value: ArrayList<MultiPlayerGame>) {
+                val game = value[0]
+                game.active = false
+                game.progress = false
+                firebaseFirestore.collection("Multi_Player_Games")
+                    .document(game.gid)
+                    .set(game)
+                    .addOnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                        }
+                    }
+            }
+        })
     }
 }
