@@ -85,6 +85,8 @@
     <string name="hint_pin">PIN</string>
     <string name="string_lobby_text">Waiting for others to join...</string>
     <string name="string_start_game">Start Game</string>
+    <string name="string_exit">EXIT</string>
+    <string name="string_scoreboard">Scoreboard</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">

@@ -16,6 +16,7 @@ import com.example.quizzicat.Utils.UserDataCallBack
 import com.google.firebase.firestore.FirebaseFirestore
 
 class LobbyUsersAdapter(
+    private val source: String,
     private val mainContext: Context?,
     private val firebaseFirestore: FirebaseFirestore,
     private val list: List<MultiPlayerUserJoined>): RecyclerView.Adapter<LobbyUsersAdapter.LobbyUserViewHolder>() {
@@ -31,7 +32,7 @@ class LobbyUsersAdapter(
 
     override fun onBindViewHolder(holder: LobbyUserViewHolder, position: Int) {
         val userJoined = list[position]
-        holder.bind(firebaseFirestore, mainContext!!, userJoined)
+        holder.bind(source, firebaseFirestore, mainContext!!, userJoined)
     }
 
     class LobbyUserViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
@@ -47,15 +48,23 @@ class LobbyUsersAdapter(
             lobby_user_host = itemView.findViewById(R.id.view_user_lobby_host)
         }
 
-         fun bind(firebaseFirestore: FirebaseFirestore, mainContext: Context, user: MultiPlayerUserJoined) {
+         fun bind(source: String, firebaseFirestore: FirebaseFirestore, mainContext: Context, user: MultiPlayerUserJoined) {
              UserDataRetrievalFacade(firebaseFirestore, user.uid)
                  .getUserDetails(object: UserDataCallBack {
                      override fun onCallback(value: User) {
                          ImageLoadingFacade(mainContext).loadImage(value.avatar_url, lobby_user_icon!!)
                          lobby_user_name!!.text = value.display_name
-                         if (user.role == "CREATOR") {
-                             lobby_user_host!!.visibility = View.VISIBLE
+                         if (source == "LOBBY") {
+                             if (user.role == "CREATOR") {
+                                 lobby_user_host!!.visibility = View.VISIBLE
+                             }
+                         } else {
+                             if (user.winner) {
+                                 lobby_user_host!!.setBackgroundResource(R.drawable.award)
+                                 lobby_user_host!!.visibility = View.VISIBLE
+                             }
                          }
+
                      }
                  })
          }

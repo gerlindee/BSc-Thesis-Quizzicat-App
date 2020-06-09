@@ -26,6 +26,7 @@ class MultiPlayerQuizActivity : AppCompatActivity() {
 
     private var mFirebaseFirestore: FirebaseFirestore? = null
     private var gid: String? = ""
+    private var gamePIN: String? = ""
     private var questionList = ArrayList<ActiveQuestion>()
     private var answersList = ArrayList<ActiveQuestionAnswer>()
 
@@ -51,6 +52,7 @@ class MultiPlayerQuizActivity : AppCompatActivity() {
 
         mFirebaseFirestore = Firebase.firestore
         gid = intent.extras!!.getString("gid")
+        gamePIN = intent.extras!!.getString("gamePIN")
 
         setupLayoutElements()
         getQuestionsAndAnswers()
@@ -63,26 +65,46 @@ class MultiPlayerQuizActivity : AppCompatActivity() {
         questionProgress!!.progress = 1
 
         nextQuestionButton!!.setOnClickListener {
-            if (currentQuestionNr == (questionList.size - 1)) {
-                val correctAnswer = getCorrectAnswer(currentQuestionNr)
-                val selectedAnswer = findViewById<RadioButton>(answerGroup!!.checkedRadioButtonId)
-                if (selectedAnswer.text == correctAnswer.answer_text) {
-                    userScore += computeScorePerAnswer()
-                    setAnswerHighlight(selectedAnswer, true)
-                } else {
-                    setAnswerHighlight(selectedAnswer, false)
-                }
-                timer!!.cancel()
-                timer!!.onFinish()
+            userAnswersQuestion()
+        }
+    }
+
+    private fun userAnswersQuestion() {
+        if (currentQuestionNr == (questionList.size - 1)) {
+            val correctAnswer = getCorrectAnswer(currentQuestionNr)
+            val selectedAnswer = findViewById<RadioButton>(answerGroup!!.checkedRadioButtonId)
+            if (selectedAnswer.text == correctAnswer.answer_text) {
+                userScore += computeScorePerAnswer()
+                setAnswerHighlight(selectedAnswer, true)
             } else {
-                timer!!.cancel()
-                if (currentQuestionNr == (questionList.size - 2)) {
-                    nextQuestionButton!!.text = getString(R.string.string_finish_quiz)
-                }
-                val correctAnswer = getCorrectAnswer(currentQuestionNr)
-                currentQuestionNr += 1
-                questionProgress!!.progress += 1
-                val selectedAnswer = findViewById<RadioButton>(answerGroup!!.checkedRadioButtonId)
+                setAnswerHighlight(selectedAnswer, false)
+            }
+            timer!!.cancel()
+            timer!!.onFinish()
+        } else {
+            timer!!.cancel()
+            if (currentQuestionNr == (questionList.size - 2)) {
+                nextQuestionButton!!.text = getString(R.string.string_finish_quiz)
+            }
+            val correctAnswer = getCorrectAnswer(currentQuestionNr)
+            currentQuestionNr += 1
+            questionProgress!!.progress += 1
+            val selectedAnswer = findViewById<RadioButton>(answerGroup!!.checkedRadioButtonId)
+            if (selectedAnswer == null) { // time expires but user has not selected anything
+                setAnswerHighlight(answer1!!, false)
+                setAnswerHighlight(answer2!!, false)
+                setAnswerHighlight(answer3!!, false)
+                setAnswerHighlight(answer4!!, false)
+                Handler().postDelayed({
+                    setQuestionView()
+                    answerGroup!!.clearCheck()
+                    answer1!!.background = getDrawable(R.drawable.shape_rect_light_yellow)
+                    answer2!!.background = getDrawable(R.drawable.shape_rect_light_yellow)
+                    answer3!!.background = getDrawable(R.drawable.shape_rect_light_yellow)
+                    answer4!!.background = getDrawable(R.drawable.shape_rect_light_yellow)
+                    timer!!.start()
+                }, 2000)
+            } else {
                 if (selectedAnswer.text == correctAnswer.answer_text) {
                     userScore += computeScorePerAnswer()
                     setAnswerHighlight(selectedAnswer, true)
@@ -214,7 +236,16 @@ class MultiPlayerQuizActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                Log.d("Result", userScore.toString())
+                if (currentQuestionNr == (questionList.size - 1)) {
+                    MultiPlayerDataRetrievalFacade(mFirebaseFirestore!!, this@MultiPlayerQuizActivity)
+                        .setUserScore(gid!!, userScore.toLong())
+                    val scoreboardIntent = Intent(this@MultiPlayerQuizActivity, MultiPlayerScoreboardActivity::class.java)
+                    scoreboardIntent.putExtra("gid", gid)
+                    scoreboardIntent.putExtra("gamePIN", gamePIN)
+                    startActivity(scoreboardIntent)
+                } else {
+                    userAnswersQuestion()
+                }
             }
         }
         timer!!.start()

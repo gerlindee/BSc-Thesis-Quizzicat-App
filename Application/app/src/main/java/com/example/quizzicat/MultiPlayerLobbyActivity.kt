@@ -62,7 +62,7 @@ class MultiPlayerLobbyActivity : AppCompatActivity() {
                     usersJoined = value
                     lobbyJoinedUsers!!.apply {
                         layoutManager = LinearLayoutManager(this@MultiPlayerLobbyActivity)
-                        adapter = LobbyUsersAdapter(context, mFirestoreDatabase!!, usersJoined)
+                        adapter = LobbyUsersAdapter("LOBBY", context, mFirestoreDatabase!!, usersJoined)
                         addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                     }
                 }
@@ -165,6 +165,7 @@ class MultiPlayerLobbyActivity : AppCompatActivity() {
                     if (changes.type == DocumentChange.Type.MODIFIED) {
                         val gameIntent = Intent(this, MultiPlayerQuizActivity::class.java)
                         gameIntent.putExtra("gid", gid)
+                        gameIntent.putExtra("gamePIN", gamePIN)
                         startActivity(gameIntent)
                     }
                 }

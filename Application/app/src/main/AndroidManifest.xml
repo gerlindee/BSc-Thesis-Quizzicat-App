@@ -13,7 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MultiPlayerQuizActivity"></activity>
+        <activity android:name=".MultiPlayerScoreboardActivity"></activity>
+        <activity android:name=".MultiPlayerQuizActivity" />
         <activity android:name=".MultiPlayerLobbyActivity" />
         <activity android:name=".UserQuestionsPendingActivity" />
         <activity android:name=".UserQuestionsAcceptedActivity" />

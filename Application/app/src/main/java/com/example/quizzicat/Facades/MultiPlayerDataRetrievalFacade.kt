@@ -241,4 +241,34 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
                 }
             }
     }
+
+    fun setUserScore(gid: String, newScore: Long) {
+        firebaseFirestore.collection("Multi_Player_Users_Joined")
+            .whereEqualTo("gid", gid)
+            .whereEqualTo("uid", FirebaseAuth.getInstance().uid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val userArray = ArrayList<MultiPlayerUserJoined>()
+                    var documentID: String = ""
+                    for (document in task.result!!) {
+                        documentID = document.id
+                        val role = document.get("role") as String
+                        val winner = document.get("winner") as Boolean
+                        userArray.add(MultiPlayerUserJoined(gid, FirebaseAuth.getInstance().uid!!, newScore, role, winner))
+                    }
+                    firebaseFirestore.collection("Multi_Player_Users_Joined")
+                        .document(documentID)
+                        .set(userArray[0])
+                        .addOnCompleteListener { task1 ->
+                            if (!task1.isSuccessful) {
+                                Toast.makeText(context, task1.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                } else {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
 }

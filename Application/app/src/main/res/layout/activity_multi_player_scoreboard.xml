@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context=".MultiPlayerLobbyActivity">
+    tools:context=".MultiPlayerScoreboardActivity">
 
     <TextView
-        android:id="@+id/lobby_game_pin"
+        android:id="@+id/scoreboard_game_pin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -17,7 +17,7 @@
         android:textColor="@color/colorAccent"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/lobby_icon"
+        app:layout_constraintBottom_toTopOf="@+id/scoreboard_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,32 +25,32 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <ImageView
-        android:id="@+id/lobby_icon"
+        android:id="@+id/scoreboard_icon"
         android:layout_width="140dp"
         android:layout_height="140dp"
         android:layout_marginTop="128dp"
-        android:src="@drawable/cat_waiting"
+        android:src="@drawable/kitty_laptop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription" />
 
     <TextView
-        android:id="@+id/lobby_text"
+        android:id="@+id/scoreboard_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-condensed-light"
-        android:text="@string/string_lobby_text"
+        android:text="@string/string_scoreboard"
         android:textColor="@color/colorAccent"
         android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lobby_icon" />
+        app:layout_constraintTop_toBottomOf="@+id/scoreboard_icon" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/lobby_joined_users"
+        android:id="@+id/scoreboard_users"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="32dp"
@@ -59,23 +59,22 @@
         android:layout_marginBottom="32dp"
         android:background="@color/white"
         android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/lobby_start_button"
+        app:layout_constraintBottom_toTopOf="@+id/scoreboard_leave_game"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lobby_text"
+        app:layout_constraintTop_toBottomOf="@+id/scoreboard_text"
         app:layout_constraintVertical_bias="0.5" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/lobby_start_button"
+        android:id="@+id/scoreboard_leave_game"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="16dp"
-        android:visibility="gone"
         android:backgroundTint="@color/colorAccent"
-        android:text="@string/string_start_game"
+        android:text="@string/string_exit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
