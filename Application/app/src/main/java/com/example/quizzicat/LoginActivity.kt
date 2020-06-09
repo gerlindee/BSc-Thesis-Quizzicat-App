@@ -166,7 +166,6 @@ class LoginActivity : AppCompatActivity() {
                 login_progress_bar.visibility = View.GONE
                 if (it.isSuccessful) {
                     socialMediaAccountExists()
-                    checkUserSession()
                 } else {
                     DesignUtils.showSnackbar(window.decorView.rootView, it.exception!!.message.toString(), this)
                 }
@@ -205,8 +204,6 @@ class LoginActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // save the user's information to the database if the account with the social media account does not already exist
                     socialMediaAccountExists()
-                    // update UI with the signed-in user's information
-                    checkUserSession()
                 } else {
                     // If sign in fails, display a message to the user.
                     DesignUtils.showSnackbar(window.decorView.rootView, task.exception!!.message.toString(), this)
@@ -249,6 +246,9 @@ class LoginActivity : AppCompatActivity() {
                 val result = task.result
                 if (!result!!.exists()) {
                     saveUserData()
+                } else {
+                    // update UI with the signed-in user's information
+                    checkUserSession()
                 }
             }
     }
@@ -266,10 +266,12 @@ class LoginActivity : AppCompatActivity() {
             userProfilePictureURL = currentUser.providerData[1].photoUrl.toString().replace("s96-c", "s400-c")
         }
         val user = User(userUID, userDisplayName, userProfilePictureURL, countryName!!, cityName!!)
+        Log.d("USER", user.toString())
         mFirestoreDatabase!!.collection("Users").document(userUID)
             .set(user)
             .addOnSuccessListener {
                 Log.d("SaveUser", "User information successfully saved to the cloud")
+                checkUserSession()
             }
             .addOnFailureListener {
                 DesignUtils.showSnackbar(window.decorView.rootView, "An internal error occurred when saving user information. Please try again!", this)

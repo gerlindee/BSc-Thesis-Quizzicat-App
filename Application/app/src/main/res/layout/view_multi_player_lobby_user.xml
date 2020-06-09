@@ -21,22 +21,34 @@
 
         <TextView
             android:id="@+id/view_user_lobby_name"
-            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginStart="3dp"
-            android:textSize="18sp"
-            android:text="@string/hint_username" />
+            android:text="@string/hint_username"
+            android:textSize="18sp" />
 
         <ImageView
             android:id="@+id/view_user_lobby_host"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_gravity="center"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:visibility="gone"
             android:layout_marginStart="10dp"
-            android:src="@drawable/host_icon"
+            android:background="@drawable/host_icon"
+            android:visibility="gone"
             tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/view_user_lobby_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            android:visibility="gone"
+            android:fontFamily="sans-serif-condensed-light"
+            android:textColor="#000000"
+            android:textSize="21sp"
+            android:textStyle="bold" />
 
     </TableRow>
 

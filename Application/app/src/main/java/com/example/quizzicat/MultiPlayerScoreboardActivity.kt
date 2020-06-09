@@ -3,6 +3,7 @@ package com.example.quizzicat
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -47,9 +48,10 @@ class MultiPlayerScoreboardActivity : AppCompatActivity() {
             .getUsersForGame(gid!!, object: MultiPlayerUsersCallBack {
                 override fun onCallback(value: ArrayList<MultiPlayerUserJoined>) {
                     for (user in value) {
-                        if (user.score != 0.toLong())
+                        if (user.score != 0.toLong() && user.uid != FirebaseAuth.getInstance().uid)
                             usersJoined.add(user)
                     }
+                    usersJoined = ArrayList(usersJoined.sortedWith(compareBy(({ it.score }))))
                     scoreboardUsers!!.apply {
                         layoutManager = LinearLayoutManager(this@MultiPlayerScoreboardActivity)
                         adapter = LobbyUsersAdapter("SCOREBOARD", context, mFirestoreDatabase!!, usersJoined)
@@ -80,10 +82,9 @@ class MultiPlayerScoreboardActivity : AppCompatActivity() {
                 if (gameID == gid) {
                     val uid = changes.document.data.get("uid") as String
                     val score = changes.document.data.get("score") as Long
-                    val winner = changes.document.data.get("winner") as Boolean
                     val role = changes.document.data.get("role") as String
-                    val changedUser = MultiPlayerUserJoined(gameID, uid, score, role, winner)
-                    if (changes.type == DocumentChange.Type.MODIFIED && uid != FirebaseAuth.getInstance().uid) {
+                    val changedUser = MultiPlayerUserJoined(gameID, uid, score, role)
+                    if (changes.type == DocumentChange.Type.MODIFIED) {
                         usersJoined.add(changedUser)
                     }
                     if (scoreboardUsers!!.adapter != null) {
@@ -92,10 +93,6 @@ class MultiPlayerScoreboardActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun sortUsersByScore() {
-        
     }
 
     private fun userLeavesScreen() {

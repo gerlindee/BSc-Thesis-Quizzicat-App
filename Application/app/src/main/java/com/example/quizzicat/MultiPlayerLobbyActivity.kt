@@ -56,17 +56,11 @@ class MultiPlayerLobbyActivity : AppCompatActivity() {
 
         lobbyGamePIN!!.text = gamePIN
 
-        MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, this)
-            .getUsersForGame(gid!!, object: MultiPlayerUsersCallBack {
-                override fun onCallback(value: ArrayList<MultiPlayerUserJoined>) {
-                    usersJoined = value
-                    lobbyJoinedUsers!!.apply {
-                        layoutManager = LinearLayoutManager(this@MultiPlayerLobbyActivity)
-                        adapter = LobbyUsersAdapter("LOBBY", context, mFirestoreDatabase!!, usersJoined)
-                        addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-                    }
-                }
-            })
+        lobbyJoinedUsers!!.apply {
+            layoutManager = LinearLayoutManager(this@MultiPlayerLobbyActivity)
+            adapter = LobbyUsersAdapter("LOBBY", context, mFirestoreDatabase!!, usersJoined)
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        }
 
         listenForUsers()
         listenForGameStart()
@@ -125,30 +119,29 @@ class MultiPlayerLobbyActivity : AppCompatActivity() {
             }
 
             for (changes in snapshot!!.documentChanges) {
-                    val gameID = changes.document.data.get("gid") as String
-                    if (gameID == gid) {
-                        val uid = changes.document.data.get("uid") as String
-                        val score = changes.document.data.get("score") as Long
-                        val winner = changes.document.data.get("winner") as Boolean
-                        val role = changes.document.data.get("role") as String
-                        val changedUser = MultiPlayerUserJoined(gameID, uid, score, role, winner)
-                        if (changes.type == DocumentChange.Type.ADDED && uid != FirebaseAuth.getInstance().uid) {
-                            usersJoined.add(changedUser)
-                        } else if (changes.type == DocumentChange.Type.REMOVED) {
-                            var userRemoved: MultiPlayerUserJoined? = null
-                            for (idx in (0 until usersJoined.size)) {
-                                if (usersJoined[idx].uid == uid) {
-                                    userRemoved = usersJoined[idx]
-                                }
+                val gameID = changes.document.data.get("gid") as String
+                if (gameID == gid) {
+                    val uid = changes.document.data.get("uid") as String
+                    val score = changes.document.data.get("score") as Long
+                    val role = changes.document.data.get("role") as String
+                    val changedUser = MultiPlayerUserJoined(gameID, uid, score, role)
+                    if (changes.type == DocumentChange.Type.ADDED) {
+                        usersJoined.add(changedUser)
+                    } else if (changes.type == DocumentChange.Type.REMOVED) {
+                        var userRemoved: MultiPlayerUserJoined? = null
+                        for (idx in (0 until usersJoined.size)) {
+                            if (usersJoined[idx].uid == uid) {
+                                userRemoved = usersJoined[idx]
                             }
-                            usersJoined.remove(userRemoved)
                         }
-                        if (lobbyJoinedUsers!!.adapter != null) {
-                            lobbyJoinedUsers!!.adapter!!.notifyDataSetChanged()
-                        }
+                        usersJoined.remove(userRemoved)
+                    }
+                    if (lobbyJoinedUsers!!.adapter != null) {
+                        lobbyJoinedUsers!!.adapter!!.notifyDataSetChanged()
                     }
                 }
             }
+        }
     }
 
     private fun listenForGameStart() {

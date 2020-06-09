@@ -4,6 +4,5 @@ class MultiPlayerUserJoined(
     val gid: String,
     val uid: String,
     val score: Long,
-    val role: String,
-    val winner: Boolean
+    val role: String
 )

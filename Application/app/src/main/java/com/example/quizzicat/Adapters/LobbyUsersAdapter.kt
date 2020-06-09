@@ -41,11 +41,13 @@ class LobbyUsersAdapter(
         var lobby_user_icon: ImageView? = null
         var lobby_user_name: TextView? = null
         var lobby_user_host: ImageView? = null
+        var lobby_user_points: TextView? = null
 
         init {
             lobby_user_icon = itemView.findViewById(R.id.view_user_lobby_icon)
             lobby_user_name = itemView.findViewById(R.id.view_user_lobby_name)
             lobby_user_host = itemView.findViewById(R.id.view_user_lobby_host)
+            lobby_user_points = itemView.findViewById(R.id.view_user_lobby_points)
         }
 
          fun bind(source: String, firebaseFirestore: FirebaseFirestore, mainContext: Context, user: MultiPlayerUserJoined) {
@@ -59,10 +61,8 @@ class LobbyUsersAdapter(
                                  lobby_user_host!!.visibility = View.VISIBLE
                              }
                          } else {
-                             if (user.winner) {
-                                 lobby_user_host!!.setBackgroundResource(R.drawable.award)
-                                 lobby_user_host!!.visibility = View.VISIBLE
-                             }
+                             lobby_user_points!!.text = user.score.toString()
+                             lobby_user_points!!.visibility = View.VISIBLE
                          }
 
                      }

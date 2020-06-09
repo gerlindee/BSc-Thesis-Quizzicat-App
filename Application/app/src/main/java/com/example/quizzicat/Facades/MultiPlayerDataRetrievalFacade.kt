@@ -31,8 +31,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
                             val gid = document.get("gid") as String
                             val role = document.get("role") as String
                             val score = document.get("score") as Long
-                            val winner = document.get("winner") as Boolean
-                            gamesJoined.add(MultiPlayerUserJoined(gid, role, score, uid, winner))
+                            gamesJoined.add(MultiPlayerUserJoined(gid, role, score, uid))
                         }
                     } else {
                         Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
@@ -88,7 +87,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
         if (game.length == 4)  { // gamePIN was given, not GID
             getGamesByPIN(game, object: MultiPlayerGamesCallBack {
                 override fun onCallback(value: ArrayList<MultiPlayerGame>) {
-                    val userJoined = MultiPlayerUserJoined(value[0].gid, FirebaseAuth.getInstance().uid!!, 0, role, false)
+                    val userJoined = MultiPlayerUserJoined(value[0].gid, FirebaseAuth.getInstance().uid!!, 0, role)
                     firebaseFirestore.collection("Multi_Player_Users_Joined")
                         .add(userJoined)
                         .addOnCompleteListener { task ->
@@ -99,7 +98,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
                 }
             })
         } else {
-            val userJoined = MultiPlayerUserJoined(game, FirebaseAuth.getInstance().uid!!, 0, role, false)
+            val userJoined = MultiPlayerUserJoined(game, FirebaseAuth.getInstance().uid!!, 0, role)
             firebaseFirestore.collection("Multi_Player_Users_Joined")
                 .add(userJoined)
                 .addOnCompleteListener { task ->
@@ -184,9 +183,8 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
                     for (document in task.result!!) {
                         val role = document.get("role") as String
                         val score = document.get("score") as Long
-                        val winner = document.get("winner") as Boolean
                         val uid = document.get("uid") as String
-                        users.add(MultiPlayerUserJoined(gid, uid, score, role, winner))
+                        users.add(MultiPlayerUserJoined(gid, uid, score, role))
                     }
                     callback.onCallback(users)
                 } else {
@@ -254,8 +252,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
                     for (document in task.result!!) {
                         documentID = document.id
                         val role = document.get("role") as String
-                        val winner = document.get("winner") as Boolean
-                        userArray.add(MultiPlayerUserJoined(gid, FirebaseAuth.getInstance().uid!!, newScore, role, winner))
+                        userArray.add(MultiPlayerUserJoined(gid, FirebaseAuth.getInstance().uid!!, newScore, role))
                     }
                     firebaseFirestore.collection("Multi_Player_Users_Joined")
                         .document(documentID)
@@ -270,5 +267,4 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
                 }
             }
     }
-
 }
