@@ -9,14 +9,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.quizzicat.Adapters.MultiPlayerGamesAdapter
 import com.example.quizzicat.Adapters.TopicSpinnerAdapter
 import com.example.quizzicat.Facades.MultiPlayerDataRetrievalFacade
 import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
-import com.example.quizzicat.Model.AbstractTopic
-import com.example.quizzicat.Model.MultiPlayerGame
-import com.example.quizzicat.Model.Topic
-import com.example.quizzicat.Model.TopicCategory
+import com.example.quizzicat.Model.*
 import com.example.quizzicat.MultiPlayerLobbyActivity
 
 import com.example.quizzicat.R
@@ -24,6 +24,7 @@ import com.example.quizzicat.SoloQuizActivity
 import com.example.quizzicat.Utils.CounterCallBack
 import com.example.quizzicat.Utils.CustomCallBack
 import com.example.quizzicat.Utils.MultiPlayerGamesCallBack
+import com.example.quizzicat.Utils.MultiPlayerUsersCallBack
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.firestore.FirebaseFirestore
@@ -40,7 +41,7 @@ class MultiPlayerMenuFragment : Fragment() {
 
     private var createNewGame: MaterialButton? = null
     private var joinGame: MaterialButton? = null
-    private var leaderboardResults: RecyclerView? = null
+    private var gamesPlayed: RecyclerView? = null
     private var progressBar: ProgressBar? = null
     private var noGamesLayout: LinearLayout? = null
 
@@ -59,7 +60,7 @@ class MultiPlayerMenuFragment : Fragment() {
 
         initializeLayoutElements()
 
-        noGamesLayout!!.visibility = View.VISIBLE
+        setupGames()
 
         joinGame!!.setOnClickListener {
             val inflater = LayoutInflater.from(context)
@@ -130,7 +131,7 @@ class MultiPlayerMenuFragment : Fragment() {
                 .setView(customizingQuizView)
                 .setPositiveButton("Create Game") { _, _ ->
                     MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, context!!)
-                        .createMultiPlayerGame(object: MultiPlayerGamesCallBack{
+                        .createMultiPlayerGame(selectedTopicItem.tid, object: MultiPlayerGamesCallBack{
                             override fun onCallback(value: ArrayList<MultiPlayerGame>) {
                                 val lobbyIntent = Intent(activity, MultiPlayerLobbyActivity::class.java)
                                 lobbyIntent.putExtra("gamePIN", value[0].game_pin)
@@ -153,7 +154,31 @@ class MultiPlayerMenuFragment : Fragment() {
         joinGame = view?.findViewById(R.id.join_multi_player_game)
         progressBar = view?.findViewById(R.id.multi_player_progress_bar)
         noGamesLayout = view?.findViewById(R.id.layout_no_games_played)
-        leaderboardResults = view?.findViewById(R.id.multi_player_games_played)
+        gamesPlayed = view?.findViewById(R.id.multi_player_games_played)
+    }
+
+    private fun setupGames() {
+        MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, context!!)
+            .getUserPlayedGames(object: MultiPlayerUsersCallBack {
+                override fun onCallback(value: ArrayList<MultiPlayerUserJoined>) {
+                    if (value.size == 0) {
+                        createNewGame!!.visibility = View.VISIBLE
+                        joinGame!!.visibility = View.VISIBLE
+                        noGamesLayout!!.visibility = View.VISIBLE
+                        progressBar!!.visibility = View.GONE
+                    } else {
+                        gamesPlayed!!.apply {
+                            layoutManager = LinearLayoutManager(activity)
+                            adapter = MultiPlayerGamesAdapter(context, mFirestoreDatabase!!, value)
+                            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                        }
+                        createNewGame!!.visibility = View.VISIBLE
+                        joinGame!!.visibility = View.VISIBLE
+                        gamesPlayed!!.visibility = View.VISIBLE
+                        progressBar!!.visibility = View.GONE
+                    }
+                }
+            })
     }
 
     private fun getCIDByName(name: String): Long {

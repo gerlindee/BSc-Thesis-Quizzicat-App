@@ -87,6 +87,9 @@
     <string name="string_start_game">Start Game</string>
     <string name="string_exit">EXIT</string>
     <string name="string_scoreboard">Scoreboard</string>
+    <string name="string_hosted_by">Hosted by:</string>
+    <string name="string_points_earned">Points earned:</string>
+    <string name="string_played_on">Played on:</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">

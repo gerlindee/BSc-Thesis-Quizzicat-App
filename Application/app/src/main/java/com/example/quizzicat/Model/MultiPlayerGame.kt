@@ -8,5 +8,6 @@ class MultiPlayerGame(
     var progress: Boolean,
     val created_on: String,
     val created_by: String,
-    val game_pin: String
+    val game_pin: String,
+    val tid: Long
 )
