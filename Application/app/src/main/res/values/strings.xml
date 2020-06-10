@@ -57,13 +57,13 @@
     <string name="string_incorrect">Incorrect</string>
     <string name="string_questions_factory">Questions Factory</string>
     <string name="factory_suggest_title">Suggest a question</string>
-    <string name="factory_suggest_desc">Suggest new questions for your favourite topics!</string>
+    <string name="factory_suggest_desc">Suggest new questions for your favourite topics</string>
     <string name="factory_approved_title">Approved questions</string>
-    <string name="factory_approved_desc">Questions that have been approved and added to the game.</string>
+    <string name="factory_approved_desc">Questions that have been approved and added to the game</string>
     <string name="factory_pending_title">Pending questions</string>
-    <string name="factory_pending_desc">Questions need at least 85% of positive votes to be approved</string>
+    <string name="factory_pending_desc">Questions need at least 75% ratings over 4 stars in order to be approved</string>
     <string name="factory_rejected_title">Rejected questions</string>
-    <string name="factory_rejected_desc">Questions that have been rejected by other players</string>
+    <string name="factory_rejected_desc">Questions need to have been reported by 65% of the number of users or have a rating less than 2 stars in order to be removed</string>
     <string name="hint_question_text">Question text</string>
     <string name="string_create_text_button">Create Question</string>
     <string name="string_first_answ_text">First Answer Text</string>
@@ -90,6 +90,8 @@
     <string name="string_hosted_by">Hosted by:</string>
     <string name="string_points_earned">Points earned:</string>
     <string name="string_played_on">Played on:</string>
+    <string name="string_play_again">Play it again</string>
+    <string name="string_play_new">Play something new</string>
 
     <!--    spinner values-->
     <string-array name="quiz_difficulties">

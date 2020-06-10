@@ -58,7 +58,7 @@ class MultiPlayerMenuFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         mFirestoreDatabase = Firebase.firestore
 
-        initializeLayoutElements()
+        setupLayoutElements()
 
         setupGames()
 
@@ -149,7 +149,7 @@ class MultiPlayerMenuFragment : Fragment() {
         }
     }
 
-    private fun initializeLayoutElements() {
+    private fun setupLayoutElements() {
         createNewGame = view?.findViewById(R.id.create_multi_player_game)
         joinGame = view?.findViewById(R.id.join_multi_player_game)
         progressBar = view?.findViewById(R.id.multi_player_progress_bar)

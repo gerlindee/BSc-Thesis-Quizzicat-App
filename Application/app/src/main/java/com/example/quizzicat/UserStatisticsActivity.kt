@@ -68,38 +68,46 @@ class UserStatisticsActivity : AppCompatActivity() {
 
         setUserProfileData()
 
-        getUserPlayedHistory(object: TopicsPlayedCallBack {
-            override fun onCallback(value: List<TopicPlayed>) {
-                topicsHistory = value as ArrayList<TopicPlayed>
-                if (topicsHistory.isEmpty()) {
-                    progressBar!!.visibility = View.GONE
-                    noGamesPlayed!!.visibility = View.VISIBLE
-                    gamesPlayed!!.visibility = View.GONE
-                    soloGamesPieCharts!!.visibility = View.GONE
-                    correctIncorrectBarLayout!!.visibility = View.GONE
-                } else {
-                    determineGamesPlayed(topicsHistory)
-                    getTopicsPlayedData(object: CustomCallBack {
-                        override fun onCallback(value: List<AbstractTopic>) {
-                            topicsPlayed = value as ArrayList<Topic>
-                            topicsDataRetrievalFacade!!.getCategoriesPlayedData(object: CustomCallBack {
-                                override fun onCallback(value: List<AbstractTopic>) {
-                                    categoriesPlayed = value as ArrayList<TopicCategory>
-                                    createCategoriesPieChart(createCategoriesPieChartDataset(topicsHistory))
-                                    createTopicsPieChart()
-                                    createCorrectIncorrectBar()
-                                    noGamesPlayed!!.visibility = View.GONE
-                                    gamesPlayed!!.visibility = View.VISIBLE
-                                    soloGamesPieCharts!!.visibility = View.VISIBLE
-                                    correctIncorrectBarLayout!!.visibility = View.VISIBLE
-                                    progressBar!!.visibility = View.GONE
-                                }
-                            }, topicsPlayed)
-                        }
-                    }, topicsHistory)
+        val topicsDataRetrievalFacade = TopicsDataRetrievalFacade(mFirestoreDatabase!!, this)
+
+        topicsDataRetrievalFacade
+            .getUserPlayedHistory(object : TopicsPlayedCallBack {
+                override fun onCallback(value: List<TopicPlayed>) {
+                    topicsHistory = value as ArrayList<TopicPlayed>
+                    if (topicsHistory.isEmpty()) {
+                        progressBar!!.visibility = View.GONE
+                        noGamesPlayed!!.visibility = View.VISIBLE
+                        gamesPlayed!!.visibility = View.GONE
+                        soloGamesPieCharts!!.visibility = View.GONE
+                        correctIncorrectBarLayout!!.visibility = View.GONE
+                    } else {
+                        determineGamesPlayed(topicsHistory)
+                        topicsDataRetrievalFacade.getTopicsPlayedData(object : CustomCallBack {
+                            override fun onCallback(value: List<AbstractTopic>) {
+                                topicsPlayed = value as ArrayList<Topic>
+                                topicsDataRetrievalFacade.getCategoriesPlayedData(object :
+                                    CustomCallBack {
+                                    override fun onCallback(value: List<AbstractTopic>) {
+                                        categoriesPlayed = value as ArrayList<TopicCategory>
+                                        createCategoriesPieChart(
+                                            createCategoriesPieChartDataset(
+                                                topicsHistory
+                                            )
+                                        )
+                                        createTopicsPieChart()
+                                        createCorrectIncorrectBar()
+                                        noGamesPlayed!!.visibility = View.GONE
+                                        gamesPlayed!!.visibility = View.VISIBLE
+                                        soloGamesPieCharts!!.visibility = View.VISIBLE
+                                        correctIncorrectBarLayout!!.visibility = View.VISIBLE
+                                        progressBar!!.visibility = View.GONE
+                                    }
+                                }, topicsPlayed)
+                            }
+                        }, topicsHistory)
+                    }
                 }
-            }
-        })
+            })
 
         categoriesPieChart!!.setOnChartValueSelectedListener(object: OnChartValueSelectedListener {
             override fun onNothingSelected() {
@@ -125,26 +133,7 @@ class UserStatisticsActivity : AppCompatActivity() {
             })
     }
 
-    private fun getUserPlayedHistory(callback: TopicsPlayedCallBack) {
-        mFirestoreDatabase!!.collection("Topics_Played")
-            .whereEqualTo("uid", mFirebaseAuth!!.currentUser!!.uid)
-            .get()
-            .addOnCompleteListener { task ->
-                val topicsPlayed = ArrayList<TopicPlayed>()
-                for (document in task.result!!) {
-                    val correct_answers = document.get("correct_answers") as Long
-                    val incorrect_answers = document.get("incorrect_answers") as Long
-                    val pid = document.get("pid") as String
-                    val tid = document.get("tid") as Long
-                    val cid = document.get("cid") as Long
-                    val times_played_solo = document.get("times_played_solo") as Long
-                    val uid = document.get("uid") as String
-                    val topicPlayed = TopicPlayed(pid, tid, cid, uid, correct_answers, incorrect_answers, times_played_solo)
-                    topicsPlayed.add(topicPlayed)
-                }
-                callback.onCallback(topicsPlayed)
-            }
-    }
+
 
     private fun determineGamesPlayed(topicsPlayed: ArrayList<TopicPlayed>) {
         var soloGamesPlayed = 0
@@ -158,32 +147,6 @@ class UserStatisticsActivity : AppCompatActivity() {
         soloGames!!.text = soloGamesPlayed.toString()
         soloGamesCorrect!!.text = soloCorrectAnswers.toString()
         soloGamesIncorrect!!.text = soloIncorrectAnswers.toString()
-    }
-
-    private fun getTopicsPlayedData(callback: CustomCallBack, topicsPlayed: ArrayList<TopicPlayed>) {
-        val playedTopics = ArrayList<Long>()
-        for (topic in topicsPlayed) {
-            playedTopics.add(topic.tid)
-        }
-        mFirestoreDatabase!!.collection("Topics")
-            .whereIn("tid", playedTopics)
-            .get()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val topics = ArrayList<Topic>()
-                    for (document in task.result!!) {
-                        val topicCID = document.get("cid") as Long
-                        val topicTID = document.get("tid") as Long
-                        val topicURL = document.get("icon_url") as String
-                        val topicName = document.get("name") as String
-                        val topic = Topic(topicTID, topicCID, topicURL, topicName)
-                        topics.add(topic)
-                    }
-                    callback.onCallback(topics)
-                } else {
-                    Toast.makeText(this, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
-                }
-            }
     }
 
     private fun createCategoriesPieChartDataset(topicsPlayed: ArrayList<TopicPlayed>): HashMap<String, Int> {

@@ -7,15 +7,49 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.RecommendationsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
+        android:id="@+id/recommend_again_text"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Recommendations will go here"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:fontFamily="sans-serif-condensed-light"
+        android:padding="5dp"
+        android:text="@string/string_play_again"
+        android:textColor="@color/colorAccent"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recommend_again_topics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recommend_again_text" />
+
+    <TextView
+        android:id="@+id/recommend_different_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-condensed-light"
+        android:padding="5dp"
+        android:text="@string/string_play_new"
+        android:textColor="@color/colorAccent"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recommend_again_topics" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recommend_different_topics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recommend_different_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
