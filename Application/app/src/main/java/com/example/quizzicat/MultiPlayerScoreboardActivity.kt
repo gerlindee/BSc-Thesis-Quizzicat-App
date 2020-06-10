@@ -86,6 +86,7 @@ class MultiPlayerScoreboardActivity : AppCompatActivity() {
                     val changedUser = MultiPlayerUserJoined(gameID, uid, score, role)
                     if (changes.type == DocumentChange.Type.MODIFIED) {
                         usersJoined.add(changedUser)
+                        usersJoined = ArrayList(usersJoined.sortedWith(compareBy(({ it.score }))))
                     }
                     if (scoreboardUsers!!.adapter != null) {
                         scoreboardUsers!!.adapter!!.notifyDataSetChanged()

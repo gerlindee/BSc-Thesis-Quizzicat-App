@@ -29,6 +29,29 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
                         topic = Topic(topicTID, topicCID, topicURL, topicName)
                     }
                     callback.onCallback(topic!!)
+                } else {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    fun getTopicsDetails(callback: CustomCallBack, tids: ArrayList<Long>) {
+        firebaseFirestore.collection("Topics")
+            .whereIn("tid", tids)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val topics = ArrayList<Topic>()
+                    for (document in task.result!!) {
+                        val topicCID = document.get("cid") as Long
+                        val topicTID = document.get("tid") as Long
+                        val topicURL = document.get("icon_url") as String
+                        val topicName = document.get("name") as String
+                        topics.add(Topic(topicTID, topicCID, topicURL, topicName))
+                    }
+                    callback.onCallback(topics)
+                } else {
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                 }
             }
     }
@@ -49,7 +72,7 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
                     }
                     callBack.onCallback(topicCategories)
                 } else {
-                    Log.d("TopicCategoryQuery", task.exception.toString())
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                 }
             }
     }
@@ -72,7 +95,7 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
                     }
                     callBack.onCallback(topics)
                 } else {
-                    Log.d("TopicQuery", task.exception.toString())
+                    Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                 }
             }
     }
@@ -109,19 +132,23 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
                 .whereEqualTo("uid", user)
                 .get()
                 .addOnCompleteListener { task ->
-                    val topicsPlayed = ArrayList<TopicPlayed>()
-                    for (document in task.result!!) {
-                        val correct_answers = document.get("correct_answers") as Long
-                        val incorrect_answers = document.get("incorrect_answers") as Long
-                        val pid = document.get("pid") as String
-                        val tid = document.get("tid") as Long
-                        val cid = document.get("cid") as Long
-                        val times_played_solo = document.get("times_played_solo") as Long
-                        val uid = document.get("uid") as String
-                        val topicPlayed = TopicPlayed(pid, tid, cid, uid, correct_answers, incorrect_answers, times_played_solo)
-                        topicsPlayed.add(topicPlayed)
+                    if (task.isSuccessful) {
+                        val topicsPlayed = ArrayList<TopicPlayed>()
+                        for (document in task.result!!) {
+                            val correct_answers = document.get("correct_answers") as Long
+                            val incorrect_answers = document.get("incorrect_answers") as Long
+                            val pid = document.get("pid") as String
+                            val tid = document.get("tid") as Long
+                            val cid = document.get("cid") as Long
+                            val times_played_solo = document.get("times_played_solo") as Long
+                            val uid = document.get("uid") as String
+                            val topicPlayed = TopicPlayed(pid, tid, cid, uid, correct_answers, incorrect_answers, times_played_solo)
+                            topicsPlayed.add(topicPlayed)
+                        }
+                        callback.onCallback(topicsPlayed)
+                    } else {
+                        Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                     }
-                    callback.onCallback(topicsPlayed)
                 }
         }
     }
@@ -152,18 +179,7 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
             }
     }
 
-    fun getTopicsNotPlayed(callback: CustomCallBack, topicsPlayed: ArrayList<TopicPlayed>) {
-        getAllTopics(object: CustomCallBack {
-            override fun onCallback(value: List<AbstractTopic>) {
-                val allTopics = value as ArrayList<Topic>
-                val playedIDs = topicsPlayed.map { topic -> topic.tid }
-                val topicsNotPlayed = allTopics.filterNot { topic -> topic.tid in playedIDs }
-                callback.onCallback(topicsNotPlayed)
-            }
-        })
-    }
-
-    fun getAllTopics(callback: CustomCallBack) {
+    private fun getAllTopics(callback: CustomCallBack) {
         firebaseFirestore.collection("Topics")
             .get()
             .addOnCompleteListener { task ->
@@ -182,5 +198,24 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
                     Toast.makeText(context, task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                 }
             }
+    }
+
+    fun getMostPlayedTopics(callback: CustomCallBack) {
+        getUserPlayedHistory(object: TopicsPlayedCallBack {
+            override fun onCallback(value: List<TopicPlayed>) {
+                val topicsInOrder = ArrayList(value.sortedWith(compareByDescending (({ it.times_played_solo }))))
+                val mostPlayedTopics = ArrayList<Long>()
+                var idx = 0
+                while (idx < 3 && idx < topicsInOrder.size) {
+                    mostPlayedTopics.add(topicsInOrder[idx].tid)
+                    idx += 1
+                }
+                getTopicsDetails(object: CustomCallBack {
+                    override fun onCallback(value: List<AbstractTopic>) {
+                        callback.onCallback(value)
+                    }
+                }, mostPlayedTopics)
+            }
+        })
     }
 }

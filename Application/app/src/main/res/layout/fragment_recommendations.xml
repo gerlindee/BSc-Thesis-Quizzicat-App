@@ -5,6 +5,7 @@
     android:id="@+id/user_profile_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="10dp"
     tools:context=".Fragments.RecommendationsFragment">
 
     <TextView
@@ -17,39 +18,86 @@
         android:textColor="@color/colorAccent"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recommend_again_topics"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:orientation="horizontal"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recommend_again_text" />
 
     <TextView
-        android:id="@+id/recommend_different_text"
+        android:id="@+id/recommend_similar_1_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-condensed-light"
         android:padding="5dp"
-        android:text="@string/string_play_new"
+        android:text="@string/placeholder_question_text"
         android:textColor="@color/colorAccent"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recommend_again_topics" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recommend_different_topics"
+        android:id="@+id/recommend_similar_1_topics"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recommend_similar_1_text" />
+
+    <TextView
+        android:id="@+id/recommend_similar_2_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="visible"
+        android:fontFamily="sans-serif-condensed-light"
+        android:padding="5dp"
+        android:text="@string/placeholder_question_text"
+        android:textColor="@color/colorAccent"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recommend_different_text" />
+        app:layout_constraintTop_toBottomOf="@+id/recommend_similar_1_topics" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recommend_similar_2_topics"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recommend_similar_2_text" />
+
+    <TextView
+        android:id="@+id/recommend_similar_3_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed-light"
+        android:padding="5dp"
+        android:text="@string/placeholder_question_text"
+        android:textColor="@color/colorAccent"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recommend_similar_2_topics" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recommend_similar_3_topics"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recommend_similar_3_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
