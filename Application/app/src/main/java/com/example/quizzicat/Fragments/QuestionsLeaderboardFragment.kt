@@ -25,6 +25,7 @@ import com.example.quizzicat.Utils.PendingQuestionsCallBack
 import com.example.quizzicat.Utils.UserReportsCallBack
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -33,7 +34,8 @@ import com.google.firebase.ktx.Firebase
 class QuestionsLeaderboardFragment : Fragment() {
 
     private var mFirestoreDatabase: FirebaseFirestore? = null
-
+    private var nonReportedQuestions = ArrayList<PendingQuestion>()
+    private var reportedQuestions = ArrayList<UserReports>()
     private var questionsFactoryNavigation: MaterialButton? = null
     private var pendingQuestions: RecyclerView? = null
     private var progressBar: ProgressBar? = null
@@ -64,7 +66,7 @@ class QuestionsLeaderboardFragment : Fragment() {
                 PendingDataRetrievalFacade(mFirestoreDatabase!!, context!!)
                     .getReportedQuestionsForUser(object: UserReportsCallBack {
                         override fun onCallback(value: ArrayList<UserReports>) {
-                            val nonReportedQuestions = ArrayList<PendingQuestion>()
+                            reportedQuestions = value
                             for (question in pendingQuestionsLocal) {
                                 if (!isQuestionReported(value, question.pqid)) {
                                     nonReportedQuestions.add(question)
@@ -81,11 +83,51 @@ class QuestionsLeaderboardFragment : Fragment() {
                                 }
                                 progressBar!!.visibility = View.GONE
                                 pendingQuestions!!.visibility = View.VISIBLE
+                                listenForQuestions()
                             }
                         }
                     })
             }
         })
+    }
+
+    private fun listenForQuestions() {
+        val questionsCollection = mFirestoreDatabase!!.collection("Pending_Questions")
+        questionsCollection.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Toast.makeText(context, "Questions could not be fetched! Please try again!", Toast.LENGTH_LONG).show()
+                return@addSnapshotListener
+            }
+
+            for (changes in snapshot!!.documentChanges) {
+                val submitted_by = changes.document.data.get("submitted_by") as String
+                if (submitted_by != FirebaseAuth.getInstance().uid) {
+                    val pqid = changes.document.data.get("pqid") as String
+                    val tid = changes.document.data.get("tid") as Long
+                    val difficulty = changes.document.data.get("difficulty") as Long
+                    val question_text = changes.document.data.get("question_text") as String
+                    val nr_votes = changes.document.data.get("nr_votes") as Long
+                    val avg_rating = changes.document.data.get("avg_rating") as Long
+                    val nr_reports = changes.document.data.get("nr_reports") as Long
+                    val changedQuestion = PendingQuestion(pqid, tid, difficulty, question_text, submitted_by, nr_votes, avg_rating, nr_reports)
+                    var question: PendingQuestion? = null
+                    for (idx in (0 until nonReportedQuestions.size)) {
+                        if (nonReportedQuestions[idx].pqid == pqid) {
+                            question = nonReportedQuestions[idx]
+                        }
+                    }
+                    if (changes.type == DocumentChange.Type.ADDED && question == null && !isQuestionReported(reportedQuestions, pqid)) {
+                        nonReportedQuestions.add(changedQuestion)
+                    } else if (changes.type == DocumentChange.Type.REMOVED) {
+                        nonReportedQuestions.remove(question)
+                    }
+                    if (pendingQuestions!!.adapter != null) {
+                        pendingQuestions!!.adapter!!.notifyDataSetChanged()
+                    }
+                }
+            }
+        }
+
     }
 
     private fun initializeLayoutElements() {
