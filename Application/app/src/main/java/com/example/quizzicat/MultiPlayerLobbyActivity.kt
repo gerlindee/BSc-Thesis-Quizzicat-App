@@ -124,7 +124,8 @@ class MultiPlayerLobbyActivity : AppCompatActivity() {
                     val uid = changes.document.data.get("uid") as String
                     val score = changes.document.data.get("score") as Long
                     val role = changes.document.data.get("role") as String
-                    val changedUser = MultiPlayerUserJoined(gameID, uid, score, role)
+                    val finished_playing = changes.document.data.get("finished_playing") as Boolean
+                    val changedUser = MultiPlayerUserJoined(gameID, uid, score, role, finished_playing)
                     if (changes.type == DocumentChange.Type.ADDED) {
                         usersJoined.add(changedUser)
                     } else if (changes.type == DocumentChange.Type.REMOVED) {

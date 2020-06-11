@@ -1,6 +1,7 @@
 package com.example.quizzicat.Adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -60,19 +61,19 @@ class MultiPlayerGamesAdapter(
         fun bind(firebaseFirestore: FirebaseFirestore, mainContext: Context, game: MultiPlayerUserJoined) {
             val multiPlayerDataRetrievalFacade = MultiPlayerDataRetrievalFacade(firebaseFirestore, mainContext)
             multiPlayerDataRetrievalFacade
-                .getMultiPlayerGameData(game.gid, object: MultiPlayerGamesCallBack {
+                .getMultiPlayerGameData(game.gid, object : MultiPlayerGamesCallBack {
                     override fun onCallback(value: ArrayList<MultiPlayerGame>) {
                         val multiGame = value[0]
                         TopicsDataRetrievalFacade(firebaseFirestore, mainContext)
-                            .getTopicDetails(object: TopicCallBack {
+                            .getTopicDetails(object : TopicCallBack {
                                 override fun onCallback(value: Topic) {
                                     val topic = value
-                                    if (FirebaseAuth.getInstance().uid != null) {
-                                        UserDataRetrievalFacade(firebaseFirestore, multiGame.created_by)
-                                            .getUserDetails(object: UserDataCallBack {
-                                                override fun onCallback(value: User) {
-                                                    val host = value
-                                                    multiPlayerDataRetrievalFacade.hasUserWon(FirebaseAuth.getInstance().uid!!, multiGame.gid, object: CounterCallBack {
+                                    UserDataRetrievalFacade(firebaseFirestore, multiGame.created_by)
+                                        .getUserDetails(object : UserDataCallBack {
+                                            override fun onCallback(value: User) {
+                                                val host = value
+                                                multiPlayerDataRetrievalFacade.hasUserWon(
+                                                    FirebaseAuth.getInstance().uid!!, multiGame.gid, object : CounterCallBack {
                                                         override fun onCallback(value: Int) {
                                                             if (value == 1)
                                                                 multi_game_winner!!.visibility = View.VISIBLE
@@ -82,10 +83,8 @@ class MultiPlayerGamesAdapter(
                                                             multi_game_date!!.text = multiGame.created_on
                                                         }
                                                     })
-                                                }
-                                            })
-
-                                    }
+                                            }
+                                        })
                                 }
                             }, multiGame.tid)
                     }

@@ -1,9 +1,9 @@
 package com.example.quizzicat.Facades
 
+import android.util.Log
 import com.example.quizzicat.Model.User
 import com.example.quizzicat.Utils.CounterCallBack
 import com.example.quizzicat.Utils.UserDataCallBack
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class UserDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore, private val uid: String) {
@@ -23,6 +23,8 @@ class UserDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore, 
                         user = User(userUID, userDisplayName, userPicture, userCountry, userCity)
                     }
                     callback.onCallback(user!!)
+                } else {
+                    Log.d("USER_ERROR", task.exception!!.message.toString())
                 }
             }
     }
@@ -37,6 +39,8 @@ class UserDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore, 
                         numberOfUsers += 1
                     }
                     callback.onCallback(numberOfUsers)
+                } else {
+                    Log.d("USER_ERROR", task.exception!!.message.toString())
                 }
             }
     }

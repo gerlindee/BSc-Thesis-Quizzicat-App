@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Facades.ImageLoadingFacade
-import com.example.quizzicat.Model.MultiPlayerUserJoined
 import com.example.quizzicat.Model.Topic
 import com.example.quizzicat.R
 import com.example.quizzicat.SoloQuizActivity
