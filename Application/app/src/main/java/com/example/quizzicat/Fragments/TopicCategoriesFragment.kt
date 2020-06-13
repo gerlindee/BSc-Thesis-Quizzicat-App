@@ -1,27 +1,23 @@
 package com.example.quizzicat.Fragments
 
-import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridView
 import android.widget.ProgressBar
 import android.widget.Spinner
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.quizzicat.Adapters.TopicCategoriesAdapter
 import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
-import com.example.quizzicat.Model.AbstractTopic
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.Topic
 import com.example.quizzicat.Model.TopicCategory
 import com.example.quizzicat.R
 import com.example.quizzicat.SoloQuizActivity
-import com.example.quizzicat.Utils.CustomCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -73,10 +69,10 @@ class TopicCategoriesFragment : Fragment() {
             } else {
                 val selectedCategory = topicCategoriesList!![position]
                 topicsLevel = true
-                topicsDataRetrievalFacade!!.getTopicsForACategory(object: CustomCallBack {
-                    override fun onCallback(value: List<AbstractTopic>) {
+                topicsDataRetrievalFacade!!.getTopicsForACategory(object: ModelArrayCallback {
+                    override fun onCallback(value: List<ModelEntity>) {
                         topicsList = value as ArrayList<Topic>
-                        topicCategoriesAdapter!!.arrayList = topicsList as ArrayList<AbstractTopic>
+                        topicCategoriesAdapter!!.arrayList = topicsList as ArrayList<ModelEntity>
                         topicCategoriesAdapter!!.notifyDataSetChanged()
                     }
                 }, selectedCategory.cid)
@@ -94,10 +90,10 @@ class TopicCategoriesFragment : Fragment() {
     private fun setCategoriesData() {
         progressIndicator!!.visibility = View.VISIBLE
         topicCategoriesGridView!!.visibility = View.GONE
-        topicsDataRetrievalFacade!!.getTopicCategories(object: CustomCallBack {
-            override fun onCallback(value: List<AbstractTopic>) {
+        topicsDataRetrievalFacade!!.getTopicCategories(object: ModelArrayCallback {
+            override fun onCallback(value: List<ModelEntity>) {
                 topicCategoriesList = value as ArrayList<TopicCategory>
-                topicCategoriesAdapter = TopicCategoriesAdapter(context!!, topicCategoriesList as ArrayList<AbstractTopic>)
+                topicCategoriesAdapter = TopicCategoriesAdapter(context!!, topicCategoriesList as ArrayList<ModelEntity>)
                 topicCategoriesGridView?.adapter = topicCategoriesAdapter
                 progressIndicator!!.visibility = View.GONE
                 topicCategoriesGridView!!.visibility = View.VISIBLE

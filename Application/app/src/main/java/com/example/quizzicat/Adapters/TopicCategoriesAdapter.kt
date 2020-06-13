@@ -8,17 +8,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.quizzicat.Facades.ImageLoadingFacade
 import com.example.quizzicat.Model.AbstractTopic
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.TopicCategory
 import com.example.quizzicat.R
 
-class TopicCategoriesAdapter(var context: Context, var arrayList: ArrayList<AbstractTopic>) : BaseAdapter() {
+class TopicCategoriesAdapter(var context: Context, var arrayList: ArrayList<ModelEntity>) : BaseAdapter() {
 
     override fun getItem(position: Int): Any {
         return arrayList[position]
     }
 
     override fun getItemId(position: Int): Long {
-        return arrayList[position].cid.toLong()
+        val item = arrayList[position] as AbstractTopic
+        return item.cid
     }
 
     override fun getCount(): Int {
@@ -30,7 +32,7 @@ class TopicCategoriesAdapter(var context: Context, var arrayList: ArrayList<Abst
         val categoryIcon = categoryView.findViewById<ImageView>(R.id.category_icon)
         val categoryName = categoryView.findViewById<TextView>(R.id.category_name)
 
-        val categoryItem = arrayList[position]
+        val categoryItem = arrayList[position] as AbstractTopic
         ImageLoadingFacade(context).loadImage(categoryItem.icon_url, categoryIcon)
         categoryName.text = categoryItem.name
 

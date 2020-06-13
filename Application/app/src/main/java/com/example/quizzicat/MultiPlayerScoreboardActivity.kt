@@ -11,8 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Adapters.LobbyUsersAdapter
 import com.example.quizzicat.Facades.MultiPlayerDataRetrievalFacade
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.MultiPlayerUserJoined
-import com.example.quizzicat.Utils.MultiPlayerUsersCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
@@ -45,9 +46,9 @@ class MultiPlayerScoreboardActivity : AppCompatActivity() {
         scoreboardGamePIN!!.text = gamePIN
 
         MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, this)
-            .getUsersForGame(gid!!, object: MultiPlayerUsersCallBack {
-                override fun onCallback(value: ArrayList<MultiPlayerUserJoined>) {
-                    for (user in value) {
+            .getUsersForGame(gid!!, object: ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
+                    for (user in value as ArrayList<MultiPlayerUserJoined>) {
                         if (user.score != 0.toLong() && user.uid != FirebaseAuth.getInstance().uid)
                             usersJoined.add(user)
                     }

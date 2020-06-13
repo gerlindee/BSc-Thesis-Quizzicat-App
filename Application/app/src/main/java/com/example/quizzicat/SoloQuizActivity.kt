@@ -13,11 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.quizzicat.Facades.QuestionsDataRetrievalFacade
 import com.example.quizzicat.Model.ActiveQuestion
 import com.example.quizzicat.Model.ActiveQuestionAnswer
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.TopicPlayed
-import com.example.quizzicat.Utils.AnswersCallBack
 import com.example.quizzicat.Utils.DesignUtils
-import com.example.quizzicat.Utils.QuestionsCallBack
-import com.example.quizzicat.Utils.TopicsPlayedCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -134,9 +133,9 @@ class SoloQuizActivity : AppCompatActivity() {
 
     private fun getQuestionsAndAnswers() {
         QuestionsDataRetrievalFacade(mFirestoreDatabase!!, this)
-            .getQuestionsForQuiz(object: QuestionsCallBack {
-                override fun onCallback(value: ArrayList<ActiveQuestion>) {
-                    questionList = value
+            .getQuestionsForQuiz(object: ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
+                    questionList = value as ArrayList<ActiveQuestion>
                     if (questionList.size == 0) {
                         val mainMenuIntent = Intent(applicationContext, MainMenuActivity::class.java)
                         startActivity(mainMenuIntent)
@@ -147,9 +146,9 @@ class SoloQuizActivity : AppCompatActivity() {
                             questionsQIDList.add(question.qid)
                         }
                         QuestionsDataRetrievalFacade(mFirestoreDatabase!!, applicationContext)
-                            .getAnswers(object : AnswersCallBack {
-                                override fun onCallback(value: ArrayList<ActiveQuestionAnswer>) {
-                                    answersList = value
+                            .getAnswers(object : ModelArrayCallback {
+                                override fun onCallback(value: List<ModelEntity>) {
+                                    answersList = value as ArrayList<ActiveQuestionAnswer>
                                     setQuestionView()
                                     setTimer()
                                 }

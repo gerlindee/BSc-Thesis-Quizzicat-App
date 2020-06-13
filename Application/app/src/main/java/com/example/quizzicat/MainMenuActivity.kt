@@ -11,8 +11,9 @@ import com.example.quizzicat.Adapters.MainMenuViewPagerAdapter
 import com.example.quizzicat.Facades.ImageLoadingFacade
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
 import com.example.quizzicat.Fragments.TopicCategoriesFragment
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.User
-import com.example.quizzicat.Utils.UserDataCallBack
+import com.example.quizzicat.Utils.ModelCallback
 import com.facebook.login.LoginManager
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -76,12 +77,10 @@ class MainMenuActivity : AppCompatActivity() {
 
     private fun setUserAvatar() {
         UserDataRetrievalFacade(mFirestoreDatabase!!, mFirebaseAuth!!.currentUser!!.uid)
-            .getUserDetails(object : UserDataCallBack {
-                override fun onCallback(value: User) {
-                    ImageLoadingFacade(this@MainMenuActivity).loadImageIntoCircleView(
-                        value.avatar_url,
-                        profilePictureImageView!!
-                    )
+            .getUserDetails(object : ModelCallback {
+                override fun onCallback(value: ModelEntity) {
+                    val userData = value as User
+                    ImageLoadingFacade(this@MainMenuActivity).loadImageIntoCircleView(userData.avatar_url, profilePictureImageView!!)
                 }
             })
     }

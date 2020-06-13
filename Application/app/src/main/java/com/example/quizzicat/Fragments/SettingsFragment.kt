@@ -14,11 +14,12 @@ import android.widget.Toast
 import com.example.quizzicat.ChangeUserProfileActivity
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
 import com.example.quizzicat.LoginActivity
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.User
 
 import com.example.quizzicat.R
 import com.example.quizzicat.Utils.DesignUtils
-import com.example.quizzicat.Utils.UserDataCallBack
+import com.example.quizzicat.Utils.ModelCallback
 import com.facebook.login.LoginManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -114,12 +115,13 @@ class SettingsFragment : Fragment() {
                                 val photoURL = mFirebaseAuth!!.currentUser!!.photoUrl
                                 if (photoURL == null) {
                                     UserDataRetrievalFacade(mFirestoreDatabase!!, mFirebaseAuth!!.currentUser!!.uid)
-                                        .getUserDetails(object : UserDataCallBack {
-                                            override fun onCallback(value: User) {
-                                                if (value.avatar_url == getString(R.string.default_avatar)) {
+                                        .getUserDetails(object : ModelCallback {
+                                            override fun onCallback(value: ModelEntity) {
+                                                val userData = value as User
+                                                if (userData.avatar_url == getString(R.string.default_avatar)) {
                                                     deleteDatabaseAuth()
                                                 } else {
-                                                    mFirebaseStorage!!.getReferenceFromUrl(value.avatar_url).delete()
+                                                    mFirebaseStorage!!.getReferenceFromUrl(userData.avatar_url).delete()
                                                         .addOnCompleteListener { task ->
                                                             if (task.isSuccessful) {
                                                                 deleteDatabaseAuth()

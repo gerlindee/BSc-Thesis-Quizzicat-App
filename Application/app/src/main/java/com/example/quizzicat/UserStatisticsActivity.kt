@@ -2,20 +2,17 @@ package com.example.quizzicat
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.quizzicat.Facades.ImageLoadingFacade
 import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
 import com.example.quizzicat.Model.*
-import com.example.quizzicat.Utils.CustomCallBack
-import com.example.quizzicat.Utils.TopicsPlayedCallBack
-import com.example.quizzicat.Utils.UserDataCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
+import com.example.quizzicat.Utils.ModelCallback
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.Entry
@@ -71,8 +68,8 @@ class UserStatisticsActivity : AppCompatActivity() {
         val topicsDataRetrievalFacade = TopicsDataRetrievalFacade(mFirestoreDatabase!!, this)
 
         topicsDataRetrievalFacade
-            .getUserPlayedHistory(object : TopicsPlayedCallBack {
-                override fun onCallback(value: List<TopicPlayed>) {
+            .getUserPlayedHistory(object : ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
                     topicsHistory = value as ArrayList<TopicPlayed>
                     if (topicsHistory.isEmpty()) {
                         progressBar!!.visibility = View.GONE
@@ -82,12 +79,12 @@ class UserStatisticsActivity : AppCompatActivity() {
                         correctIncorrectBarLayout!!.visibility = View.GONE
                     } else {
                         determineGamesPlayed(topicsHistory)
-                        topicsDataRetrievalFacade.getTopicsPlayedData(object : CustomCallBack {
-                            override fun onCallback(value: List<AbstractTopic>) {
+                        topicsDataRetrievalFacade.getTopicsPlayedData(object : ModelArrayCallback {
+                            override fun onCallback(value: List<ModelEntity>) {
                                 topicsPlayed = value as ArrayList<Topic>
                                 topicsDataRetrievalFacade.getCategoriesPlayedData(object :
-                                    CustomCallBack {
-                                    override fun onCallback(value: List<AbstractTopic>) {
+                                    ModelArrayCallback {
+                                    override fun onCallback(value: List<ModelEntity>) {
                                         categoriesPlayed = value as ArrayList<TopicCategory>
                                         createCategoriesPieChart(
                                             createCategoriesPieChartDataset(
@@ -125,10 +122,11 @@ class UserStatisticsActivity : AppCompatActivity() {
 
     private fun setUserProfileData() {
         UserDataRetrievalFacade(mFirestoreDatabase!!, mFirebaseAuth!!.currentUser!!.uid)
-            .getUserDetails(object : UserDataCallBack {
-                override fun onCallback(value: User) {
-                    ImageLoadingFacade(this@UserStatisticsActivity).loadImageIntoCircleView(value.avatar_url, userProfilePicture!!)
-                    userDisplayName!!.text = value.display_name
+            .getUserDetails(object : ModelCallback {
+                override fun onCallback(value: ModelEntity) {
+                    val userData = value as User
+                    ImageLoadingFacade(this@UserStatisticsActivity).loadImageIntoCircleView(userData.avatar_url, userProfilePicture!!)
+                    userDisplayName!!.text = userData.display_name
                 }
             })
     }

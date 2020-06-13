@@ -13,9 +13,10 @@ import android.view.View
 import android.widget.Toast
 import com.example.quizzicat.Facades.ImageLoadingFacade
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.User
 import com.example.quizzicat.Utils.DesignUtils
-import com.example.quizzicat.Utils.UserDataCallBack
+import com.example.quizzicat.Utils.ModelCallback
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -58,11 +59,11 @@ class ChangeUserProfileActivity : AppCompatActivity() {
         setupLayoutElements()
 
         UserDataRetrievalFacade(mFirestoreDatabase!!, mFirebaseAuth!!.currentUser!!.uid)
-            .getUserDetails(object: UserDataCallBack {
-                override fun onCallback(value: User) {
-                    originalUserData = value
-                    ImageLoadingFacade(applicationContext).loadImageIntoCircleView(value.avatar_url, avatarImageView!!)
-                    nameTextView!!.setText(value.display_name)
+            .getUserDetails(object: ModelCallback {
+                override fun onCallback(value: ModelEntity) {
+                    originalUserData = value as User
+                    ImageLoadingFacade(applicationContext).loadImageIntoCircleView(originalUserData!!.avatar_url, avatarImageView!!)
+                    nameTextView!!.setText(originalUserData!!.display_name)
                     emailTextView!!.setText(mFirebaseAuth!!.currentUser!!.email)
                 }
             })

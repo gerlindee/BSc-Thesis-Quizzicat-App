@@ -1,26 +1,22 @@
 package com.example.quizzicat.Fragments
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.view.contains
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Adapters.RecommendedTopicsAdapter
 import com.example.quizzicat.Facades.RecommendDataFacade
 import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
-import com.example.quizzicat.Model.AbstractTopic
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.Topic
 import com.example.quizzicat.Model.TopicPlayed
 
 import com.example.quizzicat.R
-import com.example.quizzicat.Utils.CustomCallBack
-import com.example.quizzicat.Utils.TopicsPlayedCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -65,12 +61,12 @@ class RecommendationsFragment : Fragment() {
     private fun setupRecommendations() {
         val topicsDataRetrievalFacade = TopicsDataRetrievalFacade(mFirestoreDatabase!!, context!!)
 
-        topicsDataRetrievalFacade.getUserPlayedHistory(object : TopicsPlayedCallBack {
-            override fun onCallback(value: List<TopicPlayed>) {
+        topicsDataRetrievalFacade.getUserPlayedHistory(object : ModelArrayCallback {
+            override fun onCallback(value: List<ModelEntity>) {
                 val topicsHistory = value as ArrayList<TopicPlayed>
                 if (topicsHistory.isNotEmpty()) {
-                    topicsDataRetrievalFacade.getTopicsPlayedData(object : CustomCallBack {
-                        override fun onCallback(value: List<AbstractTopic>) {
+                    topicsDataRetrievalFacade.getTopicsPlayedData(object : ModelArrayCallback {
+                        override fun onCallback(value: List<ModelEntity>) {
                             topicsPlayedData = value as ArrayList<Topic>
                             playedTopics!!.apply {
                                 layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
@@ -88,8 +84,8 @@ class RecommendationsFragment : Fragment() {
 
     private fun setupSimilarLayout1(tid: Long, name: String, recyclerView: RecyclerView?, label: TextView?) {
         RecommendDataFacade(mFirestoreDatabase!!, activity!!)
-            .getRelatedTopics(tid, topicsPlayedData, object: CustomCallBack {
-                override fun onCallback(value: List<AbstractTopic>) {
+            .getRelatedTopics(tid, topicsPlayedData, object: ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
                     label!!.apply {
                         text = "You seem to like " + name
                         visibility = View.VISIBLE
@@ -106,8 +102,8 @@ class RecommendationsFragment : Fragment() {
     private fun getSimilarTopics() {
         val topicsDataRetrievalFacade = TopicsDataRetrievalFacade(mFirestoreDatabase!!, context!!)
 
-        topicsDataRetrievalFacade.getMostPlayedTopics(object: CustomCallBack {
-            override fun onCallback(value: List<AbstractTopic>) {
+        topicsDataRetrievalFacade.getMostPlayedTopics(object: ModelArrayCallback {
+            override fun onCallback(value: List<ModelEntity>) {
                 val mostPlayedTopics = value as ArrayList<Topic>
                 when (mostPlayedTopics.size) {
                     1 -> setupSimilarLayout1(mostPlayedTopics[0].tid, mostPlayedTopics[0].name, similarTopics1, similarTopics1Label)

@@ -1,17 +1,15 @@
 package com.example.quizzicat.Facades
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
-import com.example.quizzicat.Model.AbstractTopic
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.Topic
 import com.example.quizzicat.Model.TopicsComparisonValue
-import com.example.quizzicat.Utils.ComparisonValuesCallBack
-import com.example.quizzicat.Utils.CustomCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.firebase.firestore.FirebaseFirestore
 
 class RecommendDataFacade(private val firebaseFirestore: FirebaseFirestore, private val context: Context)  {
-    private fun getComparisonValues(callback: ComparisonValuesCallBack) {
+    private fun getComparisonValues(callback: ModelArrayCallback) {
         firebaseFirestore.collection("Topics_Comparison_Values")
             .get()
             .addOnCompleteListener { task ->
@@ -35,12 +33,13 @@ class RecommendDataFacade(private val firebaseFirestore: FirebaseFirestore, priv
             }
     }
 
-    fun getRelatedTopics(tid: Long, topicsPlayed: ArrayList<Topic>, callback: CustomCallBack) {
-        getComparisonValues(object: ComparisonValuesCallBack {
-            override fun onCallback(value: ArrayList<TopicsComparisonValue>) {
-                val comparingTopic = value.filter { topic -> topic.tid == tid }[0]
+    fun getRelatedTopics(tid: Long, topicsPlayed: ArrayList<Topic>, callback: ModelArrayCallback) {
+        getComparisonValues(object: ModelArrayCallback {
+            override fun onCallback(value: List<ModelEntity>) {
+                val topics = value as ArrayList<TopicsComparisonValue>
+                val comparingTopic = topics.filter { topic -> topic.tid == tid }[0]
                 val topicSimilarity = HashMap<TopicsComparisonValue, Int>()
-                for (topic in value) {
+                for (topic in topics) {
                     var similarityIndex = 0
                     val topicPlayedMatch = topicsPlayed.filter { topicPlayed -> topicPlayed.tid == topic.tid }
                     if (topic.tid != comparingTopic.tid && topicPlayedMatch.isEmpty()) {
@@ -66,8 +65,8 @@ class RecommendDataFacade(private val firebaseFirestore: FirebaseFirestore, priv
                         mostSimilarTopics.add(topic.tid)
                 }
                 TopicsDataRetrievalFacade(firebaseFirestore, context)
-                    .getTopicsDetails(object: CustomCallBack {
-                        override fun onCallback(value: List<AbstractTopic>) {
+                    .getTopicsDetails(object: ModelArrayCallback {
+                        override fun onCallback(value: List<ModelEntity>) {
                             callback.onCallback(value)
                         }
                     }, mostSimilarTopics)

@@ -16,13 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Adapters.PendingQuestionsAdapter
 import com.example.quizzicat.Facades.PendingDataRetrievalFacade
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.PendingQuestion
 import com.example.quizzicat.Model.UserReports
 import com.example.quizzicat.NoInternetConnectionActivity
 import com.example.quizzicat.QuestionsFactoryActivity
 import com.example.quizzicat.R
-import com.example.quizzicat.Utils.PendingQuestionsCallBack
-import com.example.quizzicat.Utils.UserReportsCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
@@ -59,16 +59,16 @@ class QuestionsLeaderboardFragment : Fragment() {
     }
 
     private fun setupQuestions() {
-        getPendingQuestions(object: PendingQuestionsCallBack {
-            override fun onCallback(value: ArrayList<PendingQuestion>) {
+        getPendingQuestions(object: ModelArrayCallback {
+            override fun onCallback(value: List<ModelEntity>) {
                 // remove questions reported by the user
-                val pendingQuestionsLocal = value
+                val pendingQuestionsLocal = value as ArrayList<PendingQuestion>
                 PendingDataRetrievalFacade(mFirestoreDatabase!!, context!!)
-                    .getReportedQuestionsForUser(object: UserReportsCallBack {
-                        override fun onCallback(value: ArrayList<UserReports>) {
-                            reportedQuestions = value
+                    .getReportedQuestionsForUser(object: ModelArrayCallback {
+                        override fun onCallback(value: List<ModelEntity>) {
+                            reportedQuestions = value as ArrayList<UserReports>
                             for (question in pendingQuestionsLocal) {
-                                if (!isQuestionReported(value, question.pqid)) {
+                                if (!isQuestionReported(reportedQuestions, question.pqid)) {
                                     nonReportedQuestions.add(question)
                                 }
                             }
@@ -137,7 +137,7 @@ class QuestionsLeaderboardFragment : Fragment() {
         noQuestionsLayout = view?.findViewById(R.id.layout_no_leaderboard_questions)
     }
 
-    private fun getPendingQuestions(callback: PendingQuestionsCallBack) {
+    private fun getPendingQuestions(callback: ModelArrayCallback) {
         progressBar!!.visibility = View.VISIBLE
         mFirestoreDatabase!!.collection("Pending_Questions")
             .get()

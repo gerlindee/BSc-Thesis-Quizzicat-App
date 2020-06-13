@@ -9,4 +9,4 @@ class PendingQuestion(
     var nr_votes: Long,
     var avg_rating: Long,
     var nr_reports: Long
-)
+): ModelEntity

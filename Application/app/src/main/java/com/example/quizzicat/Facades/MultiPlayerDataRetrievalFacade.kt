@@ -3,6 +3,7 @@ package com.example.quizzicat.Facades
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.MultiPlayerGame
 import com.example.quizzicat.Model.MultiPlayerGameQuestion
 import com.example.quizzicat.Model.MultiPlayerUserJoined
@@ -15,7 +16,7 @@ import kotlin.collections.ArrayList
 
 class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, val context: Context) {
 
-    fun getUserPlayedGames(callback: MultiPlayerUsersCallBack) {
+    fun getUserPlayedGames(callback: ModelArrayCallback) {
         val uid = FirebaseAuth.getInstance().uid
         if (uid != null) {
             firebaseFirestore.collection("Multi_Player_Users_Joined")
@@ -39,14 +40,14 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
         }
     }
 
-    fun createMultiPlayerGame(tid: Long, callback: MultiPlayerGamesCallBack) {
+    fun createMultiPlayerGame(tid: Long, callback: ModelArrayCallback) {
         val gid = UUID.randomUUID().toString()
         val active = true
         val progress = false
         val created_on = LocalDateTime.now().toString().split("T")[0]
         val created_by = FirebaseAuth.getInstance().currentUser!!.uid
-        getAllActiveGames(object: MultiPlayerGamesCallBack {
-            override fun onCallback(value: ArrayList<MultiPlayerGame>) {
+        getAllActiveGames(object: ModelArrayCallback {
+            override fun onCallback(value: List<ModelEntity>) {
                 var randomPIN = -1
                 if (value.size == 0) {
                     randomPIN = (1000 until 9999).random()
@@ -55,7 +56,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
                     while (!foundPIN) {
                         var isEqual = false
                         randomPIN = (1000 until 9999).random()
-                        for (activeGame in value) {
+                        for (activeGame in value as ArrayList<MultiPlayerGame>) {
                             if (activeGame.game_pin == randomPIN.toString())
                                 isEqual = true
                             if (!isEqual) {
@@ -84,9 +85,10 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
 
     fun insertUserJoinedGame(game: String, role: String) {
         if (game.length == 4)  { // gamePIN was given, not GID
-            getGamesByPIN(game, object: MultiPlayerGamesCallBack {
-                override fun onCallback(value: ArrayList<MultiPlayerGame>) {
-                    val userJoined = MultiPlayerUserJoined(value[0].gid, FirebaseAuth.getInstance().uid!!, 0, role, false)
+            getGamesByPIN(game, object: ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
+                    val gameData = value as ArrayList<MultiPlayerGame>
+                    val userJoined = MultiPlayerUserJoined(gameData[0].gid, FirebaseAuth.getInstance().uid!!, 0, role, false)
                     firebaseFirestore.collection("Multi_Player_Users_Joined")
                         .add(userJoined)
                         .addOnCompleteListener { task ->
@@ -108,7 +110,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
         }
     }
 
-    fun getGamesByPIN(pin: String, callback: MultiPlayerGamesCallBack) {
+    fun getGamesByPIN(pin: String, callback: ModelArrayCallback) {
         firebaseFirestore.collection("Multi_Player_Games")
             .whereEqualTo("game_pin", pin)
             .whereEqualTo("active", true)
@@ -133,7 +135,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
             }
     }
 
-    private fun getAllActiveGames(callback: MultiPlayerGamesCallBack) {
+    private fun getAllActiveGames(callback: ModelArrayCallback) {
         firebaseFirestore.collection("Multi_Player_Games")
             .whereEqualTo("active", true)
             .get()
@@ -175,7 +177,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
             }
     }
 
-    fun getUsersForGame(gid: String, callback: MultiPlayerUsersCallBack) {
+    fun getUsersForGame(gid: String, callback: ModelArrayCallback) {
         firebaseFirestore.collection("Multi_Player_Users_Joined")
             .whereEqualTo("gid", gid)
             .get()
@@ -209,9 +211,9 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
     }
 
     fun startMultiPlayerGame(gamePIN: String) {
-        getGamesByPIN(gamePIN, object: MultiPlayerGamesCallBack {
-            override fun onCallback(value: ArrayList<MultiPlayerGame>) {
-                val game = value[0]
+        getGamesByPIN(gamePIN, object: ModelArrayCallback {
+            override fun onCallback(value: List<ModelEntity>) {
+                val game = value[0] as MultiPlayerGame
                 game.progress = true
                 firebaseFirestore.collection("Multi_Player_Games")
                     .document(game.gid)
@@ -225,7 +227,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
         })
     }
 
-    fun getQuestionsForQuiz(gid: String, callback: MultiPlayerQuestionsCallBack) {
+    fun getQuestionsForQuiz(gid: String, callback: ModelArrayCallback) {
         firebaseFirestore.collection("Multi_Player_Quiz_Questions")
             .whereEqualTo("gid", gid)
             .get()
@@ -272,9 +274,9 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
     }
 
     fun endGame(gamePIN: String) {
-        getGamesByPIN(gamePIN, object: MultiPlayerGamesCallBack {
-            override fun onCallback(value: ArrayList<MultiPlayerGame>) {
-                val game = value[0]
+        getGamesByPIN(gamePIN, object: ModelArrayCallback {
+            override fun onCallback(value: List<ModelEntity>) {
+                val game = value[0] as MultiPlayerGame
                 game.active = false
                 game.progress = false
                 firebaseFirestore.collection("Multi_Player_Games")
@@ -289,7 +291,7 @@ class MultiPlayerDataRetrievalFacade(val firebaseFirestore: FirebaseFirestore, v
         })
     }
 
-    fun getMultiPlayerGameData(gid: String, callback: MultiPlayerGamesCallBack) {
+    fun getMultiPlayerGameData(gid: String, callback: ModelArrayCallback) {
         firebaseFirestore.collection("Multi_Player_Games")
             .whereEqualTo("gid", gid)
             .get()

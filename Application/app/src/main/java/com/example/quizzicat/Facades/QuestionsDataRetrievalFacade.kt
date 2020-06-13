@@ -5,13 +5,13 @@ import android.util.Log
 import android.widget.Toast
 import com.example.quizzicat.Model.ActiveQuestion
 import com.example.quizzicat.Model.ActiveQuestionAnswer
-import com.example.quizzicat.Utils.AnswersCallBack
-import com.example.quizzicat.Utils.QuestionsCallBack
+import com.example.quizzicat.Model.ModelEntity
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore, private val context: Context) {
-    fun getAnswersForQuestion(callback: AnswersCallBack, qid: String) {
+    fun getAnswersForQuestion(callback: ModelArrayCallback, qid: String) {
         firebaseFirestore.collection("Active_Question_Answers")
             .whereEqualTo("qid", qid)
             .get()
@@ -33,7 +33,7 @@ class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirest
             }
     }
 
-    fun getAcceptedQuestionsForUser(callback: QuestionsCallBack) {
+    fun getAcceptedQuestionsForUser(callback: ModelArrayCallback) {
         firebaseFirestore.collection("Active_Questions")
             .whereEqualTo("submitted_by", FirebaseAuth.getInstance().currentUser!!.uid)
             .get()
@@ -57,7 +57,7 @@ class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirest
             }
     }
 
-    fun getQuestionsForQuiz(callback: QuestionsCallBack, questionsDifficulty: String, questionsTopic: Long) {
+    fun getQuestionsForQuiz(callback: ModelArrayCallback, questionsDifficulty: String, questionsTopic: Long) {
         var difficultyKey: Int? = null
         when (questionsDifficulty) {
             "Random" -> difficultyKey = 0
@@ -111,7 +111,7 @@ class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirest
         }
     }
 
-    fun getAnswers(callback: AnswersCallBack, QIDList: ArrayList<String>) {
+    fun getAnswers(callback: ModelArrayCallback, QIDList: ArrayList<String>) {
         firebaseFirestore.collection("Active_Question_Answers")
             .whereIn("qid", QIDList)
             .get()
@@ -133,7 +133,7 @@ class QuestionsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirest
             }
     }
 
-    fun getQuestionsData(QIDList: ArrayList<String>, callback: QuestionsCallBack) {
+    fun getQuestionsData(QIDList: ArrayList<String>, callback: ModelArrayCallback) {
         firebaseFirestore.collection("Active_Questions")
             .whereIn("qid", QIDList)
             .get()

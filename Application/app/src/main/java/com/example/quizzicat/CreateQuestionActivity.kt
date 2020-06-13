@@ -1,6 +1,5 @@
 package com.example.quizzicat
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,13 +7,11 @@ import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isVisible
 import com.example.quizzicat.Adapters.TopicSpinnerAdapter
 import com.example.quizzicat.Exceptions.CreateQuestionException
-import com.example.quizzicat.Exceptions.EmptyFieldsException
 import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
 import com.example.quizzicat.Model.*
-import com.example.quizzicat.Utils.CustomCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -87,7 +84,7 @@ class CreateQuestionActivity : AppCompatActivity() {
             }
         }
         
-        firstAnswerCheckbox!!.setOnCheckedChangeListener { buttonView, isChecked ->
+        firstAnswerCheckbox!!.setOnCheckedChangeListener { _, isChecked ->
             Log.d("CHECKBOX", isChecked.toString())
             if (isChecked) {
                 disableUnselectedCheckboxes(1)
@@ -98,7 +95,7 @@ class CreateQuestionActivity : AppCompatActivity() {
             }
         }
         
-        secondAnswerCheckbox!!.setOnCheckedChangeListener { buttonView, isChecked ->
+        secondAnswerCheckbox!!.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 disableUnselectedCheckboxes(2)
                 highlightCorrectAnswer(2)
@@ -108,7 +105,7 @@ class CreateQuestionActivity : AppCompatActivity() {
             }
         }
         
-        thirdAnswerCheckbox!!.setOnCheckedChangeListener { buttonView, isChecked ->
+        thirdAnswerCheckbox!!.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 disableUnselectedCheckboxes(3)
                 highlightCorrectAnswer(3)
@@ -118,7 +115,7 @@ class CreateQuestionActivity : AppCompatActivity() {
             }
         }
         
-        fourthAnswerCheckbox!!.setOnCheckedChangeListener { buttonView, isChecked ->
+        fourthAnswerCheckbox!!.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 disableUnselectedCheckboxes(4)
                 highlightCorrectAnswer(4)
@@ -224,8 +221,8 @@ class CreateQuestionActivity : AppCompatActivity() {
 
     private fun setCategoriesSpinnerValues() {
         TopicsDataRetrievalFacade(mFirestoreDatabase!!, this)
-            .getTopicCategories(object: CustomCallBack {
-                override fun onCallback(value: List<AbstractTopic>) {
+            .getTopicCategories(object: ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
                     categoriesList = value as ArrayList<TopicCategory>
                     categoriesSpinnerValues.add(TopicSpinnerAdapter.TopicSpinnerItem(DEFAULT_TOPIC, "Topic Category"))
                     for (category in categoriesList) {
@@ -246,8 +243,8 @@ class CreateQuestionActivity : AppCompatActivity() {
 
     private fun setTopicsSpinnerValues(CID: Long) {
         TopicsDataRetrievalFacade(mFirestoreDatabase!!, this)
-            .getTopicsForACategory(object: CustomCallBack {
-                override fun onCallback(value: List<AbstractTopic>) {
+            .getTopicsForACategory(object: ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
                     topicsList = value as ArrayList<Topic>
                     topicsSpinnerValues.clear()
                     topicsSpinnerValues.add(TopicSpinnerAdapter.TopicSpinnerItem(DEFAULT_TOPIC, "Topic"))

@@ -16,9 +16,9 @@ import com.example.quizzicat.Adapters.RejectedQuestionsAdapter
 import com.example.quizzicat.Facades.PendingDataRetrievalFacade
 import com.example.quizzicat.Facades.QuestionsDataRetrievalFacade
 import com.example.quizzicat.Model.ActiveQuestion
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.RejectedQuestion
-import com.example.quizzicat.Utils.QuestionsCallBack
-import com.example.quizzicat.Utils.RejectedQuestionsCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -44,14 +44,15 @@ class UserQuestionsAcceptedActivity: AppCompatActivity() {
             "ACCEPTED" -> {
                 progressBar!!.visibility = View.VISIBLE
                 QuestionsDataRetrievalFacade(mFirestoreDatabase!!, this)
-                    .getAcceptedQuestionsForUser(object : QuestionsCallBack {
-                        override fun onCallback(value: ArrayList<ActiveQuestion>) {
-                            if (value.size == 0) {
+                    .getAcceptedQuestionsForUser(object : ModelArrayCallback {
+                        override fun onCallback(value: List<ModelEntity>) {
+                            val activeQuestions = value as ArrayList<ActiveQuestion>
+                            if (activeQuestions.size == 0) {
                                 noQuestionsLayout!!.visibility = View.VISIBLE
                             } else {
                                 acceptedQuestions!!.apply {
                                     layoutManager = LinearLayoutManager(this@UserQuestionsAcceptedActivity)
-                                    adapter = ActiveQuestionsAdapter(context, mFirestoreDatabase!!, value)
+                                    adapter = ActiveQuestionsAdapter(context, mFirestoreDatabase!!, activeQuestions)
                                     addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                                 }
                                 acceptedQuestions!!.visibility = View.VISIBLE
@@ -62,14 +63,15 @@ class UserQuestionsAcceptedActivity: AppCompatActivity() {
             }
             "REJECTED" -> {
                 PendingDataRetrievalFacade(mFirestoreDatabase!!, this)
-                    .getRejectedQuestionsForUser(object: RejectedQuestionsCallBack {
-                        override fun onCallback(value: ArrayList<RejectedQuestion>) {
-                            if (value.size == 0) {
+                    .getRejectedQuestionsForUser(object: ModelArrayCallback {
+                        override fun onCallback(value: List<ModelEntity>) {
+                            val rejectedQuestions = value as ArrayList<RejectedQuestion>
+                            if (rejectedQuestions.size == 0) {
                                 noQuestionsLayout!!.visibility = View.VISIBLE
                             } else {
                                 acceptedQuestions!!.apply {
                                     layoutManager = LinearLayoutManager(this@UserQuestionsAcceptedActivity)
-                                    adapter = RejectedQuestionsAdapter(context, mFirestoreDatabase!!, value)
+                                    adapter = RejectedQuestionsAdapter(context, mFirestoreDatabase!!, rejectedQuestions)
                                     addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                                     acceptedQuestions!!.visibility = View.VISIBLE
                                 }

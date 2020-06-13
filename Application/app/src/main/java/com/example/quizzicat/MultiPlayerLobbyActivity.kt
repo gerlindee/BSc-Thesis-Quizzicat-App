@@ -15,10 +15,10 @@ import com.example.quizzicat.Adapters.LobbyUsersAdapter
 import com.example.quizzicat.Facades.MultiPlayerDataRetrievalFacade
 import com.example.quizzicat.Facades.QuestionsDataRetrievalFacade
 import com.example.quizzicat.Model.ActiveQuestion
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.MultiPlayerGame
 import com.example.quizzicat.Model.MultiPlayerUserJoined
-import com.example.quizzicat.Utils.MultiPlayerUsersCallBack
-import com.example.quizzicat.Utils.QuestionsCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
@@ -81,9 +81,9 @@ class MultiPlayerLobbyActivity : AppCompatActivity() {
         val quizNumberOfQuestions = intent.extras!!.getString("questionsNumber")!!.toInt()
 
         QuestionsDataRetrievalFacade(mFirestoreDatabase!!, this)
-            .getQuestionsForQuiz(object: QuestionsCallBack {
-                override fun onCallback(value: ArrayList<ActiveQuestion>) {
-                    val randomQuestions = randomizeQuestions(value, quizNumberOfQuestions)
+            .getQuestionsForQuiz(object: ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
+                    val randomQuestions = randomizeQuestions(value as ArrayList<ActiveQuestion>, quizNumberOfQuestions)
                     for (question in randomQuestions) {
                         MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, this@MultiPlayerLobbyActivity)
                             .addQuestionToGame(gid!!, question.qid)

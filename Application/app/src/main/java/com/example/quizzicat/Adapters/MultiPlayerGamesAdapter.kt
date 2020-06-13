@@ -14,10 +14,7 @@ import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
 import com.example.quizzicat.Model.*
 import com.example.quizzicat.R
-import com.example.quizzicat.Utils.CounterCallBack
-import com.example.quizzicat.Utils.MultiPlayerGamesCallBack
-import com.example.quizzicat.Utils.TopicCallBack
-import com.example.quizzicat.Utils.UserDataCallBack
+import com.example.quizzicat.Utils.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -61,17 +58,17 @@ class MultiPlayerGamesAdapter(
         fun bind(firebaseFirestore: FirebaseFirestore, mainContext: Context, game: MultiPlayerUserJoined) {
             val multiPlayerDataRetrievalFacade = MultiPlayerDataRetrievalFacade(firebaseFirestore, mainContext)
             multiPlayerDataRetrievalFacade
-                .getMultiPlayerGameData(game.gid, object : MultiPlayerGamesCallBack {
-                    override fun onCallback(value: ArrayList<MultiPlayerGame>) {
-                        val multiGame = value[0]
+                .getMultiPlayerGameData(game.gid, object : ModelArrayCallback {
+                    override fun onCallback(value: List<ModelEntity>) {
+                        val multiGame = value[0] as MultiPlayerGame
                         TopicsDataRetrievalFacade(firebaseFirestore, mainContext)
-                            .getTopicDetails(object : TopicCallBack {
-                                override fun onCallback(value: Topic) {
-                                    val topic = value
+                            .getTopicDetails(object : ModelCallback {
+                                override fun onCallback(value: ModelEntity) {
+                                    val topic = value as Topic
                                     UserDataRetrievalFacade(firebaseFirestore, multiGame.created_by)
-                                        .getUserDetails(object : UserDataCallBack {
-                                            override fun onCallback(value: User) {
-                                                val host = value
+                                        .getUserDetails(object : ModelCallback {
+                                            override fun onCallback(value: ModelEntity) {
+                                                val host = value as User
                                                 multiPlayerDataRetrievalFacade.hasUserWon(
                                                     FirebaseAuth.getInstance().uid!!, multiGame.gid, object : CounterCallBack {
                                                         override fun onCallback(value: Int) {

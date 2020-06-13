@@ -21,10 +21,7 @@ import com.example.quizzicat.MultiPlayerLobbyActivity
 
 import com.example.quizzicat.R
 import com.example.quizzicat.SoloQuizActivity
-import com.example.quizzicat.Utils.CounterCallBack
-import com.example.quizzicat.Utils.CustomCallBack
-import com.example.quizzicat.Utils.MultiPlayerGamesCallBack
-import com.example.quizzicat.Utils.MultiPlayerUsersCallBack
+import com.example.quizzicat.Utils.*
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.firestore.FirebaseFirestore
@@ -71,15 +68,16 @@ class MultiPlayerMenuFragment : Fragment() {
                 .setView(joinView)
                 .setPositiveButton("Join Game") { _, _ ->
                     val dataAgent = MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, context!!)
-                    dataAgent.getGamesByPIN(gamePIN.text.toString(), object: MultiPlayerGamesCallBack {
-                        override fun onCallback(value: ArrayList<MultiPlayerGame>) {
-                            if (value.size == 0) {
+                    dataAgent.getGamesByPIN(gamePIN.text.toString(), object: ModelArrayCallback {
+                        override fun onCallback(value: List<ModelEntity>) {
+                            val game = value as ArrayList<MultiPlayerGame>
+                            if (game.isEmpty()) {
                                 Toast.makeText(context, "The given PIN could not be recognised! Please check with the game host and try again.", Toast.LENGTH_LONG).show()
                             } else {
                                 dataAgent.insertUserJoinedGame(gamePIN.text.toString(), "PLAYER")
                                 val lobbyIntent = Intent(activity, MultiPlayerLobbyActivity::class.java)
                                 lobbyIntent.putExtra("gamePIN", gamePIN.text.toString())
-                                lobbyIntent.putExtra("gid", value[0].gid)
+                                lobbyIntent.putExtra("gid", game[0].gid)
                                 lobbyIntent.putExtra("userRole", "PLAYER")
                                 startActivity(lobbyIntent)
                             }
@@ -131,11 +129,12 @@ class MultiPlayerMenuFragment : Fragment() {
                 .setView(customizingQuizView)
                 .setPositiveButton("Create Game") { _, _ ->
                     MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, context!!)
-                        .createMultiPlayerGame(selectedTopicItem.tid, object: MultiPlayerGamesCallBack{
-                            override fun onCallback(value: ArrayList<MultiPlayerGame>) {
+                        .createMultiPlayerGame(selectedTopicItem.tid, object: ModelArrayCallback{
+                            override fun onCallback(value: List<ModelEntity>) {
+                                val game = value as ArrayList<MultiPlayerGame>
                                 val lobbyIntent = Intent(activity, MultiPlayerLobbyActivity::class.java)
-                                lobbyIntent.putExtra("gamePIN", value[0].game_pin)
-                                lobbyIntent.putExtra("gid", value[0].gid)
+                                lobbyIntent.putExtra("gamePIN", game[0].game_pin)
+                                lobbyIntent.putExtra("gid", game[0].gid)
                                 lobbyIntent.putExtra("userRole", "CREATOR")
                                 lobbyIntent.putExtra("questionsTopic", selectedTopicItem.tid)
                                 lobbyIntent.putExtra("questionsDifficulty", selectedDifficulty.selectedItem.toString())
@@ -159,9 +158,10 @@ class MultiPlayerMenuFragment : Fragment() {
 
     private fun setupGames() {
         MultiPlayerDataRetrievalFacade(mFirestoreDatabase!!, context!!)
-            .getUserPlayedGames(object: MultiPlayerUsersCallBack {
-                override fun onCallback(value: ArrayList<MultiPlayerUserJoined>) {
-                    if (value.size == 0) {
+            .getUserPlayedGames(object: ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
+                    val userGames = value as ArrayList<MultiPlayerUserJoined>
+                    if (userGames.size == 0) {
                         createNewGame!!.visibility = View.VISIBLE
                         joinGame!!.visibility = View.VISIBLE
                         noGamesLayout!!.visibility = View.VISIBLE
@@ -169,7 +169,7 @@ class MultiPlayerMenuFragment : Fragment() {
                     } else {
                         gamesPlayed!!.apply {
                             layoutManager = LinearLayoutManager(activity)
-                            adapter = MultiPlayerGamesAdapter(context, mFirestoreDatabase!!, value)
+                            adapter = MultiPlayerGamesAdapter(context, mFirestoreDatabase!!, userGames)
                             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                         }
                         createNewGame!!.visibility = View.VISIBLE
@@ -191,8 +191,8 @@ class MultiPlayerMenuFragment : Fragment() {
 
     private fun setCategoriesSpinnerValues(categoriesSpinner: Spinner) {
         TopicsDataRetrievalFacade(mFirestoreDatabase!!, context!!)
-            .getTopicCategories(object: CustomCallBack {
-                override fun onCallback(value: List<AbstractTopic>) {
+            .getTopicCategories(object: ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
                     categoriesList = value as ArrayList<TopicCategory>
                     categoriesSpinnerValues.add(TopicSpinnerAdapter.TopicSpinnerItem(DEFAULT_TOPIC, "Topic Category"))
                     for (category in categoriesList) {
@@ -205,8 +205,8 @@ class MultiPlayerMenuFragment : Fragment() {
 
     private fun setTopicsSpinnerValues(topicsSpinner: Spinner, CID: Long) {
         TopicsDataRetrievalFacade(mFirestoreDatabase!!, context!!)
-            .getTopicsForACategory(object: CustomCallBack {
-                override fun onCallback(value: List<AbstractTopic>) {
+            .getTopicsForACategory(object: ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
                     topicsList = value as ArrayList<Topic>
                     topicsSpinnerValues.clear()
                     topicsSpinnerValues.add(TopicSpinnerAdapter.TopicSpinnerItem(DEFAULT_TOPIC, "Topic"))

@@ -5,4 +5,4 @@ class ActiveQuestionAnswer(
     val qid: String,
     val answer_text: String,
     val correct: Boolean
-)
+): ModelEntity

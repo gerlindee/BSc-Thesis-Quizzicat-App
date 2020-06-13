@@ -10,4 +10,4 @@ class MultiPlayerGame(
     val created_by: String,
     val game_pin: String,
     val tid: Long
-)
+): ModelEntity

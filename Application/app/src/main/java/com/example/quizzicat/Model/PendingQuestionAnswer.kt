@@ -5,4 +5,4 @@ class PendingQuestionAnswer(
     val pqid: String,
     val answer_text: String,
     val correct: Boolean
-)
+): ModelEntity

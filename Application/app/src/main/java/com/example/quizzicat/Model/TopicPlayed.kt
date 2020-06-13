@@ -9,4 +9,4 @@ class TopicPlayed(
     var correct_answers: Long,
     var incorrect_answers: Long,
     var times_played_solo: Long
-)
+): ModelEntity

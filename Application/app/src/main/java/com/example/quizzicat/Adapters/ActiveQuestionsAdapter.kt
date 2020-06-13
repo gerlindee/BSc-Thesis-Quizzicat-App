@@ -12,8 +12,8 @@ import com.example.quizzicat.Facades.QuestionsDataRetrievalFacade
 import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
 import com.example.quizzicat.Model.*
 import com.example.quizzicat.R
-import com.example.quizzicat.Utils.AnswersCallBack
-import com.example.quizzicat.Utils.TopicCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
+import com.example.quizzicat.Utils.ModelCallback
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ActiveQuestionsAdapter(
@@ -42,20 +42,21 @@ class ActiveQuestionsAdapter(
 
         holder.question_topic_icon!!.setOnClickListener {
             QuestionsDataRetrievalFacade(firebaseFirestore, mainContext)
-                .getAnswersForQuestion(object: AnswersCallBack {
-                    override fun onCallback(value: ArrayList<ActiveQuestionAnswer>) {
+                .getAnswersForQuestion(object: ModelArrayCallback {
+                    override fun onCallback(value: List<ModelEntity>) {
+                        val answers = value as ArrayList<ActiveQuestionAnswer>
                         val inflated = LayoutInflater.from(mainContext)
                         val questionAnswersView = inflated.inflate(R.layout.view_pending_question_answers, null)
                         val questionText = questionAnswersView.findViewById<TextView>(R.id.display_question_answer_text)
                         questionText!!.text = list[position].question_text
                         val firstAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_first_answer_text)
-                        setAnswerData(firstAnswerText, value[0])
+                        setAnswerData(firstAnswerText, answers[0])
                         val secondAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_second_answer_text)
-                        setAnswerData(secondAnswerText, value[1])
+                        setAnswerData(secondAnswerText, answers[1])
                         val thirdAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_third_answer_text)
-                        setAnswerData(thirdAnswerText, value[2])
+                        setAnswerData(thirdAnswerText, answers[2])
                         val fourthAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_fourth_answer_text)
-                        setAnswerData(fourthAnswerText, value[3])
+                        setAnswerData(fourthAnswerText, answers[3])
 
                         AlertDialog.Builder(mainContext)
                             .setView(questionAnswersView)
@@ -80,9 +81,8 @@ class ActiveQuestionsAdapter(
         }
 
         fun bind(firebaseFirestore: FirebaseFirestore, mainContext: Context, question: ActiveQuestion) {
-            TopicsDataRetrievalFacade(firebaseFirestore, mainContext).getTopicDetails(object :
-                TopicCallBack {
-                override fun onCallback(value: Topic) {
+            TopicsDataRetrievalFacade(firebaseFirestore, mainContext).getTopicDetails(object : ModelCallback {
+                override fun onCallback(value: ModelEntity) {
                     question_text!!.text = question.question_text
                     var questionDifficultyString = ""
                     when (question.difficulty) {
@@ -91,7 +91,8 @@ class ActiveQuestionsAdapter(
                         3.toLong() -> questionDifficultyString = "Hard"
                     }
                     question_difficulty!!.text = questionDifficultyString
-                    ImageLoadingFacade(mainContext).loadImage(value.icon_url, question_topic_icon!!)
+                    val topic = value as Topic
+                    ImageLoadingFacade(mainContext).loadImage(topic.icon_url, question_topic_icon!!)
                 }
             }, question.tid)
         }

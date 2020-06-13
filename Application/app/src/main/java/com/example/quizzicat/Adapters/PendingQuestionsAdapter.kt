@@ -16,14 +16,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Facades.ImageLoadingFacade
 import com.example.quizzicat.Facades.PendingDataRetrievalFacade
 import com.example.quizzicat.Facades.TopicsDataRetrievalFacade
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.PendingQuestion
 import com.example.quizzicat.Model.PendingQuestionAnswer
 import com.example.quizzicat.Model.Topic
 import com.example.quizzicat.R
-import com.example.quizzicat.Utils.CounterCallBack
-import com.example.quizzicat.Utils.PendingAnswersCallback
-import com.example.quizzicat.Utils.PendingQuestionsCallBack
-import com.example.quizzicat.Utils.TopicCallBack
+import com.example.quizzicat.Utils.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -55,20 +53,21 @@ class PendingQuestionsAdapter(
 
         holder.question_topic_icon!!.setOnClickListener {
             PendingDataRetrievalFacade(firebaseFirestore, mainContext)
-                .getAnswersForAQuestion(object: PendingAnswersCallback {
-                    override fun onCallback(value: ArrayList<PendingQuestionAnswer>) {
+                .getAnswersForAQuestion(object: ModelArrayCallback {
+                    override fun onCallback(value: List<ModelEntity>) {
+                        val answers = value as ArrayList<PendingQuestionAnswer>
                         val inflated = LayoutInflater.from(mainContext)
                         val questionAnswersView = inflated.inflate(R.layout.view_pending_question_answers, null)
                         val questionText = questionAnswersView.findViewById<TextView>(R.id.display_question_answer_text)
                         questionText!!.text = list[position].question_text
                         val firstAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_first_answer_text)
-                        setAnswerData(firstAnswerText, value[0])
+                        setAnswerData(firstAnswerText, answers[0])
                         val secondAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_second_answer_text)
-                        setAnswerData(secondAnswerText, value[1])
+                        setAnswerData(secondAnswerText, answers[1])
                         val thirdAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_third_answer_text)
-                        setAnswerData(thirdAnswerText, value[2])
+                        setAnswerData(thirdAnswerText, answers[2])
                         val fourthAnswerText = questionAnswersView.findViewById<TextView>(R.id.display_fourth_answer_text)
-                        setAnswerData(fourthAnswerText, value[3])
+                        setAnswerData(fourthAnswerText, answers[3])
 
                         AlertDialog.Builder(mainContext)
                             .setView(questionAnswersView)
@@ -142,14 +141,15 @@ class PendingQuestionsAdapter(
             if (fromUser) {
                 Log.d("QUESTION", pendingQuestion.question_text)
                 PendingDataRetrievalFacade(firebaseFirestore, mainContext)
-                    .ratePendingQuestion(object: PendingQuestionsCallBack {
-                        override fun onCallback(value: ArrayList<PendingQuestion>) {
-                            if (value.size == 0) {
+                    .ratePendingQuestion(object: ModelArrayCallback {
+                        override fun onCallback(value: List<ModelEntity>) {
+                            val pendingQuestions = value as ArrayList<PendingQuestion>
+                            if (pendingQuestions.isEmpty()) {
                                 list.remove(pendingQuestion)
                                 notifyDataSetChanged()
                             } else {
                                 holder.question_rating!!.setIsIndicator(true)
-                                holder.question_rating!!.rating = value[0].avg_rating.toFloat()
+                                holder.question_rating!!.rating = pendingQuestions[0].avg_rating.toFloat()
                                 holder.user_question_rating!!.visibility = View.VISIBLE
                             }
                         }
@@ -178,9 +178,8 @@ class PendingQuestionsAdapter(
         }
 
         fun bind(firebaseFirestore: FirebaseFirestore, mainContext: Context, question: PendingQuestion) {
-            TopicsDataRetrievalFacade(firebaseFirestore, mainContext).getTopicDetails(object :
-                TopicCallBack {
-                override fun onCallback(value: Topic) {
+            TopicsDataRetrievalFacade(firebaseFirestore, mainContext).getTopicDetails(object : ModelCallback {
+                override fun onCallback(value: ModelEntity) {
                     question_text!!.text = question.question_text
                     question_rating!!.rating = question.avg_rating.toFloat()
                     var questionDifficultyString = ""
@@ -204,7 +203,8 @@ class PendingQuestionsAdapter(
                                 }
                             }, question)
                     }
-                    ImageLoadingFacade(mainContext).loadImage(value.icon_url, question_topic_icon!!)
+                    val topic = value as Topic
+                    ImageLoadingFacade(mainContext).loadImage(topic.icon_url, question_topic_icon!!)
                 }
             }, question.tid)
         }

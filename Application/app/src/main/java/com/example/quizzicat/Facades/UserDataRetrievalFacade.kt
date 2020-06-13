@@ -3,11 +3,11 @@ package com.example.quizzicat.Facades
 import android.util.Log
 import com.example.quizzicat.Model.User
 import com.example.quizzicat.Utils.CounterCallBack
-import com.example.quizzicat.Utils.UserDataCallBack
+import com.example.quizzicat.Utils.ModelCallback
 import com.google.firebase.firestore.FirebaseFirestore
 
 class UserDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore, private val uid: String) {
-    fun getUserDetails(callback: UserDataCallBack) {
+    fun getUserDetails(callback: ModelCallback) {
         firebaseFirestore.collection("Users")
             .whereEqualTo("uid", uid)
             .get()

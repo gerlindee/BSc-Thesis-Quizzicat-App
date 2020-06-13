@@ -6,4 +6,4 @@ class MultiPlayerUserJoined(
     val score: Long,
     val role: String,
     var finished_playing: Boolean
-)
+): ModelEntity

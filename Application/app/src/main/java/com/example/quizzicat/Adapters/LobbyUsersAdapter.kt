@@ -9,10 +9,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Facades.ImageLoadingFacade
 import com.example.quizzicat.Facades.UserDataRetrievalFacade
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.MultiPlayerUserJoined
 import com.example.quizzicat.Model.User
 import com.example.quizzicat.R
-import com.example.quizzicat.Utils.UserDataCallBack
+import com.example.quizzicat.Utils.ModelCallback
 import com.google.firebase.firestore.FirebaseFirestore
 
 class LobbyUsersAdapter(
@@ -52,10 +53,11 @@ class LobbyUsersAdapter(
 
          fun bind(source: String, firebaseFirestore: FirebaseFirestore, mainContext: Context, user: MultiPlayerUserJoined) {
              UserDataRetrievalFacade(firebaseFirestore, user.uid)
-                 .getUserDetails(object: UserDataCallBack {
-                     override fun onCallback(value: User) {
-                         ImageLoadingFacade(mainContext).loadImage(value.avatar_url, lobby_user_icon!!)
-                         lobby_user_name!!.text = value.display_name
+                 .getUserDetails(object: ModelCallback {
+                     override fun onCallback(value: ModelEntity) {
+                         val userDetails = value as User
+                         ImageLoadingFacade(mainContext).loadImage(userDetails.avatar_url, lobby_user_icon!!)
+                         lobby_user_name!!.text = userDetails.display_name
                          if (source == "LOBBY") {
                              if (user.role == "CREATOR") {
                                  lobby_user_host!!.visibility = View.VISIBLE

@@ -8,4 +8,4 @@ class TopicsComparisonValue (
     val pop_culture: Boolean,
     val real_life: Boolean,
     val science: Boolean
-)
+): ModelEntity

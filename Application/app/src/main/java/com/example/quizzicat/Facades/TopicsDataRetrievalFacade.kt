@@ -3,18 +3,13 @@ package com.example.quizzicat.Facades
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import com.example.quizzicat.Model.AbstractTopic
-import com.example.quizzicat.Model.Topic
-import com.example.quizzicat.Model.TopicCategory
-import com.example.quizzicat.Model.TopicPlayed
-import com.example.quizzicat.Utils.CustomCallBack
-import com.example.quizzicat.Utils.TopicCallBack
-import com.example.quizzicat.Utils.TopicsPlayedCallBack
+import com.example.quizzicat.Model.*
+import com.example.quizzicat.Utils.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore, private val context: Context) {
-    fun getTopicDetails(callback: TopicCallBack, tid: Long) {
+    fun getTopicDetails(callback: ModelCallback, tid: Long) {
         firebaseFirestore.collection("Topics")
             .whereEqualTo("tid", tid)
             .get()
@@ -35,7 +30,7 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
             }
     }
 
-    fun getTopicsDetails(callback: CustomCallBack, tids: ArrayList<Long>) {
+    fun getTopicsDetails(callback: ModelArrayCallback, tids: ArrayList<Long>) {
         firebaseFirestore.collection("Topics")
             .whereIn("tid", tids)
             .get()
@@ -56,7 +51,7 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
             }
     }
 
-    fun getTopicCategories(callBack: CustomCallBack) {
+    fun getTopicCategories(callBack: ModelArrayCallback) {
         firebaseFirestore.collection("Topic_Categories")
             .orderBy("name")
             .get()
@@ -77,7 +72,7 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
             }
     }
 
-    fun getTopicsForACategory(callBack: CustomCallBack, selectedCategory: Long) {
+    fun getTopicsForACategory(callBack: ModelArrayCallback, selectedCategory: Long) {
         firebaseFirestore.collection("Topics")
             .whereEqualTo("cid", selectedCategory)
             .orderBy("name")
@@ -100,7 +95,7 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
             }
     }
 
-    fun getCategoriesPlayedData(callback: CustomCallBack, topicList: ArrayList<Topic>) {
+    fun getCategoriesPlayedData(callback: ModelArrayCallback, topicList: ArrayList<Topic>) {
         val playedCategories = ArrayList<Long>()
         for (topic in topicList) {
             playedCategories.add(topic.cid)
@@ -125,7 +120,7 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
             }
     }
 
-    fun getUserPlayedHistory(callback: TopicsPlayedCallBack) {
+    fun getUserPlayedHistory(callback: ModelArrayCallback) {
         val user = FirebaseAuth.getInstance().uid
         if (user != null) {
             firebaseFirestore.collection("Topics_Played")
@@ -153,7 +148,7 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
         }
     }
 
-    fun getTopicsPlayedData(callback: CustomCallBack, topicsPlayed: ArrayList<TopicPlayed>) {
+    fun getTopicsPlayedData(callback: ModelArrayCallback, topicsPlayed: ArrayList<TopicPlayed>) {
         val playedTopics = ArrayList<Long>()
         for (topic in topicsPlayed) {
             playedTopics.add(topic.tid)
@@ -179,7 +174,7 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
             }
     }
 
-    private fun getAllTopics(callback: CustomCallBack) {
+    private fun getAllTopics(callback: ModelArrayCallback) {
         firebaseFirestore.collection("Topics")
             .get()
             .addOnCompleteListener { task ->
@@ -200,18 +195,19 @@ class TopicsDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore
             }
     }
 
-    fun getMostPlayedTopics(callback: CustomCallBack) {
-        getUserPlayedHistory(object: TopicsPlayedCallBack {
-            override fun onCallback(value: List<TopicPlayed>) {
-                val topicsInOrder = ArrayList(value.sortedWith(compareByDescending (({ it.times_played_solo }))))
+    fun getMostPlayedTopics(callback: ModelArrayCallback) {
+        getUserPlayedHistory(object: ModelArrayCallback {
+            override fun onCallback(value: List<ModelEntity>) {
+                val topicsRetrieved = value as List<TopicPlayed>
+                val topicsInOrder = ArrayList(topicsRetrieved.sortedWith(compareByDescending (({ it.times_played_solo }))))
                 val mostPlayedTopics = ArrayList<Long>()
                 var idx = 0
                 while (idx < 3 && idx < topicsInOrder.size) {
                     mostPlayedTopics.add(topicsInOrder[idx].tid)
                     idx += 1
                 }
-                getTopicsDetails(object: CustomCallBack {
-                    override fun onCallback(value: List<AbstractTopic>) {
+                getTopicsDetails(object: ModelArrayCallback {
+                    override fun onCallback(value: List<ModelEntity>) {
                         callback.onCallback(value)
                     }
                 }, mostPlayedTopics)

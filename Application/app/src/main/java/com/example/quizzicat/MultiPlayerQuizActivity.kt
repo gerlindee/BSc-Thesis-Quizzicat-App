@@ -13,10 +13,9 @@ import com.example.quizzicat.Facades.MultiPlayerDataRetrievalFacade
 import com.example.quizzicat.Facades.QuestionsDataRetrievalFacade
 import com.example.quizzicat.Model.ActiveQuestion
 import com.example.quizzicat.Model.ActiveQuestionAnswer
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.MultiPlayerGameQuestion
-import com.example.quizzicat.Utils.AnswersCallBack
-import com.example.quizzicat.Utils.MultiPlayerQuestionsCallBack
-import com.example.quizzicat.Utils.QuestionsCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -145,24 +144,24 @@ class MultiPlayerQuizActivity : AppCompatActivity() {
 
     private fun getQuestionsAndAnswers() {
         MultiPlayerDataRetrievalFacade(mFirebaseFirestore!!, this)
-            .getQuestionsForQuiz(gid!!, object: MultiPlayerQuestionsCallBack {
-                override fun onCallback(value: ArrayList<MultiPlayerGameQuestion>) {
+            .getQuestionsForQuiz(gid!!, object: ModelArrayCallback {
+                override fun onCallback(value: List<ModelEntity>) {
                     val questionIDs = ArrayList<String>()
-                    for (question in value) {
+                    for (question in value as ArrayList<MultiPlayerGameQuestion>) {
                         questionIDs.add(question.qid)
                     }
                     QuestionsDataRetrievalFacade(mFirebaseFirestore!!, this@MultiPlayerQuizActivity)
-                        .getQuestionsData(questionIDs, object: QuestionsCallBack {
-                            override fun onCallback(value: ArrayList<ActiveQuestion>) {
-                                questionList = value
+                        .getQuestionsData(questionIDs, object: ModelArrayCallback {
+                            override fun onCallback(value: List<ModelEntity>) {
+                                questionList = value as ArrayList<ActiveQuestion>
                                 val questionsQIDList = ArrayList<String>()
                                 for (question in questionList) {
                                     questionsQIDList.add(question.qid)
                                 }
                                 QuestionsDataRetrievalFacade(mFirebaseFirestore!!, applicationContext)
-                                    .getAnswers(object : AnswersCallBack {
-                                        override fun onCallback(value: ArrayList<ActiveQuestionAnswer>) {
-                                            answersList = value
+                                    .getAnswers(object : ModelArrayCallback {
+                                        override fun onCallback(value: List<ModelEntity>) {
+                                            answersList = value as ArrayList<ActiveQuestionAnswer>
                                             setQuestionView()
                                             setTimer()
                                         }

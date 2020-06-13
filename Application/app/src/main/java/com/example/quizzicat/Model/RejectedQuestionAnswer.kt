@@ -5,4 +5,4 @@ class RejectedQuestionAnswer(
     val rqid: String,
     val answer_text: String,
     val correct: Boolean
-)
+): ModelEntity

@@ -11,7 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 
 class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestore, private val context: Context) {
-    fun getAnswersForAQuestion(callback: PendingAnswersCallback, pqid: String) {
+    fun getAnswersForAQuestion(callback: ModelArrayCallback, pqid: String) {
         firebaseFirestore.collection("Pending_Question_Answers")
             .whereEqualTo("pqid", pqid)
             .get()
@@ -55,7 +55,7 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
             }
     }
 
-    fun ratePendingQuestion(callback: PendingQuestionsCallBack, question: PendingQuestion, rating: Float) {
+    fun ratePendingQuestion(callback: ModelArrayCallback, question: PendingQuestion, rating: Float) {
         UserDataRetrievalFacade(firebaseFirestore, FirebaseAuth.getInstance().currentUser!!.uid)
             .getNumberOfUsers(object: CounterCallBack {
                 override fun onCallback(value: Int) {
@@ -66,9 +66,9 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
                     } else {
                         if ((question.nr_votes >= (0.75 * value) || (question.nr_votes.toInt() == (value - 1))) && (question.avg_rating >= 4)) {
                             insertActiveQuestion(ActiveQuestion(question.pqid, question.tid, question.question_text, question.difficulty, question.submitted_by))
-                            getAnswersForAQuestion(object: PendingAnswersCallback {
-                                override fun onCallback(value: ArrayList<PendingQuestionAnswer>) {
-                                    for (newAnswer in value) {
+                            getAnswersForAQuestion(object: ModelArrayCallback {
+                                override fun onCallback(value: List<ModelEntity>) {
+                                    for (newAnswer in value as ArrayList<PendingQuestionAnswer>) {
                                         insertActiveQuestionAnswer(ActiveQuestionAnswer(newAnswer.paid, newAnswer.pqid, newAnswer.answer_text, newAnswer.correct))
                                     }
                                     removeQuestion(question, "ACCEPT")
@@ -231,7 +231,7 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
             }
     }
 
-    fun getReportedQuestionsForUser(callback: UserReportsCallBack) {
+    fun getReportedQuestionsForUser(callback: ModelArrayCallback) {
         firebaseFirestore.collection("User_Reports")
             .whereEqualTo("uid", FirebaseAuth.getInstance().currentUser!!.uid)
             .get()
@@ -250,7 +250,7 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
             }
     }
 
-    fun getRejectedQuestionsForUser(callback: RejectedQuestionsCallBack) {
+    fun getRejectedQuestionsForUser(callback: ModelArrayCallback) {
         firebaseFirestore.collection("Rejected_Questions")
             .whereEqualTo("submitted_by", FirebaseAuth.getInstance().currentUser!!.uid)
             .get()
@@ -272,7 +272,7 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
             }
     }
 
-    fun getAnswersForRejectedQuestion(callback: RejectedAnswerCallBack, rqid: String) {
+    fun getAnswersForRejectedQuestion(callback: ModelArrayCallback, rqid: String) {
         firebaseFirestore.collection("Rejected_Question_Answers")
             .whereEqualTo("rqid", rqid)
             .get()

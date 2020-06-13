@@ -10,8 +10,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quizzicat.Adapters.PendingQuestionsAdapter
+import com.example.quizzicat.Model.ModelEntity
 import com.example.quizzicat.Model.PendingQuestion
-import com.example.quizzicat.Utils.PendingQuestionsCallBack
+import com.example.quizzicat.Utils.ModelArrayCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -32,15 +33,16 @@ class UserQuestionsPendingActivity : AppCompatActivity() {
 
         initializeLayoutElements()
 
-        getPendingQuestionsForUser(object: PendingQuestionsCallBack {
-            override fun onCallback(value: ArrayList<PendingQuestion>) {
-                if (value.size == 0) {
+        getPendingQuestionsForUser(object: ModelArrayCallback {
+            override fun onCallback(value: List<ModelEntity>) {
+                val pendingQuestion = value as ArrayList<PendingQuestion>
+                if (pendingQuestion.size == 0) {
                     noQuestionsLayout!!.visibility = View.VISIBLE
                     progressBar!!.visibility = View.GONE
                 } else {
                     pendingQuestions!!.apply {
                         layoutManager = LinearLayoutManager(this@UserQuestionsPendingActivity)
-                        adapter = PendingQuestionsAdapter("USER_PENDING", this@UserQuestionsPendingActivity, mFirestoreDatabase!!, value)
+                        adapter = PendingQuestionsAdapter("USER_PENDING", this@UserQuestionsPendingActivity, mFirestoreDatabase!!, pendingQuestion)
                         addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
                     }
                     pendingQuestions!!.visibility = View.VISIBLE
@@ -57,7 +59,7 @@ class UserQuestionsPendingActivity : AppCompatActivity() {
         noQuestionsLayout = findViewById(R.id.layout_no_questions)
     }
 
-    private fun getPendingQuestionsForUser(callback: PendingQuestionsCallBack) {
+    private fun getPendingQuestionsForUser(callback: ModelArrayCallback) {
         progressBar!!.visibility = View.VISIBLE
         mFirestoreDatabase!!.collection("Pending_Questions")
             .whereEqualTo("submitted_by", FirebaseAuth.getInstance().currentUser!!.uid)
