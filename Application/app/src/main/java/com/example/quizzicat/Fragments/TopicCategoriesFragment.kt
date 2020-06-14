@@ -1,5 +1,6 @@
 package com.example.quizzicat.Fragments
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -38,6 +39,7 @@ class TopicCategoriesFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_topic_categories, container, false)
     }
 
+    @SuppressLint("InflateParams")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         mFirestoreDatabase = Firebase.firestore
         topicsDataRetrievalFacade = TopicsDataRetrievalFacade(mFirestoreDatabase!!, context!!)
