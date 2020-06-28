@@ -59,8 +59,8 @@ class PendingDataRetrievalFacade(private val firebaseFirestore: FirebaseFirestor
         UserDataRetrievalFacade(firebaseFirestore, FirebaseAuth.getInstance().currentUser!!.uid)
             .getNumberOfUsers(object: CounterCallBack {
                 override fun onCallback(value: Int) {
+                    question.avg_rating = ( question.avg_rating * question.nr_votes  + rating ).toLong() / ( question.nr_votes + 1 )
                     question.nr_votes += 1
-                    question.avg_rating = ( question.avg_rating + rating ).toLong() / question.nr_votes
                     if (question.nr_votes >= (0.65 * value) && question.avg_rating <= 2) {
                         removeQuestion(question, "REJECT")
                     } else {

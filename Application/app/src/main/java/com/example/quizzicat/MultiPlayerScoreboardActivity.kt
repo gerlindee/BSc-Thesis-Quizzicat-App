@@ -74,7 +74,7 @@ class MultiPlayerScoreboardActivity : AppCompatActivity() {
         val usersCollection = mFirestoreDatabase!!.collection("Multi_Player_Users_Joined")
         usersCollection.addSnapshotListener(this) { snapshot, e ->
             if (e != null) {
-                Toast.makeText(this, "Users could not be fetched! Please try again!", Toast.LENGTH_LONG).show()
+//                Toast.makeText(this, "Users could not be fetched! Please try again!", Toast.LENGTH_LONG).show()
                 return@addSnapshotListener
             }
 
