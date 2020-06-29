@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import com.example.quizzicat.Facades.MultiPlayerDataRetrievalFacade
@@ -33,6 +34,8 @@ class MultiPlayerQuizActivity : AppCompatActivity() {
     private var userScore = 0
 
     // layout elements
+    private var questionLayout: LinearLayout? = null
+    private var loadingProgressBar: ProgressBar? = null
     private var answer1: RadioButton? = null
     private var answer2: RadioButton? = null
     private var answer3: RadioButton? = null
@@ -130,6 +133,8 @@ class MultiPlayerQuizActivity : AppCompatActivity() {
     }
 
     private fun setupLayoutElements() {
+        loadingProgressBar = findViewById(R.id.solo_quiz_progress_bar)
+        questionLayout = findViewById(R.id.solo_quiz_layout)
         questionNumberText = findViewById(R.id.solo_quiz_question_nr_text)
         questionTimeText = findViewById(R.id.solo_quiz_question_time_text)
         questionProgress = findViewById(R.id.solo_quiz_question_progress)
@@ -217,6 +222,8 @@ class MultiPlayerQuizActivity : AppCompatActivity() {
         answer2!!.text = currentAnswers[1].answer_text
         answer3!!.text = currentAnswers[2].answer_text
         answer4!!.text = currentAnswers[3].answer_text
+        questionLayout!!.visibility = View.VISIBLE
+        loadingProgressBar!!.visibility = View.GONE
     }
 
     private fun setTimer() {
